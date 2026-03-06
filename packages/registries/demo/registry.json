@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "demo",
+  "homepage": "https://ui-registry.example.com",
+  "items": [
+    {
+      "name": "hello-world",
+      "type": "registry:block",
+      "title": "Hello World",
+      "description": "A demo block showcasing a registry component with a button.",
+      "registryDependencies": ["button"],
+      "files": [
+        {
+          "path": "registry/base-nova/hello-world/hello-world.tsx",
+          "type": "registry:component"
+        }
+      ]
+    }
+  ]
+}

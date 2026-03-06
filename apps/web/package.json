@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "prebuild": "cp -r ../../packages/registries/dist/* public/r/ 2>/dev/null || true",
     "build": "next build",
     "dev": "next dev",
     "start": "next start",
@@ -10,6 +11,7 @@
     "postinstall": "fumadocs-mdx"
   },
   "dependencies": {
+    "@repo/registries": "workspace:*",
     "fumadocs-core": "16.6.9",
     "fumadocs-mdx": "14.2.9",
     "fumadocs-ui": "16.6.9",
