@@ -1,0 +1,12 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "prebuild": {
+      "dependsOn": ["@repo/registries#build"],
+      "outputs": ["public/r/**", "src/lib/registry-data.ts"]
+    },
+    "build": {
+      "dependsOn": ["prebuild"]
+    }
+  }
+}

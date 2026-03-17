@@ -22,6 +22,7 @@ yarn-error.log*
 
 # registry output
 /public/r/
+/src/lib/registry-data.ts
 
 # others
 .env*.local
