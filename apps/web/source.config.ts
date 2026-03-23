@@ -1,8 +1,9 @@
 import { metaSchema, pageSchema } from "fumadocs-core/source/schema";
 import { defineConfig, defineDocs } from "fumadocs-mdx/config";
+import rehypePrettyCode from "rehype-pretty-code";
 
-// You can customise Zod schemas for frontmatter and `meta.json` here
-// see https://fumadocs.dev/docs/mdx/collections
+import { transformers } from "@/lib/highlight-code";
+
 export const docs = defineDocs({
   dir: "content/docs",
   docs: {
@@ -18,6 +19,20 @@ export const docs = defineDocs({
 
 export default defineConfig({
   mdxOptions: {
-    // MDX options
+    rehypePlugins: (plugins) => {
+      plugins.shift();
+      plugins.push([
+        rehypePrettyCode,
+        {
+          theme: {
+            dark: "github-dark",
+            light: "github-light-default",
+          },
+          transformers,
+        },
+      ]);
+
+      return plugins;
+    },
   },
 });
