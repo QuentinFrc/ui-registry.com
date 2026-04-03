@@ -1,0 +1,30 @@
+---
+title: Hello World
+description: A demo block showcasing a registry component with a button.
+---
+
+<ComponentPreview registry="demo" name="hello-world" />
+
+## Installation
+
+<InstallCommand registry="demo" name="hello-world" />
+
+## Usage
+
+```tsx
+import { HelloWorld } from "@/registry/base-nova/hello-world/hello-world";
+
+export default function Page() {
+  return <HelloWorld />;
+}
+```
+
+## Source
+
+<ComponentSource registry="demo" name="hello-world" />
+
+## Dependencies
+
+This component depends on:
+
+- `button` — from the shadcn registry
