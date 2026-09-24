@@ -1,25 +1,13 @@
 import Link from "next/link";
+import { SegmentedCatalog } from "@/components/home/segmented-catalog";
 import { Logo } from "@/components/logo";
+import { catalogByKind } from "@/lib/catalog";
 import { siteConfig } from "@/lib/site.config";
 
-const packages = [
-  {
-    slug: "flash",
-    name: "@ui-registry/flash",
-    tagline:
-      "Encode flash messages in the URL so they survive a redirect — Rails-style.",
-    status: "alpha",
-  },
-  {
-    slug: "swappable",
-    name: "@ui-registry/swappable",
-    tagline:
-      "Swap component implementations by variant — responsive, platform, feature flag — with typed slots.",
-    status: "alpha",
-  },
-] as const;
-
 export default function HomePage() {
+  const ui = catalogByKind("ui");
+  const libraries = catalogByKind("library");
+
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-16 px-6 py-16 sm:py-24">
       <header className="flex flex-col gap-6">
@@ -32,33 +20,7 @@ export default function HomePage() {
         </p>
       </header>
 
-      <section className="flex flex-col gap-4">
-        <h2 className="font-medium text-muted-foreground text-sm uppercase tracking-wide">
-          Packages
-        </h2>
-        <ul className="flex flex-col divide-y divide-border border-border border-y">
-          {packages.map((pkg) => (
-            <li key={pkg.slug}>
-              <Link
-                className="flex flex-col gap-1 py-4 transition-colors hover:text-foreground"
-                href={`/packages/${pkg.slug}`}
-              >
-                <div className="flex items-center gap-3">
-                  <span className="font-medium font-mono text-sm">
-                    {pkg.name}
-                  </span>
-                  <span className="rounded bg-muted px-1.5 py-0.5 text-muted-foreground text-xs">
-                    {pkg.status}
-                  </span>
-                </div>
-                <span className="text-muted-foreground text-sm leading-relaxed">
-                  {pkg.tagline}
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </section>
+      <SegmentedCatalog libraries={libraries} ui={ui} />
 
       <footer className="flex items-center gap-4 border-border border-t pt-8 text-muted-foreground text-sm">
         <Link className="hover:text-foreground" href="/about">
