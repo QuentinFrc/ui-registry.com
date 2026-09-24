@@ -10,6 +10,13 @@ const packages = [
       "Encode flash messages in the URL so they survive a redirect — Rails-style.",
     status: "alpha",
   },
+  {
+    slug: "swappable",
+    name: "@ui-registry/swappable",
+    tagline:
+      "Swap component implementations by variant — responsive, platform, feature flag — with typed slots.",
+    status: "alpha",
+  },
 ] as const;
 
 export default function HomePage() {

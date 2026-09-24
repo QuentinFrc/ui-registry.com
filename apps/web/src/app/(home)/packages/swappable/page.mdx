@@ -1,0 +1,119 @@
+export const metadata = {
+  title: "@ui-registry/swappable",
+  description:
+    "Swap component implementations by variant — responsive, platform, feature flag — with typed slots.",
+};
+
+# @ui-registry/swappable
+
+Declare a component once, implement it per variant, and let a Provider decide which implementation renders. Typed end to end.
+
+## Origin
+
+Every app with a real mobile layout ends up with the same three patterns, usually all at once:
+
+- **`isMobile ? <A /> : <B />` everywhere**: the condition leaks into every page, and every page decides on its own what "mobile" means.
+- **CSS `hidden md:block` duplication**: both implementations render and both mount, hooks run twice, forms lose state on resize.
+- **One component with a `variant` prop and a giant `if`**: the mobile and desktop code share a file and a props interface they have no reason to share.
+
+What we actually want is a **slot**: a name (`Layout.Header`) with one implementation per variant, resolved by a Provider that owns the "which variant" decision. Same idea as dependency injection, applied to layout. This package is that pattern, extracted from a real mission and made type-safe.
+
+## Install
+
+```sh
+pnpm add @ui-registry/swappable
+pnpm dlx shadcn@latest add https://ui-registry.com/r/swappable/responsive
+```
+
+The npm package is the headless core (React only). The shadcn registry ships ready-made configs: `responsive` first, `pointer` and `feature-flag` next.
+
+## API
+
+```tsx
+import { createSwappable } from "@ui-registry/swappable";
+
+const Layout = createSwappable({
+  name: "Layout",
+  variants: ["mobile", "desktop"],
+  fallback: "desktop",
+  useVariant: ({ initial }: { initial: "mobile" | "desktop" }) => initial,
+})({
+  Header: { mobile: HeaderMobile, desktop: HeaderDesktop },
+  Sidebar: { mobile: null, desktop: Sidebar },
+  BottomBar: { mobile: BottomBar, desktop: null },
+});
+```
+
+Two calls. The first describes the mechanics, the second the slots. Because `variants` and `fallback` are known when the slots are declared, TypeScript can check everything:
+
+- a typo in a variant key (`desktp`) is a compile error;
+- an implementation that requires props the slot contract does not provide is a compile error;
+- `<Layout.Header title={1} />` is a compile error.
+
+The **slot contract** is the props of the fallback implementation. Other implementations may accept a subset of it. When the fallback implementation is `null`, the contract comes from the remaining implementations.
+
+`Layout` exposes:
+
+```tsx
+<Layout.Provider initial="desktop">        // resolves the variant via useVariant
+<Layout.Header title="Hi" />               // implementation of the current variant
+<Layout.Header.mobile title="Hi" />        // rendered only in mobile, at this position
+<Layout.Match variant={["mobile"]}>…</Layout.Match>  // inline, no slot needed
+Layout.useVariant()                        // "mobile" | "desktop"
+Layout.useVariantProps()                   // { "data-variant": variant } by default
+```
+
+`null` and `undefined` mean different things in a slot map. `undefined` (key omitted) uses the fallback implementation. `null` renders nothing, on purpose.
+
+## Example — responsive layout
+
+```tsx
+// lib/swappable/responsive.ts (from the registry)
+export const responsive = defineConfig({
+  variants: ["mobile", "desktop"],
+  fallback: "desktop",
+  useVariant: useResponsiveVariant, // useSyncExternalStore on a media query
+});
+
+// components/layout/layout.swappable.ts
+export const Layout = createSwappable({ ...responsive, name: "Layout" })({
+  Header: { mobile: HeaderMobile, desktop: HeaderDesktop },
+  Nav: { mobile: NavDrawer, desktop: NavSidebar },
+});
+
+// app/layout.tsx
+export default function RootLayout({ children }) {
+  const initial = headers().get("sec-ch-ua-mobile") === "?1" ? "mobile" : "desktop";
+  return (
+    <Layout.Provider initial={initial}>
+      <Layout.Header />
+      <Layout.Nav.desktop />
+      {children}
+      <Layout.Nav.mobile />
+    </Layout.Provider>
+  );
+}
+```
+
+`Nav.desktop` and `Nav.mobile` are placed where each belongs. Only one mounts. No CSS hiding, no double hooks.
+
+## Conventions
+
+These are the rules the package assumes. They are what makes swappables predictable across a codebase.
+
+- **One swappable per zone, one file.** `layout.swappable.ts` exports `Layout`. Its Provider is mounted at the highest level that owns the inputs.
+- **One file per implementation.** `header.mobile.tsx`, `header.desktop.tsx`. The fallback implementation exports the props type. Derived implementations import it.
+- **Variants are names, never booleans.** `"mobile" | "desktop"`, not `isMobile`. Three variants tomorrow costs nothing.
+- **Implementations never read `useVariant`.** If a component needs to branch on the variant, it is two implementations or a `Match`.
+- **`data-variant` is for styling.** Every implementation receives it. Target it in CSS instead of re-deriving the variant.
+- **`useVariant` must be hydration-safe.** Take an `initial` prop and use `useSyncExternalStore` or an effect. The registry configs do this for you.
+- **Registry ships configs, not swappables.** `responsive` is a `defineConfig` you spread into your own `createSwappable`. The package never decides what a variant is.
+
+## Decisions
+
+- **Two-step factory over a single options object**: the second call sees the variants, which is what makes keys and props checkable without helpers.
+- **Fallback is required**: it is both the runtime fallback and the source of the slot contract. One rule, no ambiguity about which implementation is "the reference".
+- **Props inferred, not declared**: a `slot<Props>()` helper was considered and dropped. The fallback implementation already declares the props. When the contract must differ, a one-line wrapper does it.
+- **Per-variant sub-components over an `only` prop**: `Header.mobile` reads as intent and reserves no prop name. `variant="outline"` stays available for your buttons.
+- **No discriminated union by variant**: the consumer does not know the variant, so it cannot pick a branch. Implementations accept a subset of a flat contract instead.
+- **`variantProps` stays generic**: `data-variant` by default, anything you want otherwise. Hand-written components read it through `useVariantProps`.

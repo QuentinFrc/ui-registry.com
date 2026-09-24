@@ -139,6 +139,9 @@ importers:
       '@ui-registry/flash':
         specifier: workspace:*
         version: link:../flash
+      '@ui-registry/swappable':
+        specifier: workspace:*
+        version: link:../swappable
       shadcn:
         specifier: ^3.8.5
         version: 3.8.5(@types/node@22.19.13)(typescript@5.9.2)
@@ -151,6 +154,33 @@ importers:
       typescript:
         specifier: 5.9.2
         version: 5.9.2
+
+  packages/swappable:
+    devDependencies:
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@types/react':
+        specifier: ^19.2.14
+        version: 19.2.14
+      '@types/react-dom':
+        specifier: ^19.2.3
+        version: 19.2.3(@types/react@19.2.14)
+      react:
+        specifier: ^19.2.4
+        version: 19.2.4
+      react-dom:
+        specifier: ^19.2.4
+        version: 19.2.4(react@19.2.4)
+      tsup:
+        specifier: ^8.5.1
+        version: 8.5.1(jiti@2.6.1)(postcss@8.5.15)(tsx@4.21.0)(typescript@5.9.2)
+      typescript:
+        specifier: 5.9.2
+        version: 5.9.2
+      vitest:
+        specifier: ^4.1.7
+        version: 4.1.7(@types/node@25.3.3)(@vitest/coverage-v8@4.1.7)(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.2))(vite@8.0.14(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0))
 
   packages/typescript-config: {}
 
