@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "swappable",
+  "homepage": "https://ui-registry.com/packages/swappable",
+  "items": [
+    {
+      "name": "responsive",
+      "type": "registry:lib",
+      "title": "responsive",
+      "description": "Swappable config that resolves mobile/desktop from a media query, SSR-safe via an initial variant.",
+      "dependencies": ["@ui-registry/swappable"],
+      "files": [
+        {
+          "path": "registry/base-nova/swappable/responsive.ts",
+          "type": "registry:lib"
+        }
+      ]
+    }
+  ]
+}
