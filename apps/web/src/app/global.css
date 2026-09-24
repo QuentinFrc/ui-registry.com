@@ -76,6 +76,16 @@
   background: none;
 }
 
+.prose-content figure[data-rehype-pretty-code-figure] {
+  margin: 0;
+}
+
+code[data-theme],
+code[data-theme] span {
+  color: var(--shiki-light);
+  background-color: var(--shiki-light-bg);
+}
+
 @media (prefers-color-scheme: dark) {
   @theme {
     --color-background: oklch(0.145 0 0);
@@ -85,5 +95,11 @@
     --color-border: oklch(0.269 0 0);
     --color-primary: oklch(0.985 0 0);
     --color-primary-foreground: oklch(0.205 0 0);
+  }
+
+  code[data-theme],
+  code[data-theme] span {
+    color: var(--shiki-dark);
+    background-color: var(--shiki-dark-bg);
   }
 }

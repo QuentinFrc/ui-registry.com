@@ -1,6 +1,19 @@
 import createMDX from "@next/mdx";
 
-const withMDX = createMDX();
+/** @type {import('rehype-pretty-code').Options} */
+const prettyCodeOptions = {
+  theme: {
+    light: "github-light",
+    dark: "github-dark",
+  },
+  keepBackground: false,
+};
+
+const withMDX = createMDX({
+  options: {
+    rehypePlugins: [["rehype-pretty-code", prettyCodeOptions]],
+  },
+});
 
 /** @type {import('next').NextConfig} */
 const config = {
