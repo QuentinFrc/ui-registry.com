@@ -171,16 +171,26 @@ if (!validationOk) {
 
 // Step 2: Discover registries
 const registries = findRegistries();
-if (registries.length === 0) {
-  console.log("No registries found.");
-  process.exit(0);
-}
 
 // Step 3: Clean dist/
 if (existsSync(distDir)) {
   rmSync(distDir, { recursive: true });
 }
 mkdirSync(distDir, { recursive: true });
+
+if (registries.length === 0) {
+  console.log("No registries found. Writing empty index.");
+  const emptyIndex: RegistryIndex = {
+    registries: [],
+    generatedAt: new Date().toISOString(),
+    totalItems: 0,
+  };
+  writeFileSync(
+    join(distDir, "index.json"),
+    JSON.stringify(emptyIndex, null, 2)
+  );
+  process.exit(0);
+}
 
 // Step 4: Build all registries in parallel
 console.log("\n--- Building registries ---\n");

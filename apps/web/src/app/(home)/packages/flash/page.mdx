@@ -1,0 +1,128 @@
+export const metadata = {
+  title: "@ui-registry/flash",
+  description:
+    "Encode flash messages in the URL so they survive a redirect — Rails-style, for React and Next.js apps.",
+};
+
+# @ui-registry/flash
+
+Encode a flash message in the URL so it survives a redirect — the Rails / Laravel pattern, for React and Next.js.
+
+## Origin
+
+Every client app eventually needs to say something after a redirect: "Saved", "Welcome back", "Something went wrong, try again." The usual options all hurt:
+
+- **Session storage**: requires server state, breaks on hard reload, fights with the back button.
+- **Client-side store handoff**: requires the destination route to know who redirected, which couples server code to client state.
+- **Pre-rendered toast on the destination page**: needs to know the message at render time, which the producer doesn't have at runtime.
+
+The Rails ecosystem solved this 15 years ago with the [flash hash](https://api.rubyonrails.org/classes/ActionDispatch/Flash.html). The same idea works perfectly fine in the URL: producer encodes the message into a query param, redirects, consumer reads it on mount, and strips it from history. No state, no coupling, no server.
+
+This package is that pattern, extracted from a real mission and packaged so I never have to rewrite it.
+
+## Install
+
+```sh
+pnpm add @ui-registry/flash
+pnpm dlx shadcn@latest add https://ui-registry.com/r/flash/flash-toaster
+```
+
+The npm package is the headless lib (zero deps). The shadcn registry installs `useFlash` and a Sonner-based `FlashToaster` you can tweak.
+
+## API
+
+```ts
+import {
+  appendFlash,
+  readFlash,
+  stripFlash,
+  consumeFlash,
+  FLASH_PARAM,
+} from "@ui-registry/flash";
+
+type Flash<T = unknown> = {
+  message: string;
+  level?: "info" | "success" | "warning" | "error";
+  data?: T;
+};
+
+appendFlash(url, flash, opts?);   // URL → URL (with flash)
+readFlash(url, opts?);            // URL → Flash | null
+stripFlash(url, opts?);           // URL → URL (without flash)
+consumeFlash(opts?);              // window only — read + strip + return
+```
+
+`opts.storage` switches between `"searchParam"` (default, SSR-friendly) and `"hash"` (client-only, kept out of server logs).
+
+## Example — Next.js Server Action
+
+```tsx
+// app/orders/actions.ts
+"use server";
+import { appendFlash } from "@ui-registry/flash";
+import { redirect } from "next/navigation";
+
+export async function placeOrder(formData: FormData) {
+  const order = await db.orders.create(/* … */);
+  redirect(
+    appendFlash(`/orders/${order.id}`, {
+      message: "Order placed",
+      level: "success",
+      data: { orderId: order.id },
+    })
+  );
+}
+```
+
+```tsx
+// app/layout.tsx
+import { Toaster } from "@/components/ui/sonner";
+import { FlashToaster } from "@/components/flash-toaster";
+
+export default function Layout({ children }) {
+  return (
+    <html>
+      <body>
+        {children}
+        <Toaster />
+        <FlashToaster />
+      </body>
+    </html>
+  );
+}
+```
+
+That's it — the destination page renders normally, and `FlashToaster` surfaces the message after hydration.
+
+## Example — Client-side redirect
+
+```tsx
+"use client";
+import { appendFlash } from "@ui-registry/flash";
+import { useRouter } from "next/navigation";
+
+export function Logout() {
+  const router = useRouter();
+  return (
+    <button
+      onClick={() => {
+        router.push(
+          appendFlash("/login", {
+            message: "Signed out",
+            level: "info",
+          })
+        );
+      }}
+    >
+      Sign out
+    </button>
+  );
+}
+```
+
+## Decisions
+
+- **URL over storage**: makes the pattern stateless, debuggable, and shareable (yes, a flash URL can be sent in chat).
+- **JSON-encoded payload**: avoids inventing yet another mini-DSL, lets the consumer pass typed `data`.
+- **`searchParam` default, `hash` opt-in**: server-side rendering can see the flash and SSR a fallback if you want; switch to `hash` when the message is sensitive enough that it shouldn't end up in server logs.
+- **`useFlash` lives in the shadcn registry, not the npm package**: keeps the lib zero-React, and lets you tweak the consumer (Sonner, your own toaster, an inline banner).

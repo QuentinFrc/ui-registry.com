@@ -1,13 +1,15 @@
 export const siteConfig = {
-  name: "UI Registry",
+  name: "ui-registry",
+  description:
+    "Headless libraries extracted from real client engagements, paired with shadcn-compatible UI — as case studies.",
+  url: "https://ui-registry.com",
   github: {
     user: "QuentinFrc",
     repo: "ui-registry",
     branch: "main",
   },
-  nav: [
-    { label: "Components", href: "/docs/components" },
-    { label: "Patterns", href: "/docs/patterns" },
-    { label: "Blocks", href: "/docs/blocks" },
-  ],
+  author: {
+    name: "Quentin",
+    malt: "https://www.malt.fr",
+  },
 } as const;

@@ -1,80 +1,89 @@
 @import "tailwindcss";
-@import "fumadocs-ui/css/neutral.css";
-@import "fumadocs-ui/css/preset.css";
 
-@utility layout-gutter-x {
-  position: relative;
-  padding-inline: 1.5rem;
-
-  &::before,
-  &::after {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    content: "";
-    background: repeating-linear-gradient(
-      to bottom,
-      var(--color-fd-border) 0px,
-      var(--color-fd-border) 4px,
-      transparent 4px,
-      transparent 8px
-    );
-  }
-
-  &::before {
-    left: 0;
-  }
-
-  &::after {
-    right: 0;
-  }
+@theme {
+  --color-background: oklch(1 0 0);
+  --color-foreground: oklch(0.145 0 0);
+  --color-muted: oklch(0.97 0 0);
+  --color-muted-foreground: oklch(0.556 0 0);
+  --color-border: oklch(0.922 0 0);
+  --color-primary: oklch(0.205 0 0);
+  --color-primary-foreground: oklch(0.985 0 0);
 }
 
-@utility layout-gutter-y {
-  position: relative;
-
-  &::before,
-  &::after {
-    position: absolute;
-    right: 0;
-    left: 0;
-    height: 1px;
-    content: "";
-    background: repeating-linear-gradient(
-      to right,
-      var(--color-fd-border) 0px,
-      var(--color-fd-border) 4px,
-      transparent 4px,
-      transparent 8px
-    );
-  }
-
-  &::before {
-    top: 0;
-  }
-
-  &::after {
-    bottom: 0;
-  }
+.prose-content h1 {
+  margin-top: 0;
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
 }
 
-@utility layout-gutter-b {
-  position: relative;
+.prose-content h2 {
+  margin-top: 2rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
 
-  &::after {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    height: 1px;
-    content: "";
-    background: repeating-linear-gradient(
-      to right,
-      var(--color-fd-border) 0px,
-      var(--color-fd-border) 4px,
-      transparent 4px,
-      transparent 8px
-    );
+.prose-content h3 {
+  margin-top: 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.prose-content p,
+.prose-content ul,
+.prose-content ol {
+  line-height: 1.7;
+  color: var(--color-muted-foreground);
+}
+
+.prose-content ul,
+.prose-content ol {
+  padding-left: 1.25rem;
+}
+
+.prose-content li + li {
+  margin-top: 0.25rem;
+}
+
+.prose-content a {
+  color: var(--color-foreground);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.prose-content code {
+  padding: 0.15rem 0.35rem;
+  font-size: 0.85em;
+  background: var(--color-muted);
+  border-radius: 0.25rem;
+}
+
+.prose-content pre {
+  padding: 1rem;
+  overflow-x: auto;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  background: var(--color-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+}
+
+.prose-content pre code {
+  padding: 0;
+  font-size: inherit;
+  background: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  @theme {
+    --color-background: oklch(0.145 0 0);
+    --color-foreground: oklch(0.985 0 0);
+    --color-muted: oklch(0.205 0 0);
+    --color-muted-foreground: oklch(0.708 0 0);
+    --color-border: oklch(0.269 0 0);
+    --color-primary: oklch(0.985 0 0);
+    --color-primary-foreground: oklch(0.205 0 0);
   }
 }

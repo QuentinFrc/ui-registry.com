@@ -1,90 +1,71 @@
-import { ArrowRight, ArrowUpRight, Github } from "lucide-react";
-import { Bricolage_Grotesque } from "next/font/google";
 import Link from "next/link";
 import { Logo } from "@/components/logo";
-import { env } from "@/lib/env";
+import { siteConfig } from "@/lib/site.config";
 
-const bricolage = Bricolage_Grotesque({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
+const packages = [
+  {
+    slug: "flash",
+    name: "@ui-registry/flash",
+    tagline:
+      "Encode flash messages in the URL so they survive a redirect — Rails-style.",
+    status: "alpha",
+  },
+] as const;
 
 export default function HomePage() {
   return (
-    <div className="flex flex-col">
-      {/* Hero */}
-      <section className="layout-gutter-b px-4 sm:px-8 lg:px-24">
-        <div className="layout-gutter-x mx-auto py-16 text-center lg:py-24">
-          <div className="mx-auto max-w-3xl">
-            <span className="inline-flex items-center gap-2 rounded-full border border-fd-border bg-fd-secondary/50 px-3 py-1 text-fd-muted-foreground text-xs">
-              <Logo className="size-3" />
-              shadcn/ui component registry
-            </span>
+    <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-16 px-6 py-16 sm:py-24">
+      <header className="flex flex-col gap-6">
+        <Logo className="size-8" />
+        <h1 className="text-balance font-semibold text-3xl tracking-tight sm:text-4xl">
+          {siteConfig.name}
+        </h1>
+        <p className="text-balance text-lg text-muted-foreground leading-relaxed">
+          {siteConfig.description}
+        </p>
+      </header>
 
-            <h1
-              className={`${bricolage.className} mt-8 text-balance font-semibold text-3xl leading-[1.1] tracking-[-0.03em] sm:text-5xl lg:text-6xl`}
-            >
-              Production-Grade Patterns for Scaled Apps
-            </h1>
-
-            <p className="mt-6 text-balance text-base text-fd-muted-foreground leading-relaxed sm:text-lg">
-              Opinionated blocks built on purpose-driven libraries. Strong
-              conventions, real-world tested, one install away.
-            </p>
-
-            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+      <section className="flex flex-col gap-4">
+        <h2 className="font-medium text-muted-foreground text-sm uppercase tracking-wide">
+          Packages
+        </h2>
+        <ul className="flex flex-col divide-y divide-border border-border border-y">
+          {packages.map((pkg) => (
+            <li key={pkg.slug}>
               <Link
-                className="inline-flex items-center gap-2 rounded-lg bg-fd-primary px-6 py-3 font-medium text-fd-primary-foreground text-sm shadow-sm transition-all hover:bg-fd-primary/90 hover:shadow-md"
-                href="/docs"
+                className="flex flex-col gap-1 py-4 transition-colors hover:text-foreground"
+                href={`/packages/${pkg.slug}`}
               >
-                Get started
-                <ArrowRight className="size-4" />
+                <div className="flex items-center gap-3">
+                  <span className="font-medium font-mono text-sm">
+                    {pkg.name}
+                  </span>
+                  <span className="rounded bg-muted px-1.5 py-0.5 text-muted-foreground text-xs">
+                    {pkg.status}
+                  </span>
+                </div>
+                <span className="text-muted-foreground text-sm leading-relaxed">
+                  {pkg.tagline}
+                </span>
               </Link>
-              <Link
-                className="inline-flex items-center gap-2 text-fd-muted-foreground text-sm transition-colors hover:text-fd-foreground"
-                href="https://github.com"
-              >
-                <Github className="size-4" />
-                GitHub
-                <ArrowUpRight className="size-3" />
-              </Link>
-            </div>
-          </div>
-
-          {/* Playground */}
-          <div className="mt-12 flex min-h-80 items-center justify-center rounded-xl border border-fd-border border-dashed bg-fd-secondary/30 text-fd-muted-foreground text-sm">
-            Component playground coming soon
-          </div>
-          <p className="mt-3 text-left text-fd-muted-foreground text-xs">
-            Interactive demo of the layering pattern — dialog stacking, panel
-            orchestration, and overlay conflict resolution.
-          </p>
-        </div>
+            </li>
+          ))}
+        </ul>
       </section>
 
-      {/* Sponsors */}
-      <section className="layout-gutter-b px-4 sm:px-8 lg:px-24">
-        <div className="layout-gutter-x mx-auto py-16 lg:py-24">
-          <h2 className="font-semibold text-2xl tracking-[-0.02em] sm:text-3xl">
-            Sponsors
-          </h2>
-          <p className="mt-4 max-w-xl text-base text-fd-muted-foreground leading-relaxed">
-            This project is still in its early days. If you believe in what
-            we&apos;re building and want to support it from the start, you can
-            become a sponsor.
-          </p>
-
-          <div className="mt-10">
-            <Link
-              className="inline-flex items-center gap-2 text-fd-muted-foreground text-sm transition-colors hover:text-fd-foreground"
-              href={`mailto:${env.contactEmail}`}
-            >
-              Become a sponsor
-              <ArrowUpRight className="size-3" />
-            </Link>
-          </div>
-        </div>
-      </section>
-    </div>
+      <footer className="flex items-center gap-4 border-border border-t pt-8 text-muted-foreground text-sm">
+        <Link className="hover:text-foreground" href="/about">
+          About
+        </Link>
+        <Link
+          className="hover:text-foreground"
+          href={`https://github.com/${siteConfig.github.user}/${siteConfig.github.repo}`}
+          rel="noopener"
+          target="_blank"
+        >
+          GitHub
+        </Link>
+      </footer>
+    </main>
   );
 }

@@ -1,0 +1,38 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "flash",
+  "homepage": "https://ui-registry.com/packages/flash",
+  "items": [
+    {
+      "name": "use-flash",
+      "type": "registry:hook",
+      "title": "useFlash",
+      "description": "React hook that consumes a flash message from the URL on mount and clears it from history.",
+      "dependencies": ["@ui-registry/flash"],
+      "files": [
+        {
+          "path": "registry/base-nova/flash/use-flash.ts",
+          "type": "registry:hook"
+        }
+      ]
+    },
+    {
+      "name": "flash-toaster",
+      "type": "registry:component",
+      "title": "FlashToaster",
+      "description": "Drop-in component that surfaces URL flash messages through Sonner toasts.",
+      "dependencies": ["@ui-registry/flash", "sonner"],
+      "registryDependencies": ["sonner"],
+      "files": [
+        {
+          "path": "registry/base-nova/flash/flash-toaster.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/base-nova/flash/use-flash.ts",
+          "type": "registry:hook"
+        }
+      ]
+    }
+  ]
+}
