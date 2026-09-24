@@ -52,7 +52,7 @@ export const catalog: readonly CatalogEntry[] = [
     slug: "flash",
     name: "@ui-registry/flash",
     tagline:
-      "Encode flash messages in the URL so they survive a redirect — Rails-style.",
+      "Carry flash messages across redirects — typed, cataloged, signed when it matters.",
     status: "alpha",
     kind: "library",
     href: "/packages/flash",

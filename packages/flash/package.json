@@ -1,12 +1,14 @@
 {
   "name": "@ui-registry/flash",
   "version": "0.0.0",
-  "description": "Encode flash messages in the URL so they survive a redirect.",
+  "description": "Carry flash messages across redirects: typed payloads, pluggable stores, message catalogs and signatures.",
   "keywords": [
     "flash",
     "toast",
     "redirect",
     "url",
+    "cookie",
+    "standard-schema",
     "react",
     "nextjs"
   ],
@@ -47,6 +49,7 @@
     "@repo/typescript-config": "workspace:*",
     "tsup": "^8.5.1",
     "typescript": "5.9.2",
-    "vitest": "^4.1.7"
+    "vitest": "^4.1.7",
+    "zod": "^4"
   }
 }

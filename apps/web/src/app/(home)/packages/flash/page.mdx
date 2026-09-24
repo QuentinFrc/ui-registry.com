@@ -1,12 +1,12 @@
 export const metadata = {
   title: "@ui-registry/flash",
   description:
-    "Encode flash messages in the URL so they survive a redirect — Rails-style, for React and Next.js apps.",
+    "Carry flash messages across redirects — typed payloads, pluggable stores, message catalogs and signatures, for React and Next.js.",
 };
 
 # @ui-registry/flash
 
-Encode a flash message in the URL so it survives a redirect — the Rails / Laravel pattern, for React and Next.js.
+Carry a flash message across a redirect — the Rails / Laravel pattern, for React and Next.js. One factory, no mandatory configuration, and protections you add when the message starts to matter.
 
 ## Origin
 
@@ -16,9 +16,9 @@ Every client app eventually needs to say something after a redirect: "Saved", "W
 - **Client-side store handoff**: requires the destination route to know who redirected, which couples server code to client state.
 - **Pre-rendered toast on the destination page**: needs to know the message at render time, which the producer doesn't have at runtime.
 
-The Rails ecosystem solved this 15 years ago with the [flash hash](https://api.rubyonrails.org/classes/ActionDispatch/Flash.html). The same idea works perfectly fine in the URL: producer encodes the message into a query param, redirects, consumer reads it on mount, and strips it from history. No state, no coupling, no server.
+The Rails ecosystem solved this 15 years ago with the [flash hash](https://api.rubyonrails.org/classes/ActionDispatch/Flash.html). v0.1 moved the idea into the URL: encode, redirect, read on mount, strip from history.
 
-This package is that pattern, extracted from a real mission and packaged so I never have to rewrite it.
+It worked, but it was rigid (URL only, a fixed `{ message, level, data }` shape) and naive: anyone could forge a link that displays any text with your UI, on your domain. A copied link replayed the flash, and the URL leaked into history, analytics and `Referer`. v0.2 fixes that without giving up the one-liner.
 
 ## Install
 
@@ -27,57 +27,165 @@ pnpm add @ui-registry/flash
 pnpm dlx shadcn@latest add https://ui-registry.com/r/flash/flash-toaster
 ```
 
-The npm package is the headless lib (zero deps). The shadcn registry installs `useFlash` and a Sonner-based `FlashToaster` you can tweak.
+The npm package is the headless lib (zero deps, no React). The shadcn registry installs `useFlash`, a Sonner-based `FlashToaster` and a Next.js middleware you can tweak.
+
+## Mental model
+
+A flash goes through four independent layers:
+
+1. **Payload** — what you send. Any shape `T`.
+2. **Envelope** — safety metadata: destination (`to`), expiry (`exp`), a random nonce (`id`).
+3. **Signer** — authenticity. Optional.
+4. **Store** — where it lives: URL, cookie, `sessionStorage`, or your own.
+
+On read, every step can fail, and any failure returns `null` and calls `onReject`. A partially verified flash is never shown.
+
+The trust level follows from the configuration, there is no global flag:
+
+- **Open** — no `catalog`, no `signer`. Anyone can display any text with your UI. Fine for prototypes and internal back-offices.
+- **Catalog** — a `catalog`. An attacker can only display one of your messages, with validated params. The recommended default for public apps.
+- **Signed** — a `signer`, optionally with a `catalog`. Nothing can be forged; a received flash can only be replayed until it expires.
+
+The store is orthogonal: it decides who sees the payload, not who can forge it. That said, an `httpOnly` cookie written by the server cannot be forged through a link either.
 
 ## API
 
+The package exports `createFlash`, the adapters, the presets and the types. Each app declares its instance once, in `lib/flash.ts`:
+
 ```ts
-import {
-  appendFlash,
-  readFlash,
-  stripFlash,
-  consumeFlash,
-  FLASH_PARAM,
-} from "@ui-registry/flash";
+import { createFlash, type ToastFlash } from "@ui-registry/flash";
 
-type Flash<T = unknown> = {
-  message: string;
-  level?: "info" | "success" | "warning" | "error";
-  data?: T;
-};
+export const flash = createFlash<ToastFlash>(); // or any T
 
-appendFlash(url, flash, opts?);   // URL → URL (with flash)
-readFlash(url, opts?);            // URL → Flash | null
-stripFlash(url, opts?);           // URL → URL (without flash)
-consumeFlash(opts?);              // window only — read + strip + return
+flash.append(target, payload, { ttl? }); // → URL to redirect to
+flash.read(source?);                     // → Flash<T> | null
+flash.consume(source?);                  // read + strip + remember the nonce
+flash.strip(source?);                    // → URL without the flash
+
+type Flash<T> = { payload: T; id: string; createdAt: number };
 ```
 
-`opts.storage` switches between `"searchParam"` (default, SSR-friendly) and `"hash"` (client-only, kept out of server logs).
+- **`Flash<T>` is an envelope, not the payload.** Read `flash.payload`; metadata never collides with your fields.
+- **Sync or async, depending on the config.** Methods return plain values when the store, signer and verifier are sync, promises otherwise. `redirect(flash.append(…))` stays synchronous in the default setup.
+- **`source` is optional** in the browser, where it defaults to `window.location`. On the server, omitting it throws rather than silently returning `null`.
+- **`append` always returns a URL**, unchanged for stores that don't live in the URL. One calling convention for every store.
+- **Options**: `store`, `schema`, `catalog`, `signer`, `verifier`, `ttl`, `scope`, `maxBytes`, `onReject`. Rejection reasons are `malformed`, `bad-signature`, `expired`, `out-of-scope`, `replayed`, `invalid-payload` and `unknown-code`, each logged once in dev.
 
-## Example — Next.js Server Action
+## Stores
 
-```tsx
-// app/orders/actions.ts
-"use server";
-import { appendFlash } from "@ui-registry/flash";
-import { redirect } from "next/navigation";
+A store only moves an opaque, already-encoded string around. It knows nothing about the payload, the signature or the expiry, so writing your own (Redis, KV, a response header) takes three methods.
 
-export async function placeOrder(formData: FormData) {
-  const order = await db.orders.create(/* … */);
-  redirect(
-    appendFlash(`/orders/${order.id}`, {
-      message: "Order placed",
-      level: "success",
-      data: { orderId: order.id },
-    })
-  );
-}
+- `searchParam({ key })` — the default. Server and client, visible during SSR.
+- `hash({ key })` — client only, never reaches server logs.
+- `sessionStorage({ key })` — client only, per tab.
+- `cookie({ jar })` or `cookie({ get, set, remove })` — server and client, `httpOnly` and `secure` by default. `cookie({ jar: () => cookies() })` plugs Next's cookies in and makes the store async.
+- `memory()` — for tests.
+
+**Scope.** The envelope records the destination pathname. `scope: "exact"` (default for side stores) requires the same pathname, `"prefix"` a pathname starting with it, `"any"` (default for URL stores) skips the check, and a function gets the last word — to ignore the locale, for instance. Out of scope, a side store keeps the flash for the right page, within its `ttl`.
+
+**Expiry and single use.** Defaults: 120 s for URL stores, 30 s for side stores, none in the open URL mode, which keeps v0.1's behaviour. `consume` remembers the nonce in `sessionStorage`, so going back or reloading doesn't show the flash again. That's best effort on the client; strict single use needs a server-side side store, whose `clear` deletes the source.
+
+**Size.** `append` throws above `maxBytes`: 1 024 bytes for URL stores, 3 800 for cookies. A flash is not a data channel.
+
+## Payload and validation
+
+The core imposes no shape. `ToastFlash` (`{ message, level? }`) is just the type the presets and the registry use.
+
+`schema` accepts any [Standard Schema](https://standardschema.dev) validator — Zod, Valibot, ArkType — without the lib depending on any of them. With a schema, `T` is inferred and `read` returns validated data:
+
+```ts
+const checkout = createFlash({
+  store: sessionStorage({ key: "checkout" }),
+  schema: z.object({ step: z.enum(["paid", "failed"]), cartId: z.uuid() }),
+});
 ```
+
+Nothing forces a toast: this flash can drive a banner, confetti or an analytics event. An async schema needs `mode: "async"`, since it can't be detected from its type.
+
+### Message catalog
+
+The catalog replaces free text with codes. The link only carries `{ code, params }`; the text is resolved on read.
+
+```ts
+const messages = defineCatalog({
+  "order.placed": {
+    level: "success",
+    params: z.object({ orderId: z.uuid() }),
+    render: (p) => `Order ${p.orderId.slice(0, 8)} placed`,
+  },
+  "auth.signed-out": { level: "info", render: () => "You are signed out" },
+});
+
+const flash = createFlash({ catalog: messages });
+flash.append("/orders/42", { code: "order.placed", params: { orderId } });
+```
+
+- The payload is a discriminated union derived from the catalog: an unknown code or wrong params fail at compile time.
+- On read, an unknown code is `unknown-code` and invalid params are `invalid-payload`.
+- `read` returns `{ code, params, level, message }`, which is a valid `ToastFlash` as is.
+- `render` can return an i18n key instead of text.
+
+**Params stay user-controlled.** A free `string` param interpolated into the text brings injection back: `Welcome {name}` with `name = "call 555-0100"`. Prefer constrained formats — uuid, enum, number. In dev, `defineCatalog` warns about string params with no format, pattern, enum or max length when the schema exposes that metadata (Zod 4 does).
+
+## Security
+
+Every threat has an explicit counter. The open mode accepts them all, knowingly.
+
+- **Forged link with free text** — phishing with your UI, on your domain. → Catalog or signature.
+- **Abusive interpolated params** — reduced but real injection. → Constrained params, dev warning.
+- **Link shared or copied before consumption** — the message shows up for someone else. → Short `exp`, scope.
+- **Replay (back button, reload)** — the flash shows again. → Remembered nonce, `clear` on the server.
+- **Sensitive data in the URL** — leaks through history, analytics, `Referer`. → Side store, middleware handoff.
+- **Server logs** — the payload lands in access logs. → `hash` or `cookie` store.
+- **Link previews (Slack, iMessage)** — the flash renders in the preview. → No SSR rendering by default, `exp`.
+- **Malformed or huge payload** — crash, denial of service. → `maxBytes`, safe parsing, schema.
+
+### Signature
+
+A signature proves the flash comes from your server. It doesn't encrypt it: the payload stays readable. If it's confidential, use the cookie store.
+
+- **HMAC-SHA256**: `hmac({ secret })` is both signer and verifier. The secret never reaches the client, so verification happens on the server (Server Component, route handler, middleware), which forwards the verified flash.
+- **Ed25519**: `ed25519.signer({ privateKey })` on the server, `ed25519.verifier({ publicKey })` anywhere — the public key can ship in the bundle for client-only verification. `ed25519.generateKeys()` gives you a pair; check WebCrypto Ed25519 support on your target browsers.
+- The signature covers the whole envelope — payload, `to`, `exp`, `id` — so a signed flash can't be moved to another page or extended.
+- WebCrypto is async: a signer makes `append` return a promise.
+- An unsigned flash read by an instance with a `verifier` is rejected as `bad-signature`. No silent fallback.
+
+## Presets
+
+Presets are prefilled options, overridable field by field.
+
+- `createFlash<T>()` — URL, free `T`, unvalidated, no expiry. Prototypes, back-offices.
+- `presets.safe(catalog)` — URL, catalog codes, 120 s. The recommended default for public apps.
+- `presets.strict({ catalog?, keys })` — signed (HMAC with `{ secret }`, Ed25519 with `{ privateKey, publicKey }`), 30 s, exact scope. Free text is validated as a `ToastFlash`. Pair it with an `httpOnly` cookie.
+
+```ts
+// lib/flash.ts — shared by producer and consumer
+export const flash = createFlash(presets.safe(messages));
+
+// Server Action
+redirect(flash.append(`/orders/${id}`, { code: "order.placed", params: { orderId: id } }));
+```
+
+```ts
+// lib/flash.server.ts — free text is fine, it's signed
+export const flash = createFlash({
+  ...presets.strict({ keys: { secret: env.FLASH_SECRET } }),
+  store: cookie({ jar: () => cookies() }),
+});
+
+// Server Action
+redirect(await flash.append("/billing", { message: `Invoice ${n} paid` }));
+```
+
+## React and the registry
+
+The registry components take your instance as a prop. All the toast semantics live there, never in the core.
 
 ```tsx
 // app/layout.tsx
 import { Toaster } from "@/components/ui/sonner";
 import { FlashToaster } from "@/components/flash-toaster";
+import { flash } from "@/lib/flash";
 
 export default function Layout({ children }) {
   return (
@@ -85,44 +193,63 @@ export default function Layout({ children }) {
       <body>
         {children}
         <Toaster />
-        <FlashToaster />
+        <FlashToaster flash={flash} />
       </body>
     </html>
   );
 }
 ```
 
-That's it — the destination page renders normally, and `FlashToaster` surfaces the message after hydration.
+- **`toToast` is optional when the payload is a `ToastFlash`** — including a resolved catalog payload — and required otherwise, e.g. `toToast={(p) => ({ title: "Order placed" })}`.
+- **`useFlash(flash, { initial, onFlash })` consumes after mount** with `history.replaceState`, and is idempotent under StrictMode thanks to the nonce.
+- **It follows client navigations**: it re-runs when `usePathname` or `useSearchParams` change, since `router.push` doesn't reload the page.
 
-## Example — Client-side redirect
+### Server-side consumption
+
+Required for HMAC and `httpOnly` cookies, which the client can't read. A Server Component can't modify cookies, so reading and deleting goes through the middleware:
+
+```ts
+// middleware.ts (proxy.ts on Next 16+)
+import { createFlash, presets } from "@ui-registry/flash";
+import { flashMiddleware } from "@/lib/flash-middleware";
+
+export default flashMiddleware(
+  (store) => createFlash({ ...presets.strict({ keys: { secret: process.env.FLASH_SECRET! } }), store }),
+  { handoff: true }
+);
+```
 
 ```tsx
-"use client";
-import { appendFlash } from "@ui-registry/flash";
-import { useRouter } from "next/navigation";
-
-export function Logout() {
-  const router = useRouter();
-  return (
-    <button
-      onClick={() => {
-        router.push(
-          appendFlash("/login", {
-            message: "Signed out",
-            level: "info",
-          })
-        );
-      }}
-    >
-      Sign out
-    </button>
-  );
-}
+// app/layout.tsx
+const initial = await getServerFlash<ToastFlash>();
+// …
+<FlashToaster flash={flash} initial={initial} />
 ```
+
+1. `flashMiddleware` reads and verifies the cookie, deletes it on the response, and forwards the verified flash through an internal request header.
+2. The layout reads it with `getServerFlash()` and passes it as `initial`.
+3. The client displays it without reading anything. A header sent by the client itself is dropped.
+
+With `handoff`, the same middleware moves a flash found in the URL into a short-lived cookie and redirects to the cleaned URL. The URL only survives in the logs of that first request: history, analytics, `Referer` and sharing never see it — and the flash is still verified by your instance when consumed.
+
+## Migrating from v0.1
+
+- `appendFlash(url, f)` → `flash.append(url, f)`.
+- `readFlash`, `stripFlash`, `consumeFlash` → `flash.read`, `flash.strip`, `flash.consume`.
+- `opts.storage: "hash"` on every call → `createFlash({ store: hash() })`, once.
+- `Flash<T>` = `{ message, level?, data? }` → `Flash<T>` is an envelope, `payload: T` is free.
+- `data?: T` → direct fields of `T`.
+- Raw JSON param → versioned base64url envelope. The old format is still read by the soft instance during v0.x.
 
 ## Decisions
 
-- **URL over storage**: makes the pattern stateless, debuggable, and shareable (yes, a flash URL can be sent in chat).
-- **JSON-encoded payload**: avoids inventing yet another mini-DSL, lets the consumer pass typed `data`.
-- **`searchParam` default, `hash` opt-in**: server-side rendering can see the flash and SSR a fallback if you want; switch to `hash` when the message is sensitive enough that it shouldn't end up in server logs.
-- **`useFlash` lives in the shadcn registry, not the npm package**: keeps the lib zero-React, and lets you tweak the consumer (Sonner, your own toaster, an inline banner).
+- **One factory, no globals**: configuration is declared once and every protection is an option, so moving from Open to Catalog to Signed never changes a call site.
+- **Standard Schema, not a validator**: validation without picking Zod, Valibot or ArkType for you.
+- **Signed, not encrypted**: authenticity is the actual threat; confidentiality belongs in a cookie.
+- **The middleware lives in the registry**: it depends on `next/server`, the npm package stays framework-agnostic and dependency-free.
+
+## Open questions
+
+- Several flashes per redirect (a Rails-style stack): `readAll()` next to `read()`, or out of scope?
+- An opt-in SSR rendering of the flash (banner without JS), knowing it re-exposes the flash to link previews?
+- A Redis/KV store for strict single use without a cookie?

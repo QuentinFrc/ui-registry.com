@@ -19,6 +19,7 @@
     "@types/react-dom": "^19.2.3",
     "@ui-registry/flash": "workspace:*",
     "@ui-registry/swappable": "workspace:*",
+    "next": "16.1.6",
     "shadcn": "^3.8.5",
     "sonner": "^2.0.7",
     "tsx": "^4.20.3",
