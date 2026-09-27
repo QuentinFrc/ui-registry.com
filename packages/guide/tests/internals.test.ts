@@ -93,6 +93,20 @@ describe("async helpers", () => {
     await vi.advanceTimersByTimeAsync(100);
     await expect(late).resolves.toBe(false);
 
+    // Ready without notification (coalesced, paused frames): the deadline
+    // checks once more instead of reporting a miss.
+    const unnotified = waitUntil(
+      () => ready,
+      subscribe,
+      100,
+      controller.signal
+    );
+    ready = true;
+    await vi.advanceTimersByTimeAsync(100);
+    await expect(unnotified).resolves.toBe(true);
+    expect(notifiers.size).toBe(0);
+    ready = false;
+
     const aborted = waitUntil(() => ready, subscribe, 100, controller.signal);
     controller.abort(new Error("stop"));
     await expect(aborted).rejects.toThrow("stop");

@@ -146,6 +146,25 @@ describe("manager with the DOM driver: waiting", () => {
     });
   });
 
+  it("finds a target at the deadline when no frame ran (background tab)", async () => {
+    // Timers only: the fake animation frames stay manual.
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    const step = createGuideStep({ id: "a", target: ".late" });
+    const { manager, events } = await create({
+      guides: [tour([step], { waitTimeout: 1000 })],
+    });
+    manager.start("tour");
+    await vi.advanceTimersByTimeAsync(0);
+    mountElement(RECT, { class: "late" });
+    // Animation frames are paused (`frames.flush()` never called): the
+    // mutation is never delivered to the wait.
+    await vi.advanceTimersByTimeAsync(999);
+    expect(runOf(manager, "tour")?.status).toBe("transitioning");
+    await vi.advanceTimersByTimeAsync(1);
+    expect(eventsOf(events, "missing")).toHaveLength(0);
+    expect(runOf(manager, "tour")?.status).toBe("active");
+  });
+
   it("waits for an anchor registration", async () => {
     const step = createGuideStep({ id: "a" });
     const { manager } = await create({ guides: [tour([step])] });
