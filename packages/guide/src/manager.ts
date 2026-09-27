@@ -1389,7 +1389,10 @@ export const createGuideManager = (
   ): boolean => {
     const run = runOf(guideId);
     if (!run) {
-      return reason === "dismissed" && dismissWithoutRun(guideId);
+      // A run still ending (slow cleanup hooks) writes its own record: a
+      // late "Skip" or veil click must not overwrite it nor emit a 2nd `end`.
+      const ending = runs.some((other) => other.guide.id === guideId);
+      return reason === "dismissed" && !ending && dismissWithoutRun(guideId);
     }
     if (reason === "dismissed" && !run.snapshot?.dismissible) {
       warn(`end("${guideId}", "dismissed") refused: not dismissible.`);
