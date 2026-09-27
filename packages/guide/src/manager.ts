@@ -18,6 +18,7 @@ import {
   resolveManagerDefaults,
   resolveOnError,
 } from "./options.js";
+import { defaultPlacement } from "./placement.js";
 import { resolveStepTarget } from "./step.js";
 import { localStorageAdapter } from "./storage.js";
 import type {
@@ -1462,6 +1463,25 @@ export const createGuideManager = (
       return () => listeners.delete(listener);
     },
     getLayout: (guideId) => layouts.get(guideId) ?? null,
+    getPresentation: (guideId) => {
+      const run = runOf(guideId);
+      const entry = run && currentEntry(run);
+      if (!entry) {
+        return null;
+      }
+      const { side, align, sideOffset, spotlightPadding } = entryOptions(
+        run,
+        entry
+      );
+      return {
+        side,
+        align,
+        sideOffset,
+        spotlightPadding,
+        margin: defaults.viewportMargin,
+        placement: options.placement ?? defaultPlacement,
+      };
+    },
     subscribeLayout: (guideId, listener) => {
       const set = layoutListeners.get(guideId) ?? new Set<() => void>();
       layoutListeners.set(guideId, set);

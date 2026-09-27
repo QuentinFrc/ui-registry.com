@@ -2,7 +2,7 @@
 
 Guide users through your UI: steps anchored on elements, ordered into guides that can cross pages, with lifecycle hooks, modal and passive modes, triggers and persistence.
 
-> Status: pre-release. The vanilla entry is complete (core, DOM, placement, spotlight); the React bindings (`@ui-registry/guide/react`) are coming. API may change.
+> Status: pre-release. The vanilla entry (core, DOM, placement, spotlight) and the React bindings (`@ui-registry/guide/react`) are complete; the registry items (tour frame, spotlight, hint) are coming. API may change.
 
 ## Install
 
@@ -82,5 +82,66 @@ if (layout) {
   });
 }
 ```
+
+## React
+
+`@ui-registry/guide/react` (React 19, optional peer dependency) binds the manager to your tree. Everything is headless: the Frame and the veil are yours.
+
+```tsx
+"use client";
+import {
+  GuideFrame,
+  GuideRoot,
+  useGuideAnchor,
+  useGuideSpotlight,
+  type WithGuideContext,
+} from "@ui-registry/guide/react";
+
+// Root: provides the manager, pushes the router and its pathname into it.
+<GuideRoot manager={guides} router={{ pathname, navigate: (path) => router.push(path) }}>
+  {children}
+  <Veil />
+  <TourFrame />
+</GuideRoot>;
+
+// Anchor: the component that owns the target also owns the step's content.
+const CreateGroupContent = ({ ctx }: WithGuideContext) => (
+  <p id={ctx.ids.title}>Create your first group</p>
+);
+
+function CreateGroupButton() {
+  const { ref } = useGuideAnchor(createGroup, { content: CreateGroupContent });
+  // Or, to see props/closure: { render: (ctx) => <CreateGroupContent ctx={ctx} /> }
+  // Or, to inherit local providers: { portal: true, content } and render `{portal}`.
+  return <Button ref={ref}>New group</Button>;
+}
+
+// Frame: one per active run; position, aria and data attributes in floatingProps.
+function TourFrame() {
+  return (
+    <GuideFrame select={(run) => run.guide.mode === "modal"}>
+      {(frame) => (
+        <Card {...frame.floatingProps}>
+          <frame.Content />
+          <footer>
+            {frame.index + 1}/{frame.total}
+            <button onClick={frame.next}>{frame.isLast ? "Done" : "Next"}</button>
+          </footer>
+        </Card>
+      )}
+    </GuideFrame>
+  );
+}
+
+// Veil: full while the modal run transitions, one hole per target once active.
+function Veil() {
+  const { active, clipPath } = useGuideSpotlight();
+  return active ? <div className="fixed inset-0 bg-black/50" style={{ clipPath }} /> : null;
+}
+```
+
+`useGuide(selector?)` returns the state (or the selected slice) with `start`, `next`, `prev`, `goTo`, `end` and `resetRecord`; `useGuideRun(guideId)` returns a run or `null`. `useGuideAnchor` also takes `lifecycle` (local hooks) and `enabled`.
+
+`GuideRoot` pushes the router and its pathname in a layout effect, which runs after the layout effects of its children: start guides from events or `useEffect`, not from a child's `useLayoutEffect` on its first commit (a route would find no router yet).
 
 See [ui-registry.com/packages/guide](https://ui-registry.com/packages/guide) for the case study.
