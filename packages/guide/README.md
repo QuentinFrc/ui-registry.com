@@ -155,7 +155,7 @@ The shadcn registry ships the visible parts for base-nova (Base UI), built on th
 | --- | --- |
 | `tour-frame` | `TourFrame`: Frame of the modal runs (`Card` + `Button`): content, "Step 1 of 3", Skip / Previous / Next / Finish. Skip is hidden when the step is not dismissible. Props: `labels`, `stepLabel`, `className`. Also `TourTitle` / `TourDescription`, which set the aria ids. |
 | `guide-spotlight` | `GuideSpotlight`: `bg-black/50` veil with one hole per target; a click dismisses the run (`closeOnClick`, default `true`). |
-| `hint` | `Hint`: Frame of the passive runs: a pulsing beacon on the target (a `button` with `aria-expanded`, placed from `frame.rects`), the content in a popover on click, Next / Got it, and a close button (`end("dismissed")`, also Escape while the focus is in the hint). Props: `labels`, `className`, `beaconClassName`. Also `HintTitle` / `HintDescription`. |
+| `hint` | `Hint`: Frame of the passive runs: a pulsing beacon on the target (a `button` with `aria-expanded`, placed from `frame.rects`), the content in a popover on click (focused then, and kept open on the next step after Next), Next / Got it, and a close button (`end("dismissed")`, also Escape while the focus is in the hint). Props: `labels`, `className`, `beaconClassName`. Also `HintTitle` / `HintDescription`. |
 | `welcome-dialog` | `WelcomeDialog`: `AlertDialog` proposing a `manual` guide once hydrated: Start, or Resume / Start over for an in-progress record, and Skip. |
 | `next-router-adapter` | `nextRouterAdapter({ router, pathname })` for the App Router. |
 

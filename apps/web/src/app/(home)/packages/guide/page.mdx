@@ -294,7 +294,7 @@ The anchor and its content work exactly as in a tour; only the frame changes. `H
 - opens the **popover** on click: the frame's `floatingProps`, placed next to the target like the tour frame, with the content, a counter when the hint has several steps, and Next or Got it (`end("completed")`);
 - closes the popover on a press outside, and **dismisses** the hint with its close button or Escape while the focus is in it (`end("dismissed")`, hidden when not dismissible).
 
-It never takes the focus on its own: the popover only receives it after a click on the beacon. A `visible` hint that was completed or dismissed never comes back by itself; bump its `version` to show it again. Labels are props with English defaults:
+It never takes the focus on its own: the popover only receives it after a click on the beacon, and after Next, when it stays open on the next step. A tour closes it: the hint comes back with its beacon only. A `visible` hint that was completed or dismissed never comes back by itself; bump its `version` to show it again. Labels are props with English defaults:
 
 ```tsx
 <Hint labels={{ open: "Voir l'astuce", close: "Fermer", next: "Suivant", done: "Compris" }} />

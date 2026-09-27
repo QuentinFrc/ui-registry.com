@@ -1,9 +1,10 @@
 "use client";
 
-import type { GuideRun, Rect } from "@ui-registry/guide";
+import type { GuideRun, GuideState, Rect } from "@ui-registry/guide";
 import {
   type FrameContext,
   GuideFrame,
+  useGuide,
   type WithGuideContext,
 } from "@ui-registry/guide/react";
 import {
@@ -59,14 +60,77 @@ export interface HintProps {
   labels?: Partial<HintLabels>;
 }
 
+const selectRuns = (state: GuideState) => state.runs;
+
+const NONE: ReadonlySet<string> = new Set();
+
+/** A popover stays open across its run's steps, not across runs or a suspension. */
+const keepsPopover = (runs: GuideRun[], guideId: string) =>
+  runs.some(
+    (run) =>
+      run.guide.id === guideId &&
+      run.step !== null &&
+      run.status !== "suspended"
+  );
+
 /**
  * Frame of the passive runs: a pulsing beacon on the step's target, which
- * opens the step's content in a popover. Never takes the focus by itself;
- * Escape while the focus is in the hint dismisses it. Mount once, inside
- * `<GuideRoot>`, next to `<TourFrame />` (hints are hidden during a tour).
+ * opens the step's content in a popover. Never takes the focus by itself:
+ * the popover gets it after a click on the beacon or on Next (it then stays
+ * open on the next step). Escape while the focus is in the hint dismisses
+ * it. Mount once, inside `<GuideRoot>`, next to `<TourFrame />` (hints are
+ * hidden during a tour, their popover closed).
  */
 export function Hint({ beaconClassName, className, labels }: HintProps) {
   const text = { ...DEFAULT_LABELS, ...labels };
+  const { state: runs } = useGuide(selectRuns);
+  const [opened, setOpened] = useState(NONE);
+  // Guides whose popover takes the focus once placed (after a user action).
+  const focusRequests = useRef(new Set<string>());
+
+  useEffect(() => {
+    for (const guideId of focusRequests.current) {
+      if (!keepsPopover(runs, guideId)) {
+        focusRequests.current.delete(guideId);
+      }
+    }
+    setOpened((current) => {
+      const kept = [...current].filter((guideId) =>
+        keepsPopover(runs, guideId)
+      );
+      return kept.length === current.size ? current : new Set(kept);
+    });
+  }, [runs]);
+
+  const setOpen = useCallback((guideId: string, open: boolean) => {
+    if (open) {
+      focusRequests.current.add(guideId);
+    } else {
+      focusRequests.current.delete(guideId);
+    }
+    setOpened((current) => {
+      if (current.has(guideId) === open) {
+        return current;
+      }
+      const next = new Set(current);
+      if (open) {
+        next.add(guideId);
+      } else {
+        next.delete(guideId);
+      }
+      return next;
+    });
+  }, []);
+
+  const requestFocus = useCallback((guideId: string) => {
+    focusRequests.current.add(guideId);
+  }, []);
+
+  const takeFocus = useCallback(
+    (guideId: string) => focusRequests.current.delete(guideId),
+    []
+  );
+
   return (
     <GuideFrame select={isPassive}>
       {(frame) => (
@@ -75,6 +139,10 @@ export function Hint({ beaconClassName, className, labels }: HintProps) {
           className={className}
           frame={frame}
           labels={text}
+          onOpenChange={setOpen}
+          open={opened.has(frame.guide.id)}
+          requestFocus={requestFocus}
+          takeFocus={takeFocus}
         />
       )}
     </GuideFrame>
@@ -86,6 +154,10 @@ interface HintItemProps {
   className?: string;
   frame: FrameContext;
   labels: HintLabels;
+  onOpenChange: (guideId: string, open: boolean) => void;
+  open: boolean;
+  requestFocus: (guideId: string) => void;
+  takeFocus: (guideId: string) => boolean;
 }
 
 function HintItem({
@@ -93,8 +165,12 @@ function HintItem({
   className,
   frame,
   labels,
+  onOpenChange,
+  open,
+  requestFocus,
+  takeFocus,
 }: HintItemProps) {
-  const [open, setOpen] = useState(false);
+  const guideId = frame.guide.id;
   const popoverId = useId();
   const beaconRef = useRef<HTMLButtonElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
@@ -115,12 +191,14 @@ function HintItem({
     [floatingRef]
   );
 
-  // Opened by the user: the focus moves into the popover once it is placed.
+  // Opened by the user (beacon, Next): the focus moves into the popover once
+  // it is placed. On every render: a new step's popover is placed after its
+  // measure.
   useEffect(() => {
-    if (open && frame.placed) {
+    if (open && frame.placed && takeFocus(guideId)) {
       popoverRef.current?.focus({ preventScroll: true });
     }
-  }, [open, frame.placed]);
+  });
 
   // A press outside the hint closes the popover (the hint stays).
   useEffect(() => {
@@ -133,19 +211,25 @@ function HintItem({
         popoverRef.current?.contains(target) ||
         beaconRef.current?.contains(target);
       if (!inside) {
-        setOpen(false);
+        onOpenChange(guideId, false);
       }
     };
     document.addEventListener("pointerdown", onPointerDown);
     return () => document.removeEventListener("pointerdown", onPointerDown);
-  }, [open]);
+  }, [open, onOpenChange, guideId]);
 
   // The popover is the run's Frame (Escape in it is handled by the manager);
   // the beacon is outside of it, so it relays Escape itself.
   const onBeaconKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
     if (event.key === "Escape" && frame.dismissible) {
+      event.preventDefault();
       frame.end("dismissed");
     }
+  };
+
+  const onNext = () => {
+    requestFocus(guideId);
+    frame.next();
   };
 
   if (!rect) {
@@ -171,7 +255,7 @@ function HintItem({
         )}
         data-slot="hint-beacon"
         data-state={open ? "open" : "closed"}
-        onClick={() => setOpen((current) => !current)}
+        onClick={() => onOpenChange(guideId, !open)}
         onKeyDown={onBeaconKeyDown}
         ref={beaconRef}
         style={beaconStyle}
@@ -230,7 +314,7 @@ function HintItem({
                 {labels.done}
               </Button>
             ) : (
-              <Button onClick={frame.next} size="xs">
+              <Button onClick={onNext} size="xs">
                 {labels.next}
               </Button>
             )}
