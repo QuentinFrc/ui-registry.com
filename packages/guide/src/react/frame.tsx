@@ -12,7 +12,7 @@ import {
 import { createPortal } from "react-dom";
 import { warn } from "../dev.js";
 import { inflateRect } from "../geometry.js";
-import type { GuideRun, GuideState, Size } from "../types.js";
+import type { GuideRun, GuideState, Rect, Size } from "../types.js";
 import {
   type ActiveRun,
   type ContentSlot,
@@ -88,6 +88,8 @@ const FrameContent = () => {
   }, [missing, stepId]);
   return slot ? <SlotContent ctx={ctx} slot={slot} /> : null;
 };
+
+const NO_RECTS: Rect[] = [];
 
 const sameSize = (a: Size | null, b: Size): boolean =>
   a !== null && a.width === b.width && a.height === b.height;
@@ -182,6 +184,7 @@ const FrameItem = ({ run, children }: FrameItemProps) => {
     run,
     Content: FrameContent,
     placed,
+    rects: layout?.rects ?? NO_RECTS,
     floatingProps: {
       ref,
       style: {

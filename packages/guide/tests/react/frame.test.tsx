@@ -16,6 +16,7 @@ import type { GuideManager, GuideStep, Rect } from "../../src/types.js";
 import {
   createManager,
   FLOATING,
+  frames as fakeFrames,
   observers,
   RECT,
   rectAttr,
@@ -198,6 +199,7 @@ describe("GuideFrame", () => {
       isLast: true,
       mode: "modal",
       dismissible: true,
+      rects: [RECT],
       run: runOf(manager, "tour"),
     });
     const element = screen.getByTestId("frame-tour");
@@ -306,6 +308,41 @@ describe("GuideFrame", () => {
     fireEvent.keyDown(wide, { key: "Escape" });
     await settle();
     expect(runOf(manager, "hint")).toBeNull();
+  });
+
+  it("exposes the targets' rects, followed while active, even without a mounted floating element", async () => {
+    const { manager } = await createManager({ guides: [hint([b])] });
+    const rects: Rect[][] = [];
+    // A hint: draws on the target, its floating popover is not mounted yet.
+    const Beacon = () => (
+      <GuideFrame>
+        {(frame) => {
+          rects.push(frame.rects);
+          return <span data-testid="beacon" />;
+        }}
+      </GuideFrame>
+    );
+    render(
+      <App manager={manager}>
+        <Target step={b} />
+        <Beacon />
+      </App>
+    );
+    await start(manager, "hint");
+    expect(screen.getByTestId("beacon")).toBeDefined();
+    expect(rects.at(-1)).toEqual([RECT]);
+
+    const moved = { ...RECT, x: 400 };
+    screen.getByText("b").setAttribute("data-rect", rectAttr(moved));
+    act(() => {
+      for (const observer of observers.resize) {
+        observer.trigger();
+      }
+    });
+    act(() => {
+      fakeFrames.flush();
+    });
+    expect(rects.at(-1)).toEqual([moved]);
   });
 
   it("works without ResizeObserver", async () => {
