@@ -31,6 +31,20 @@
       ]
     },
     {
+      "name": "hint",
+      "type": "registry:component",
+      "title": "Hint",
+      "description": "Frame of the passive guide runs: a pulsing beacon on the target that opens the step's content in a popover, with Next / Got it and a close button.",
+      "dependencies": ["@ui-registry/guide"],
+      "registryDependencies": ["button"],
+      "files": [
+        {
+          "path": "registry/base-nova/guide/hint.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "welcome-dialog",
       "type": "registry:component",
       "title": "WelcomeDialog",
