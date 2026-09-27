@@ -256,4 +256,30 @@ describe("manager records", () => {
     await flush();
     expect(manager.getState().hydrated).toBe(false);
   });
+
+  it("does not downgrade a finished record when a restart fails before its first step", async () => {
+    vi.useFakeTimers();
+    for (const status of ["completed", "dismissed"] as const) {
+      const fake = createFakeDriver();
+      const [a] = mountedSteps(fake, "a");
+      fake.unmount("#a");
+      const finished: GuideRecord = { status, version: 1, updatedAt: 1 };
+      const { manager } = await setup({
+        guides: [
+          defineGuide({
+            id: "tour",
+            onMissing: "end",
+            waitTimeout: 10,
+            steps: [a],
+          }),
+        ],
+        fake,
+        storage: memoryAdapter({ tour: finished }),
+      });
+      manager.start("tour", { from: "start" });
+      await vi.advanceTimersByTimeAsync(10);
+      expect(manager.getState().runs).toEqual([]);
+      expect(manager.getState().records.tour).toEqual(finished);
+    }
+  });
 });

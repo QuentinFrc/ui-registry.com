@@ -350,6 +350,11 @@ export const createGuideManager = (
       writeRecord(guide, withStepId({ ...base, status: "dismissed" }, stepId));
     } else if (reason === "missing" || reason === "error") {
       const previous = records[guide.id];
+      if (stepId === null && previous && previous.status !== "in-progress") {
+        // Nothing was shown in this run: a completed or dismissed record
+        // stays as it is (no downgrade to in-progress without a step).
+        return;
+      }
       const lastStepId =
         stepId ??
         (previous?.status === "in-progress" ? previous.stepId : undefined);
