@@ -550,7 +550,8 @@ export const createGuideManager = (
         !run.ending &&
         currentStepId(run) === stepId
       ) {
-        startTracking(run);
+        // In place: the layout never goes through `null` for subscribers.
+        updateLayout(run);
       }
     }
   };

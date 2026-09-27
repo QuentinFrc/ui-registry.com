@@ -271,6 +271,35 @@ describe("manager with the DOM driver: tracking", () => {
     expect(manager.getLayout("tour")?.rects).toEqual([RECT]);
   });
 
+  it("updates the layout in place when anchors change while active", async () => {
+    const step = createGuideStep({ id: "a" });
+    const { manager } = await create({ guides: [tour([step])] });
+    const first = mountElement(RECT);
+    manager.registerAnchor("a", first);
+    manager.start("tour");
+    await flush();
+    const seen: unknown[] = [];
+    manager.subscribeLayout("tour", () => seen.push(manager.getLayout("tour")));
+
+    const second = mountElement({ ...RECT, y: 300 });
+    const unregister = manager.registerAnchor("a", second);
+    expect(seen).toEqual([
+      expect.objectContaining({ rects: [RECT, { ...RECT, y: 300 }] }),
+    ]);
+    expect([...(observers.resize.at(-1)?.targets ?? [])]).toEqual([
+      first,
+      second,
+    ]);
+    // A content registration moves nothing: no notification.
+    manager.registerContent("a", {});
+    expect(seen).toHaveLength(1);
+    unregister();
+    expect(seen).toEqual([
+      expect.anything(),
+      expect.objectContaining({ rects: [RECT] }),
+    ]);
+  });
+
   it("observes a target re-rendered while active", async () => {
     const element = mountElement(RECT, { class: "row" });
     const step = createGuideStep({ id: "a", target: ".row" });
