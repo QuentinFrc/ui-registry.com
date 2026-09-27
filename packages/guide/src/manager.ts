@@ -860,8 +860,14 @@ export const createGuideManager = (
     reenter(run);
   };
 
+  /**
+   * Waits for the current step again, under the run's current signal: a new
+   * request or `end()` still cancels it, but the hooks of the transition that
+   * committed this step (`afterLeave`, `afterEnter`) are not aborted by a
+   * target that flickers.
+   */
   const reenter = async (run: RunInternal) => {
-    const signal = renewController(run);
+    const { signal } = run.controller;
     const entry = currentEntry(run) as GuideEntry;
     const t: Transition = {
       from: run.current,
