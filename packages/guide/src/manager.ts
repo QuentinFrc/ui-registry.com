@@ -71,6 +71,13 @@ interface RunInternal {
   untrack: (() => void) | null;
 }
 
+/** Where a run starts. */
+interface StartPoint {
+  direction: Direction;
+  index: number;
+  resumed: boolean;
+}
+
 /** An armed `visible` trigger. */
 interface Watcher {
   /** Observed step (first step, or the in-progress record's). */
@@ -182,6 +189,10 @@ export const createGuideManager = (
   const writtenAt = new Map<string, number>();
   /** Latest hydration: an older one finishing late is discarded. */
   let hydrations = 0;
+  let markHydrated: () => void = noop;
+  const whenHydrated = new Promise<void>((resolve) => {
+    markHydrated = resolve;
+  });
   /** Guides that already had a run: the `visible` trigger does not re-arm. */
   const handled = new Set<string>();
   const queue: string[] = [];
@@ -338,6 +349,7 @@ export const createGuideManager = (
     hydrated = true;
     refresh();
     syncTriggers();
+    markHydrated();
   };
 
   const withStepId = (
@@ -986,7 +998,7 @@ export const createGuideManager = (
     guide: Guide,
     entries: GuideEntry[],
     from: StartOptions["from"]
-  ): { index: number; resumed: boolean; direction: Direction } | null => {
+  ): StartPoint | null => {
     if (from === undefined || from === "resume") {
       const record = records[guide.id];
       const index =
@@ -1099,15 +1111,39 @@ export const createGuideManager = (
     if (guide.mode === "modal") {
       takeOverOrCapture(run);
     }
-    emit({
-      type: "start",
-      guideId: guide.id,
-      stepId: (entries[start.index] as GuideEntry).step.id,
-      resumed: start.resumed,
-      trigger,
-    });
     syncTriggers();
-    request(run, start.index, start.direction);
+    const announce = (index: number, resumed: boolean) =>
+      emit({
+        type: "start",
+        guideId: guide.id,
+        stepId: (entries[index] as GuideEntry).step.id,
+        resumed,
+        trigger,
+      });
+    const begin = (point: StartPoint) => {
+      announce(point.index, point.resumed);
+      request(run, point.index, point.direction);
+    };
+    const resumes = from === undefined || from === "resume";
+    if (hydrated || !resumes) {
+      begin(start);
+      return true;
+    }
+    // The default `from: "resume"` needs the records: the first transition
+    // waits for the hydration (the run is listed, without a step, meanwhile).
+    const initial = run.controller;
+    refresh();
+    whenHydrated.then(() => {
+      if (run.ending) {
+        return;
+      }
+      if (run.controller === initial) {
+        begin(resolveStart(guide, entries, from) as StartPoint);
+      } else {
+        // Moved (next/prev/goTo) before the hydration: that request stands.
+        announce(run.target, false);
+      }
+    });
     return true;
   };
 

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { defineGuide } from "../src/guide.js";
 import { memoryAdapter } from "../src/storage.js";
-import type { GuideRecord, GuideStorage } from "../src/types.js";
+import type { GuideEvent, GuideRecord, GuideStorage } from "../src/types.js";
 import {
   createFakeDriver,
   eventsOf,
@@ -314,6 +314,72 @@ describe("manager records", () => {
     expect(manager.getState()).toMatchObject({
       hydrated: true,
       records: { tour: inProgress("a") },
+    });
+  });
+
+  describe("start before the hydration", () => {
+    const pendingSetup = async () => {
+      const pending = deferred<GuideRecord | null>();
+      const fake = createFakeDriver();
+      const [a, b] = mountedSteps(fake, "a", "b");
+      const events: GuideEvent[] = [];
+      const { createGuideManager } = await import("../src/manager.js");
+      const manager = createGuideManager({
+        guides: [defineGuide({ id: "tour", steps: [a, b] })],
+        storage: { ...memoryAdapter(), get: () => pending.promise },
+        driver: fake.driver,
+        onEvent: (event) => events.push(event),
+      });
+      return { manager, pending, events };
+    };
+
+    it("resumes from the hydrated record", async () => {
+      const { manager, pending, events } = await pendingSetup();
+      expect(manager.start("tour")).toBe(true);
+      expect(runOf(manager, "tour")).toMatchObject({
+        status: "transitioning",
+        step: null,
+      });
+      await flush();
+      expect(eventsOf(events, "start")).toEqual([]);
+      pending.resolve(inProgress("b"));
+      await flush();
+      expect(runOf(manager, "tour")).toMatchObject({
+        status: "active",
+        step: { id: "b" },
+      });
+      expect(eventsOf(events, "start")[0]).toMatchObject({
+        stepId: "b",
+        resumed: true,
+      });
+    });
+
+    it("does not wait for an explicit `from`", async () => {
+      const { manager } = await pendingSetup();
+      manager.start("tour", { from: "start" });
+      await flush();
+      expect(runOf(manager, "tour")?.step?.id).toBe("a");
+    });
+
+    it("does not begin a run ended or moved before the hydration, but announces a moved one", async () => {
+      const { manager, pending, events } = await pendingSetup();
+      manager.start("tour");
+      manager.end("tour");
+      await flush();
+      manager.start("tour");
+      manager.next("tour");
+      pending.resolve(inProgress("a"));
+      await flush();
+      expect(eventsOf(events, "start")).toEqual([
+        {
+          type: "start",
+          guideId: "tour",
+          stepId: "b",
+          resumed: false,
+          trigger: "manual",
+        },
+      ]);
+      expect(runOf(manager, "tour")?.step?.id).toBe("b");
     });
   });
 });
