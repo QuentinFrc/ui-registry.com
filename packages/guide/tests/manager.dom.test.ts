@@ -460,6 +460,77 @@ describe("manager with the DOM driver: keyboard", () => {
   });
 });
 
+describe("manager with the DOM driver: cleanup", () => {
+  it("removes every listener and observer on destroy", async () => {
+    const live = new Map<string, number>();
+    const count = (target: string, delta: number) => (type: string) => {
+      const key = `${target}:${type}`;
+      live.set(key, (live.get(key) ?? 0) + delta);
+    };
+    for (const [name, target] of [
+      ["document", document],
+      ["window", window],
+    ] as const) {
+      const add = target.addEventListener.bind(target);
+      const remove = target.removeEventListener.bind(target);
+      vi.spyOn(target, "addEventListener").mockImplementation(
+        (type, ...rest) => {
+          count(name, 1)(type);
+          add(type, ...rest);
+        }
+      );
+      vi.spyOn(target, "removeEventListener").mockImplementation(
+        (type, ...rest) => {
+          count(name, -1)(type);
+          remove(type, ...rest);
+        }
+      );
+    }
+    const mutations = { observed: 0, disconnected: 0 };
+    const { observe, disconnect } = MutationObserver.prototype;
+    vi.spyOn(MutationObserver.prototype, "observe").mockImplementation(
+      function (this: MutationObserver, ...args) {
+        mutations.observed += 1;
+        observe.apply(this, args);
+      }
+    );
+    vi.spyOn(MutationObserver.prototype, "disconnect").mockImplementation(
+      function (this: MutationObserver) {
+        mutations.disconnected += 1;
+        disconnect.apply(this);
+      }
+    );
+
+    mountElement(RECT, { class: "row" });
+    const step = createGuideStep({ id: "a", target: ".row" });
+    const waiting = createGuideStep({ id: "w", target: ".never" });
+    const { manager } = await create({
+      guides: [
+        tour([step]),
+        defineGuide({ id: "hint", mode: "passive", steps: [waiting] }),
+        defineGuide({ id: "auto", trigger: "visible", steps: [waiting] }),
+      ],
+      scroll: { lock: true },
+    });
+    manager.start("tour");
+    manager.start("hint");
+    await flush();
+    expect(runOf(manager, "tour")?.status).toBe("active");
+    expect(mutations.observed).toBeGreaterThanOrEqual(3);
+    expect([...live.values()].some((value) => value > 0)).toBe(true);
+
+    manager.destroy();
+    await flush();
+    expect([...live.entries()].filter(([, value]) => value !== 0)).toEqual([]);
+    expect(mutations.disconnected).toBe(mutations.observed);
+    for (const observer of [...observers.resize, ...observers.intersection]) {
+      expect(observer.disconnected).toBe(true);
+    }
+    expect(frames.pending).toBe(0);
+    expect(document.documentElement.getAttribute("style") ?? "").toBe("");
+  });
+});
+
 describe("manager with the DOM driver: visible trigger", () => {
   const record = { status: "in-progress", version: 1, updatedAt: 1 } as const;
 
