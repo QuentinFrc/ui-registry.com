@@ -29,21 +29,35 @@ const listen = (
   return () => target.removeEventListener(type, handler, options);
 };
 
-/** Coalesces notifications to one call per animation frame. */
+/** Fallback frame length without `requestAnimationFrame` (e.g. plain jsdom). */
+const FRAME_FALLBACK = 16;
+
+/**
+ * Coalesces notifications to one call per animation frame (a 16 ms timeout
+ * where `requestAnimationFrame` does not exist).
+ */
 const frameScheduler = (callback: () => void) => {
-  let frame = 0;
+  let cancel: (() => void) | null = null;
+  const run = () => {
+    cancel = null;
+    callback();
+  };
   return {
     schedule: () => {
-      if (frame === 0) {
-        frame = requestAnimationFrame(() => {
-          frame = 0;
-          callback();
-        });
+      if (cancel) {
+        return;
+      }
+      if (typeof requestAnimationFrame === "function") {
+        const frame = requestAnimationFrame(run);
+        cancel = () => cancelAnimationFrame(frame);
+      } else {
+        const timer = setTimeout(run, FRAME_FALLBACK);
+        cancel = () => clearTimeout(timer);
       }
     },
     cancel: () => {
-      cancelAnimationFrame(frame);
-      frame = 0;
+      cancel?.();
+      cancel = null;
     },
   };
 };

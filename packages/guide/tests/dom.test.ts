@@ -141,6 +141,22 @@ describe("dom driver: waiting", () => {
     expect(onChange).toHaveBeenCalledTimes(3);
   });
 
+  it("coalesces with a timeout without requestAnimationFrame", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    vi.stubGlobal("requestAnimationFrame", undefined);
+    const driver = createDomDriver();
+    const onChange = vi.fn();
+    const stop = driver.watch(onChange);
+    window.dispatchEvent(new Event("resize"));
+    window.dispatchEvent(new Event("resize"));
+    await vi.advanceTimersByTimeAsync(16);
+    expect(onChange).toHaveBeenCalledTimes(1);
+    window.dispatchEvent(new Event("resize"));
+    stop();
+    await vi.advanceTimersByTimeAsync(16);
+    expect(onChange).toHaveBeenCalledTimes(1);
+  });
+
   it("listens to the visual viewport when available", () => {
     const frames = installFrames();
     const visualViewport = new EventTarget();
