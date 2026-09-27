@@ -159,4 +159,70 @@ describe("manager route", () => {
     manager.setRouter(null);
     await expect(ctx?.navigate("/nowhere")).rejects.toThrow("No router");
   });
+
+  it("bounds a navigation whose promise never settles", async () => {
+    vi.useFakeTimers();
+    const { manager, events } = await routeSetup(100);
+    manager.setRouter({
+      pathname: "/other",
+      navigate: () => new Promise<void>(() => undefined),
+    });
+    manager.start("tour");
+    await vi.advanceTimersByTimeAsync(100);
+    expect(eventsOf(events, "error")[0]).toMatchObject({
+      phase: "route",
+      action: "end",
+    });
+  });
+
+  it("does not wait for the navigate promise once the pathname matches", async () => {
+    const { manager } = await routeSetup();
+    manager.setRouter({
+      pathname: "/other",
+      navigate: (path) => {
+        manager.notifyPathname(path);
+        return new Promise<void>(() => undefined);
+      },
+    });
+    manager.start("tour");
+    await flush();
+    expect(runOf(manager, "tour")?.status).toBe("active");
+  });
+
+  it("fails with phase route when navigate rejects asynchronously", async () => {
+    const { manager, events } = await routeSetup();
+    manager.setRouter({
+      pathname: "/x",
+      navigate: () => Promise.reject(new Error("blocked")),
+    });
+    manager.start("tour");
+    await flush();
+    expect(eventsOf(events, "error")[0]).toMatchObject({
+      phase: "route",
+      error: new Error("blocked"),
+    });
+  });
+
+  it("reports a navigation timeout inside a hook with the hook's phase", async () => {
+    vi.useFakeTimers();
+    const fake = createFakeDriver();
+    const [a] = mountedSteps(fake, "a");
+    const guide = defineGuide({
+      id: "tour",
+      waitTimeout: 50,
+      steps: [
+        {
+          step: a,
+          beforeEnter: ({ navigate }) => navigate("/never"),
+        },
+      ],
+    });
+    const { manager, events } = await setup({ guides: [guide], fake });
+    manager.setRouter({ pathname: "/", navigate: () => undefined });
+    manager.start("tour");
+    await vi.advanceTimersByTimeAsync(50);
+    expect(eventsOf(events, "error")[0]).toMatchObject({
+      phase: "beforeEnter",
+    });
+  });
 });

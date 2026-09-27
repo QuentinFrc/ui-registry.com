@@ -479,18 +479,24 @@ export const createGuideManager = (
       warn(`Cannot navigate to "${path}": no router configured.`);
       throw new Error("No router configured: call `manager.setRouter()`.");
     }
-    await withAbort(
-      callAsync(() => current.navigate(path)),
-      signal
+    // The wait starts with the navigation: a `navigate` promise that never
+    // settles is still bounded by `timeout`, and its rejection fails the wait.
+    const failure = new AbortController();
+    callAsync(() => current.navigate(path)).catch((error: unknown) =>
+      failure.abort(error)
     );
     const reached = await waitUntil(
       () => matchRoute(path, pathname),
       subscribePathname,
       timeout,
-      signal
+      AbortSignal.any([signal, failure.signal])
     );
     if (!reached) {
-      throw new GuideTimeoutError(timeout);
+      // Not a `GuideTimeoutError`: inside a hook, that one means the hook's
+      // own `hookTimeout` (phase "timeout").
+      throw new Error(
+        `Pathname did not match "${path}" within ${timeout} ms of navigating.`
+      );
     }
   };
 
