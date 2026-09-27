@@ -29,6 +29,13 @@ export const createGuideStep = (options: GuideStepOptions): GuideStep => {
   });
 };
 
+/**
+ * Targets already reported as broken. Resolution runs on every DOM mutation
+ * and scroll frame while waiting: each broken target warns once, not per frame.
+ */
+const warnedSelectors = new Set<string>();
+const warnedFunctions = new WeakSet<object>();
+
 const querySafe = (
   selector: string,
   query: (selector: string) => readonly Element[]
@@ -36,7 +43,10 @@ const querySafe = (
   try {
     return [...query(selector)];
   } catch (error) {
-    warn(`Invalid selector "${selector}": resolved to no target.`, error);
+    if (!warnedSelectors.has(selector)) {
+      warnedSelectors.add(selector);
+      warn(`Invalid selector "${selector}": resolved to no target.`, error);
+    }
     return [];
   }
 };
@@ -62,7 +72,10 @@ export const resolveStepTarget = (
     try {
       resolved = target();
     } catch (error) {
-      warn("Step target function threw: resolved to no target.", error);
+      if (!warnedFunctions.has(target)) {
+        warnedFunctions.add(target);
+        warn("Step target function threw: resolved to no target.", error);
+      }
       return [];
     }
     if (resolved === null || resolved === undefined) {

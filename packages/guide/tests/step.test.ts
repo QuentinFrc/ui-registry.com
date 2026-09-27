@@ -6,7 +6,7 @@ const a = fakeElement("a");
 const b = fakeElement("b");
 
 const query = (selector: string): readonly Element[] => {
-  if (selector === "::invalid") {
+  if (selector.startsWith("::")) {
     throw new SyntaxError("invalid selector");
   }
   return selector === ".a" ? [a] : [b];
@@ -81,6 +81,12 @@ describe("resolveStepTarget", () => {
       expect.stringContaining("Invalid selector"),
       expect.any(SyntaxError)
     );
+    // Re-resolved on every DOM change while waiting: warned once.
+    expect(console.warn).toHaveBeenCalledTimes(1);
+    resolveStepTarget("::invalid", query);
+    expect(console.warn).toHaveBeenCalledTimes(1);
+    resolveStepTarget("::other", query);
+    expect(console.warn).toHaveBeenCalledTimes(2);
   });
 
   it("resolves a function returning an element, an array or nothing", () => {
@@ -95,6 +101,7 @@ describe("resolveStepTarget", () => {
       throw new Error("boom");
     };
     expect(resolveStepTarget(target, query)).toEqual([]);
-    expect(console.warn).toHaveBeenCalled();
+    expect(resolveStepTarget(target, query)).toEqual([]);
+    expect(console.warn).toHaveBeenCalledTimes(1);
   });
 });
