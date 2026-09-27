@@ -142,4 +142,6 @@ function Veil() {
 
 `useGuide(selector?)` returns the state (or the selected slice) with `start`, `next`, `prev`, `goTo`, `end` and `resetRecord`; `useGuideRun(guideId)` returns a run or `null`. `useGuideAnchor` also takes `lifecycle` (local hooks) and `enabled`.
 
+`GuideRoot` pushes the router and its pathname in a layout effect, which runs after the layout effects of its children: start guides from events or `useEffect`, not from a child's `useLayoutEffect` on its first commit (a route would find no router yet).
+
 See [ui-registry.com/packages/guide](https://ui-registry.com/packages/guide) for the case study.
