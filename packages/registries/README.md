@@ -77,6 +77,15 @@ pnpm build
 # Output goes to dist/<registry-name>/
 ```
 
+## Testing
+
+```sh
+# Vitest (jsdom), with the `@/` alias of `tsconfig.json`
+pnpm test
+```
+
+Tests live in `tests/<registry-name>/` and import the registry files directly.
+
 ## How it works
 
 1. `build.mts` scans for subdirectories containing `registry.json`.

@@ -2,7 +2,7 @@
 
 Guide users through your UI: steps anchored on elements, ordered into guides that can cross pages, with lifecycle hooks, modal and passive modes, triggers and persistence.
 
-> Status: alpha. The vanilla entry (core, DOM, placement, spotlight), the React bindings (`@ui-registry/guide/react`) and the modal registry items (tour frame, spotlight, welcome dialog, Next.js router adapter) are available; the passive `hint` item is coming. API may change.
+> Status: alpha. The vanilla entry (core, DOM, placement, spotlight), the React bindings (`@ui-registry/guide/react`) and the registry items (tour frame, spotlight, hint, welcome dialog, Next.js router adapter) are available. API may change.
 
 ## Install
 
@@ -143,7 +143,7 @@ function Veil() {
 }
 ```
 
-`useGuide(selector?)` returns the state (or the selected slice) with `start`, `next`, `prev`, `goTo`, `end` and `resetRecord`; `useGuideRun(guideId)` returns a run or `null`. `useGuideAnchor` also takes `lifecycle` (local hooks) and `enabled`.
+`useGuide(selector?)` returns the state (or the selected slice) with `start`, `next`, `prev`, `goTo`, `end` and `resetRecord`; `useGuideRun(guideId)` returns a run or `null`. `useGuideAnchor` also takes `lifecycle` (local hooks) and `enabled`. Besides `floatingProps`, a Frame receives `frame.rects`, the targets' rects followed while the step is active, to draw on the target itself (a hint's beacon).
 
 `GuideRoot` pushes the router and its pathname in a layout effect, which runs after the layout effects of its children: start guides from events or `useEffect`, not from a child's `useLayoutEffect` on its first commit (a route would find no router yet).
 
@@ -155,6 +155,7 @@ The shadcn registry ships the visible parts for base-nova (Base UI), built on th
 | --- | --- |
 | `tour-frame` | `TourFrame`: Frame of the modal runs (`Card` + `Button`): content, "Step 1 of 3", Skip / Previous / Next / Finish. Skip is hidden when the step is not dismissible. Props: `labels`, `stepLabel`, `className`. Also `TourTitle` / `TourDescription`, which set the aria ids. |
 | `guide-spotlight` | `GuideSpotlight`: `bg-black/50` veil with one hole per target; a click dismisses the run (`closeOnClick`, default `true`). |
+| `hint` | `Hint`: Frame of the passive runs: a pulsing beacon on the target (a `button` with `aria-expanded`, placed from `frame.rects`), the content in a popover on click (focused then, and kept open on the next step after Next), Next / Got it, and a close button (`end("dismissed")`, also Escape while the focus is in the hint). Props: `labels`, `className`, `beaconClassName`. Also `HintTitle` / `HintDescription`. |
 | `welcome-dialog` | `WelcomeDialog`: `AlertDialog` proposing a `manual` guide once hydrated: Start, or Resume / Start over for an in-progress record, and Skip. |
 | `next-router-adapter` | `nextRouterAdapter({ router, pathname })` for the App Router. |
 
@@ -171,6 +172,7 @@ pnpm dlx shadcn@latest add https://ui-registry.com/r/guide/next-router-adapter
   {children}
   <GuideSpotlight />
   <TourFrame labels={{ finish: "Got it" }} />
+  <Hint />
   <WelcomeDialog
     guideId="onboarding"
     title="Welcome!"

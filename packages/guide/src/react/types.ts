@@ -120,6 +120,12 @@ export type FrameContext = GuideContext & {
   floatingProps: FrameFloatingProps;
   /** `false` during the first measure. */
   placed: boolean;
+  /**
+   * Rects of the step's targets (viewport coordinates, zero-sized ones
+   * filtered), followed while the run is active: to draw on the target
+   * itself, like a hint's beacon. Empty before the first measure.
+   */
+  rects: Rect[];
   run: GuideRun;
 };
 

@@ -17,7 +17,7 @@ This package comes out of the product tour of a real mission, a bridge training 
 - **Missing targets**: a feature flag, a mobile layout or an empty list removes an element, and the tour freezes on a spotlight around nothing.
 - **Persistence**: "has the user seen it?" became "which step were they on, which version of the tour, did they skip it or finish it?".
 
-The geometry held up well (spotlight clip-path, placement with fallbacks), so it was kept. The rest was rewritten around one idea: the lib describes the **mechanics** (steps, orchestration, waiting, persistence), the app renders **everything visible**, and the registry ships the usual shapes of it (a tour frame, a spotlight, a welcome dialog).
+The geometry held up well (spotlight clip-path, placement with fallbacks), so it was kept. The rest was rewritten around one idea: the lib describes the **mechanics** (steps, orchestration, waiting, persistence), the app renders **everything visible**, and the registry ships the usual shapes of it (a tour frame, a spotlight, a welcome dialog, a hint).
 
 ## Install
 
@@ -25,9 +25,10 @@ The geometry held up well (spotlight clip-path, placement with fallbacks), so it
 pnpm add @ui-registry/guide
 pnpm dlx shadcn@latest add https://ui-registry.com/r/guide/tour-frame
 pnpm dlx shadcn@latest add https://ui-registry.com/r/guide/guide-spotlight
+pnpm dlx shadcn@latest add https://ui-registry.com/r/guide/hint
 ```
 
-The npm package has two entries: `@ui-registry/guide`, the vanilla core (zero dependencies), and `@ui-registry/guide/react`, headless React 19 bindings. The shadcn registry ships the visible parts, as files you own once installed: `tour-frame`, `guide-spotlight`, `welcome-dialog` and `next-router-adapter`.
+The npm package has two entries: `@ui-registry/guide`, the vanilla core (zero dependencies), and `@ui-registry/guide/react`, headless React 19 bindings. The shadcn registry ships the visible parts, as files you own once installed: `tour-frame`, `guide-spotlight`, `hint`, `welcome-dialog` and `next-router-adapter`.
 
 ## Quick start
 
@@ -189,7 +190,7 @@ The **frame** is the floating container of a run: position, chrome, counter, nav
 </GuideFrame>
 ```
 
-`floatingProps` carries the fixed position (hidden until the first measure), `role="dialog"`, `aria-modal`, the aria ids, `tabIndex={-1}` and three data attributes: `data-side` and `data-align`, the **effective** placement after fallbacks, and `data-mode`. The registry's `tour-frame` uses `data-side` for its entry animation, in plain CSS: no animation library.
+`floatingProps` carries the fixed position (hidden until the first measure), `role="dialog"`, `aria-modal`, the aria ids, `tabIndex={-1}` and three data attributes: `data-side` and `data-align`, the **effective** placement after fallbacks, and `data-mode`. `frame.rects` gives the targets' rects, followed while the step is active, to draw on the target itself (the hint's beacon). The registry's `tour-frame` uses `data-side` for its entry animation, in plain CSS: no animation library.
 
 `tour-frame` is that function written once with `Card` and `Button`: the step's content, a "Step 2 of 5" label, Skip (hidden when the step is not dismissible), Previous, and Next, which becomes Finish on the last step. The labels are props with English defaults:
 
@@ -239,10 +240,65 @@ All options resolve the same way: **entry, then guide, then manager, then defaul
 
 A guide is `modal` or `passive`.
 
-- **Modal** (available now): one at a time, veil and spotlight, scroll to the target, focus in the frame and restored at the end, global keyboard (Escape, arrows). Starting a second modal guide is refused unless you pass `{ replace: true }`; a modal guide triggered automatically while another runs waits in a queue.
-- **Passive** (coming with the `hint` registry item): several at once, no veil, no scroll, no stolen focus. Passive runs are suspended while a modal run is active. The mechanics already ship in the package; the registry item comes next.
+- **Modal**: one at a time, veil and spotlight, scroll to the target, focus in the frame and restored at the end, global keyboard (Escape, arrows). Starting a second modal guide is refused unless you pass `{ replace: true }`; a modal guide triggered automatically while another runs waits in a queue. Rendered by `tour-frame` and `guide-spotlight`.
+- **Passive**: several at once, no veil, no scroll (a step waits until its target is in the viewport), no stolen focus; Escape only acts when the focus is inside the run's frame. Passive runs are suspended (hidden, state kept) while a modal run is active, and come back when it ends. Rendered by `hint`.
 
 Triggers are `"manual"` (only `start()`) or `"visible"`: the guide starts when the target of its first step (or of the step an in-progress record points at) becomes visible, if it is eligible and was never completed or dismissed.
+
+## Hints (passive guides)
+
+A hint is a passive guide, usually of one step, that starts on its own when its target scrolls into view: a pulsing beacon on the target, and the step's content in a popover when the user clicks it.
+
+```ts
+// lib/guides.ts
+export const exportStep = createGuideStep({ id: "reports.export", side: "left" });
+
+export const exportHint = defineGuide({
+  id: "export-hint",
+  mode: "passive",
+  trigger: "visible", // or { on: "visible", delay: 1000, threshold: 1 }
+  steps: [exportStep],
+});
+
+export const guides = createGuideManager({ guides: [onboarding, exportHint] });
+```
+
+```tsx
+// app/providers.tsx: mount the hint frame next to the tour frame.
+<GuideRoot manager={guides} router={router}>
+  {children}
+  <GuideSpotlight />
+  <TourFrame />
+  <Hint />
+</GuideRoot>
+```
+
+```tsx
+// app/reports/export-button.tsx
+const ExportContent = ({ ctx }: WithGuideContext) => (
+  <>
+    <HintTitle ctx={ctx}>Export to CSV</HintTitle>
+    <HintDescription ctx={ctx}>Download the filtered rows, ready for a spreadsheet.</HintDescription>
+  </>
+);
+
+export function ExportButton() {
+  const { ref } = useGuideAnchor(exportStep, { content: ExportContent });
+  return <Button ref={ref}>Export</Button>;
+}
+```
+
+The anchor and its content work exactly as in a tour; only the frame changes. `Hint` selects the passive runs and, for each one:
+
+- draws the **beacon** on the target's corner, from `frame.rects`: a `button` with `aria-expanded`, pulsing in CSS (`animate-ping`, off with reduced motion);
+- opens the **popover** on click: the frame's `floatingProps`, placed next to the target like the tour frame, with the content, a counter when the hint has several steps, and Next or Got it (`end("completed")`);
+- closes the popover on a press outside, and **dismisses** the hint with its close button or Escape while the focus is in it (`end("dismissed")`, hidden when not dismissible).
+
+It never takes the focus on its own: the popover only receives it after a click on the beacon, and after Next, when it stays open on the next step. A tour closes it: the hint comes back with its beacon only. A `visible` hint that was completed or dismissed never comes back by itself; bump its `version` to show it again. Labels are props with English defaults:
+
+```tsx
+<Hint labels={{ open: "Voir l'astuce", close: "Fermer", next: "Suivant", done: "Compris" }} />
+```
 
 ## Decisions
 
