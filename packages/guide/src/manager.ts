@@ -71,6 +71,8 @@ interface RunInternal {
   snapshot: GuideRun | null;
   /** Latest requested index. */
   target: number;
+  /** Elements observed while active (sized targets at the last measure). */
+  tracked: readonly Element[];
   untrack: (() => void) | null;
 }
 
@@ -139,6 +141,9 @@ const sameLayout = (a: GuideLayout, b: GuideLayout): boolean =>
   sameRect(a.view, b.view) &&
   a.viewport.width === b.viewport.width &&
   a.viewport.height === b.viewport.height;
+
+const sameElements = (a: readonly Element[], b: readonly Element[]): boolean =>
+  a.length === b.length && a.every((element, index) => element === b[index]);
 
 const effectiveRecord = (
   guide: Guide,
@@ -460,6 +465,7 @@ export const createGuideManager = (
   const stopTracking = (run: RunInternal) => {
     run.untrack?.();
     run.untrack = null;
+    run.tracked = [];
     if (layouts.delete(run.guide.id)) {
       notifyLayout(run.guide.id);
     }
@@ -477,12 +483,31 @@ export const createGuideManager = (
       : { x: 0, y: 0, ...driver.viewport() };
   };
 
-  const updateLayout = (run: RunInternal): boolean => {
+  /**
+   * Measures the active step's targets. Without any left, the run goes back
+   * to the wait (§10). The observed elements follow the resolved ones: a
+   * target replaced or added (selector matching a re-rendered node) is
+   * observed from then on.
+   */
+  const updateLayout = (run: RunInternal) => {
     const step = (currentEntry(run) as GuideEntry).step;
-    const rects = sizedTargets(step).map((element) => driver.measure(element));
+    const elements: Element[] = [];
+    const rects: Rect[] = [];
+    for (const element of resolveElements(step)) {
+      const rect = driver.measure(element);
+      if (isNonEmpty(rect)) {
+        elements.push(element);
+        rects.push(rect);
+      }
+    }
     if (rects.length === 0) {
       lose(run);
-      return false;
+      return;
+    }
+    if (!sameElements(run.tracked, elements)) {
+      run.untrack?.();
+      run.tracked = elements;
+      run.untrack = driver.track(elements, () => updateLayout(run));
     }
     const layout: GuideLayout = {
       rects,
@@ -495,15 +520,11 @@ export const createGuideManager = (
       layouts.set(run.guide.id, layout);
       notifyLayout(run.guide.id);
     }
-    return true;
   };
 
   const startTracking = (run: RunInternal) => {
     stopTracking(run);
-    if (updateLayout(run)) {
-      const step = (currentEntry(run) as GuideEntry).step;
-      run.untrack = driver.track(sizedTargets(step), () => updateLayout(run));
-    }
+    updateLayout(run);
   };
 
   const setTransitioning = (run: RunInternal) => {
@@ -1177,6 +1198,7 @@ export const createGuideManager = (
       controller: new AbortController(),
       ending: false,
       releases: [],
+      tracked: [],
       untrack: null,
       snapshot: null,
     };

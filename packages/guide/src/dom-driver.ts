@@ -246,7 +246,12 @@ const track = (
   onChange: () => void
 ): (() => void) => {
   const scheduler = frameScheduler(onChange);
-  const cleanups = [listenViewport(scheduler.schedule), scheduler.cancel];
+  // Child list mutations: layout shifts, removed or re-rendered targets.
+  const cleanups = [
+    observeChildList(scheduler.schedule),
+    listenViewport(scheduler.schedule),
+    scheduler.cancel,
+  ];
   if (typeof ResizeObserver !== "undefined") {
     const observer = new ResizeObserver(scheduler.schedule);
     for (const element of elements) {
@@ -319,8 +324,9 @@ const observeVisibility = ({
  *
  * - Waiting: `MutationObserver` (`childList` on `document`), captured scroll
  *   and viewport changes, coalesced per animation frame.
- * - Tracking: `ResizeObserver` on the targets, captured scroll, `resize`,
- *   `visualViewport`, coalesced per animation frame. No attribute observation.
+ * - Tracking: `ResizeObserver` on the targets, `MutationObserver`
+ *   (`childList`), captured scroll, `resize`, `visualViewport`, coalesced per
+ *   animation frame. No attribute observation.
  * - Scroll: `scrollIntoView` of the largest target when it is not fully
  *   visible; `"auto"` respects `prefers-reduced-motion`; a smooth scroll
  *   settles on `scrollend` (captured on `document`) or after 500 ms.

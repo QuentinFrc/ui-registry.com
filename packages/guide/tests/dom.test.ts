@@ -188,6 +188,21 @@ describe("dom driver: tracking", () => {
     expect(onChange).toHaveBeenCalledTimes(1);
   });
 
+  it("notifies on child list mutations (layout shifts, removed targets)", async () => {
+    const frames = installFrames();
+    const driver = createDomDriver();
+    const onChange = vi.fn();
+    const stop = driver.track([mountElement(RECT)], onChange);
+    document.body.prepend(document.createElement("header"));
+    await flush();
+    frames.flush();
+    expect(onChange).toHaveBeenCalledTimes(1);
+    stop();
+    document.body.prepend(document.createElement("header"));
+    await flush();
+    expect(frames.pending).toBe(0);
+  });
+
   it("tracks scroll and resize without ResizeObserver", () => {
     const frames = installFrames();
     const driver = createDomDriver();

@@ -61,7 +61,10 @@ export interface GuideDriver {
     options: ResolvedScrollOptions,
     signal: AbortSignal
   ): Promise<void>;
-  /** Tracks the targets of an active step (resize, scroll); returns the cleanup. */
+  /**
+   * Tracks the targets of an active step (resize, child list mutations,
+   * scroll); returns the cleanup.
+   */
   track(elements: readonly Element[], onChange: () => void): () => void;
   /** Size of the layout viewport (placement view, spotlight clamp). */
   viewport(): Size;

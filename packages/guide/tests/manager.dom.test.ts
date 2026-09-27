@@ -271,6 +271,34 @@ describe("manager with the DOM driver: tracking", () => {
     expect(manager.getLayout("tour")?.rects).toEqual([RECT]);
   });
 
+  it("observes a target re-rendered while active", async () => {
+    const element = mountElement(RECT, { class: "row" });
+    const step = createGuideStep({ id: "a", target: ".row" });
+    const { manager } = await create({ guides: [tour([step])] });
+    manager.start("tour");
+    await flush();
+    const first = observers.resize.at(-1);
+
+    // The node is swapped for a new one matching the same selector.
+    element.remove();
+    const replacement = mountElement({ ...RECT, y: 100 }, { class: "row" });
+    await flush();
+    frames.flush();
+    expect(runOf(manager, "tour")?.status).toBe("active");
+    expect(manager.getLayout("tour")?.rects).toEqual([{ ...RECT, y: 100 }]);
+    expect(first?.disconnected).toBe(true);
+    const second = observers.resize.at(-1);
+    expect([...(second?.targets ?? [])]).toEqual([replacement]);
+
+    // Its size changes are followed.
+    setRect(replacement, { ...RECT, y: 100, height: 80 });
+    second?.trigger();
+    frames.flush();
+    expect(manager.getLayout("tour")?.rects).toEqual([
+      { ...RECT, y: 100, height: 80 },
+    ]);
+  });
+
   it("measures the collision container as the placement view", async () => {
     mountElement(RECT, { class: "row" });
     const container = mountElement({ x: 50, y: 60, width: 500, height: 400 });
