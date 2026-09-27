@@ -1,0 +1,246 @@
+export const metadata = {
+  title: "@ui-registry/guide",
+  description:
+    "Guide users through your UI: anchored steps, cross-page sequences, lifecycle hooks and persistence.",
+};
+
+# @ui-registry/guide
+
+Anchor steps on elements, order them into guides that cross pages, and let the component that owns each target own its content. Headless core, React bindings, shadcn frames.
+
+## Origin
+
+This package comes out of the product tour of a real mission, a bridge training app. The first version was a classic tour component: a list of steps, each with a CSS selector, a title and a description, rendered by one big provider. It held up for one page. Then the product asked for more, and every request hit the same walls:
+
+- **Content far from its target**: the step's text lived in the tour config, while the thing it described lived in a component three folders away, with the props and the state the text needed.
+- **Pages**: step 3 is on `/groups`, step 4 on `/deals/new`, and the editor must open the "Auction" tab before step 5 makes sense. The tour knew nothing about routes, tabs or waiting.
+- **Missing targets**: a feature flag, a mobile layout or an empty list removes an element, and the tour freezes on a spotlight around nothing.
+- **Persistence**: "has the user seen it?" became "which step were they on, which version of the tour, did they skip it or finish it?".
+
+The geometry held up well (spotlight clip-path, placement with fallbacks), so it was kept. The rest was rewritten around one idea: the lib describes the **mechanics** (steps, orchestration, waiting, persistence), the app renders **everything visible**, and the registry ships the usual shapes of it (a tour frame, a spotlight, a welcome dialog).
+
+## Install
+
+```sh
+pnpm add @ui-registry/guide
+pnpm dlx shadcn@latest add https://ui-registry.com/r/guide/tour-frame
+pnpm dlx shadcn@latest add https://ui-registry.com/r/guide/guide-spotlight
+```
+
+The npm package has two entries: `@ui-registry/guide`, the vanilla core (zero dependencies), and `@ui-registry/guide/react`, headless React 19 bindings. The shadcn registry ships the visible parts, as files you own once installed: `tour-frame`, `guide-spotlight`, `welcome-dialog` and `next-router-adapter`.
+
+## Quick start
+
+```tsx
+// lib/guides.ts
+import { createGuideManager, createGuideStep, defineGuide, onPage } from "@ui-registry/guide";
+
+export const createGroupStep = createGuideStep({ id: "groups.create", side: "bottom" });
+export const viewToggleStep = createGuideStep({ id: "groups.view", side: "left" });
+
+export const onboarding = defineGuide({
+  id: "onboarding",
+  steps: [...onPage("/groups", [createGroupStep, viewToggleStep])],
+});
+
+export const guides = createGuideManager({ guides: [onboarding] });
+```
+
+```tsx
+// app/providers.tsx
+"use client";
+import { GuideRoot } from "@ui-registry/guide/react";
+import { usePathname, useRouter } from "next/navigation";
+import { GuideSpotlight } from "@/components/guide-spotlight";
+import { TourFrame } from "@/components/tour-frame";
+import { nextRouterAdapter } from "@/lib/next-router-adapter";
+import { guides } from "@/lib/guides";
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  const router = nextRouterAdapter({ router: useRouter(), pathname: usePathname() });
+  return (
+    <GuideRoot manager={guides} router={router}>
+      {children}
+      <GuideSpotlight />
+      <TourFrame />
+    </GuideRoot>
+  );
+}
+```
+
+```tsx
+// app/groups/create-group-button.tsx
+"use client";
+import { useGuideAnchor, type WithGuideContext } from "@ui-registry/guide/react";
+import { Button } from "@/components/ui/button";
+import { TourDescription, TourTitle } from "@/components/tour-frame";
+import { createGroupStep } from "@/lib/guides";
+
+const CreateGroupContent = ({ ctx }: WithGuideContext) => (
+  <>
+    <TourTitle ctx={ctx}>Create your first group</TourTitle>
+    <TourDescription ctx={ctx}>Groups hold your students and their deals.</TourDescription>
+  </>
+);
+
+export function CreateGroupButton() {
+  const { ref } = useGuideAnchor(createGroupStep, { content: CreateGroupContent });
+  return <Button ref={ref}>New group</Button>;
+}
+```
+
+Then `guides.start("onboarding")` from anywhere: a button, an effect, the console. Three layers, each in its place: the steps and the guide are data, the root and the frame are mounted once, and each anchor brings its own content.
+
+## Steps & anchors
+
+A **step** is a point in the UI: an id, placement defaults (`side`, `align`, `sideOffset`, `spotlightPadding`) and, optionally, a `target`. It is frozen data with no content and no rendering, so the same step can appear in several guides.
+
+```ts
+export const dealerStep = createGuideStep({
+  id: "deals.dealer",
+  side: "right",
+  align: "start",
+  target: "[data-dealer]", // fallback when no anchor is registered
+});
+```
+
+The preferred way to point a step at an element is the **anchor**: `useGuideAnchor(step)` returns a callback ref. It can be set on several elements (the mobile and desktop variants of a button, each row of a list); empty rects are ignored, so hidden variants do not count. `target` is the fallback for elements you do not render yourself: a selector, several selectors, or a function returning elements. An invalid selector resolves to "no target", never to an exception.
+
+`useGuideAnchor` also takes `enabled` (no anchor, no content, no lifecycle while `false`) and `lifecycle`, local hooks that only exist while the component is mounted (see below).
+
+## Guides & orchestration
+
+A **guide** orders steps. Each entry can carry a route, a condition, hooks and overrides:
+
+```ts
+export const dealEditorTour = defineGuide({
+  id: "deal-editor",
+  version: 2,
+  steps: [
+    ...onPage("/groups", [createGroupStep, viewToggleStep]),
+    ...onPage("/deals/new", [
+      dealerStep,
+      { step: bidsStep, beforeEnter: () => editorUi.openTab("auction"), onMissing: "end" },
+      { step: studentStep, when: () => flags.students },
+    ]),
+  ],
+});
+```
+
+### `onPage` and routes
+
+`onPage(route, steps)` sets `route` on each entry and keeps its hooks and overrides. A string route is compared to the exact pathname (no query, no hash); a function receives the pathname and returns a boolean. When the next step's route does not match, the manager navigates through the router you gave to `GuideRoot`, waits for the pathname to match, then waits for the target. Routes are declarative and idempotent: going back a step that is on another page navigates back.
+
+`when` is evaluated once, at start. The run's total stays stable while it runs: the counter never jumps from "3 of 5" to "3 of 4".
+
+### Lifecycle, two levels
+
+A transition runs hooks at two levels: the **entry** (declared in the guide, always there) and the **local** lifecycle (registered by the anchored component, only while it is mounted). The order is fixed:
+
+1. `beforeLeave` of the current step: entry, then local.
+2. Route: navigate and wait for the pathname.
+3. `beforeEnter` of the entry: open the tab, expand the panel, whatever makes the target exist.
+4. Wait for a target (and the content, when the anchor provides one).
+5. `beforeEnter` local: the component is mounted now, it can prepare its own state.
+6. Scroll into view (modal), commit, record.
+7. `afterLeave` of the step left (local, then entry), then `afterEnter` (entry, then local).
+
+Every hook receives a context with the direction (`forward`, `backward`, `jump`), `from` and `to`, an `AbortSignal`, `navigate`, `waitFor` and the manager. The latest request wins: clicking Next twice aborts the first transition (its signal fires) and runs the second. Each hook is bounded by `hookTimeout` (10 s by default).
+
+## Content
+
+The component that owns the target also owns the step's content, because that is where the props, the state and the providers are. `useGuideAnchor` takes it in one of three forms:
+
+```tsx
+// content: a component, rendered by the frame. Own hooks and state; keep its identity stable.
+useGuideAnchor(step, { content: CreateGroupContent });
+
+// render: a function, called with the context. Sees the closure (props, state), no remount.
+useGuideAnchor(step, { render: (ctx) => <CreateGroupContent ctx={ctx} count={count} /> });
+
+// portal: the content renders in this component's tree (local providers), portaled into the frame.
+const { ref, portal } = useGuideAnchor(formStep, { portal: true, content: FormHint });
+return (
+  <>
+    <Field ref={ref} />
+    {portal}
+  </>
+);
+```
+
+Pick `content` by default, `render` when the text depends on the component's props or state, and `portal` only when the content needs a provider that the frame, mounted at the root, does not see (a form context, a local store).
+
+Every form receives `ctx`: the guide, the step, `mode`, `index`, `total`, `isFirst`, `isLast`, `dismissible`, `next()`, `prev()`, `end()` and `ids`. `ids.title` and `ids.description` are the ids the frame points `aria-labelledby` and `aria-describedby` at; `TourTitle` and `TourDescription` from the registry set them for you.
+
+## Frame
+
+The **frame** is the floating container of a run: position, chrome, counter, navigation. `GuideFrame` is headless: it renders your function once per selected run and gives it everything else.
+
+```tsx
+<GuideFrame select={(run) => run.guide.mode === "modal"}>
+  {(frame) => (
+    <Card {...frame.floatingProps}>
+      <frame.Content />
+      <footer>
+        {frame.index + 1}/{frame.total}
+      </footer>
+    </Card>
+  )}
+</GuideFrame>
+```
+
+`floatingProps` carries the fixed position (hidden until the first measure), `role="dialog"`, `aria-modal`, the aria ids, `tabIndex={-1}` and three data attributes: `data-side` and `data-align`, the **effective** placement after fallbacks, and `data-mode`. The registry's `tour-frame` uses `data-side` for its entry animation, in plain CSS: no animation library.
+
+Placement is a replaceable strategy. `defaultPlacement` anchors on the largest target, tries the requested side, then the opposite one, then the perpendiculars, avoids the padded spotlights and clamps into the view. The veil is `useGuideSpotlight()`: a `clip-path` with one hole per target, merged when they overlap. The registry's `guide-spotlight` renders it and dismisses the run on click.
+
+## Persistence
+
+Each guide has a **record** per user: `in-progress` (with the step), `completed` or `dismissed`, plus the guide's `version`.
+
+```ts
+createGuideManager({
+  guides: [onboarding],
+  storage: localStorageAdapter({ prefix: "guide:" }), // default
+});
+```
+
+- `start()` resumes an `in-progress` record by default; `start(id, { from: "start" })` starts over.
+- Bumping a guide's `version` ignores older records: the guide is offered again.
+- Writes are optimistic, with a rollback and an `error` event if the storage fails. The local storage adapter swallows quota and private-mode errors and follows other tabs.
+- `memoryAdapter()` for tests; your own `{ get, set, remove, subscribe? }` for a server.
+
+A `manual` guide never resumes on its own after a reload: the record is exposed in the state and the app decides. The registry's `welcome-dialog` is that decision, written once: it opens when the records are hydrated and the guide has no record (Start) or an in-progress one (Resume, Start over), and Skip records the guide as dismissed.
+
+## Errors & dismissible
+
+A step whose target never shows up within `waitTimeout` follows `onMissing`: `"skip"` (default) moves on in the same direction, `"end"` ends the run. A hook that throws or times out goes through `onError`, which picks an action:
+
+- **`"end"`** (default): ends the run, even when it is not dismissible.
+- **`"skip"`**: next step in the same direction.
+- **`"retry"`**: replays the transition once, then ends.
+- **`"stay"`**: stays on the current step.
+
+Whatever happens, ending a run releases everything it holds: veil, scroll lock, keyboard listeners, observers, focus. Cleanup hooks that throw are reported, not rethrown.
+
+`dismissible: false` (entry, guide or manager) removes the ways out: Escape, a click on the veil and `end("dismissed")` are refused, and the frame hides Skip. `end("completed")` is always possible.
+
+All options resolve the same way: **entry, then guide, then manager, then default**.
+
+## Modes
+
+A guide is `modal` or `passive`.
+
+- **Modal** (available now): one at a time, veil and spotlight, scroll to the target, focus in the frame and restored at the end, global keyboard (Escape, arrows). Starting a second modal guide is refused unless you pass `{ replace: true }`; a modal guide triggered automatically while another runs waits in a queue.
+- **Passive** (coming with the `hint` registry item): several at once, no veil, no scroll, no stolen focus. Passive runs are suspended while a modal run is active. The mechanics already ship in the package; the registry item comes next.
+
+Triggers are `"manual"` (only `start()`) or `"visible"`: the guide starts when the first step's target becomes visible, if it is eligible and was never completed or dismissed.
+
+## Decisions
+
+- **Steps carry no content**: the text belongs to the component that owns the target, with its props and providers. A step is a point, so it can be shared between guides.
+- **Two lifecycle levels**: the guide knows the route and the tab to open; the component knows its own state. Neither can do the other's job, so both get hooks, in a fixed order.
+- **`content`, `render` and `portal` rather than one option**: a component is the safe default, a function sees the closure, a portal inherits providers. Each has a cost the other two avoid.
+- **Headless frame, shadcn chrome in the registry**: positioning and aria are mechanics, the card and the buttons are yours. Changing a label is editing a file, not waiting for a prop.
+- **Slow and fast state**: runs and records change a few times per tour; target rects change on every scroll. They are two channels, so a scroll only re-renders the frame and the veil.
+- **Routes are data**: `onPage` is declarative and idempotent, which is what makes going backward across pages work without extra code.
+- **No animation library**: the frame animates in CSS from `data-side`, the veil transitions its `clip-path`.
