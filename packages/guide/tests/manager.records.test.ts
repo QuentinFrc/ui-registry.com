@@ -282,4 +282,38 @@ describe("manager records", () => {
       expect(manager.getState().records.tour).toEqual(finished);
     }
   });
+
+  it("discards an older hydration finishing after a newer one", async () => {
+    const reads: ReturnType<typeof deferred<GuideRecord | null>>[] = [];
+    let notify: () => void = () => undefined;
+    const storage: GuideStorage = {
+      ...memoryAdapter(),
+      get: () => {
+        const read = deferred<GuideRecord | null>();
+        reads.push(read);
+        return read.promise;
+      },
+      subscribe: (fn) => {
+        notify = fn;
+        return () => undefined;
+      },
+    };
+    const fake = createFakeDriver();
+    const [a] = mountedSteps(fake, "a");
+    const { createGuideManager } = await import("../src/manager.js");
+    const manager = createGuideManager({
+      guides: [defineGuide({ id: "tour", steps: [a] })],
+      storage,
+      driver: fake.driver,
+    });
+    notify();
+    reads[1]?.resolve(inProgress("a"));
+    await flush();
+    reads[0]?.resolve(null);
+    await flush();
+    expect(manager.getState()).toMatchObject({
+      hydrated: true,
+      records: { tour: inProgress("a") },
+    });
+  });
 });

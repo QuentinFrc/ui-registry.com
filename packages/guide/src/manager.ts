@@ -175,8 +175,11 @@ export const createGuideManager = (
   const contents = new Map<string, { entry: unknown }[]>();
   const lifecycles = new Map<string, StepLifecycle[]>();
   const frames = new Map<string, Element>();
-  /** Guides written locally while a hydration is in flight. */
-  const touched = new Set<string>();
+  /** Local write counter, and the count of each guide's latest write. */
+  let writeCount = 0;
+  const writtenAt = new Map<string, number>();
+  /** Latest hydration: an older one finishing late is discarded. */
+  let hydrations = 0;
   /** Guides that already had a run: the `visible` trigger does not re-arm. */
   const handled = new Set<string>();
   const queue: string[] = [];
@@ -276,7 +279,8 @@ export const createGuideManager = (
 
   const writeRecord = (guide: Guide, record: GuideRecord | null) => {
     const previous = records[guide.id] ?? null;
-    touched.add(guide.id);
+    writeCount += 1;
+    writtenAt.set(guide.id, writeCount);
     records = { ...records, [guide.id]: record };
     refresh();
     callAsync(() =>
@@ -314,14 +318,17 @@ export const createGuideManager = (
   };
 
   const hydrate = async () => {
-    touched.clear();
+    hydrations += 1;
+    const hydration = hydrations;
+    const startedAt = writeCount;
     const loaded = await Promise.all(options.guides.map(readRecord));
-    if (destroyed) {
+    if (destroyed || hydration !== hydrations) {
       return;
     }
     const next = { ...records };
     for (const [guideId, record] of loaded) {
-      if (!touched.has(guideId)) {
+      // A local write made after this read started is newer: keep it.
+      if ((writtenAt.get(guideId) ?? 0) <= startedAt) {
         next[guideId] = record;
       }
     }
