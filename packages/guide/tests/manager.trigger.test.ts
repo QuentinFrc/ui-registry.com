@@ -212,4 +212,28 @@ describe("manager trigger", () => {
     await vi.advanceTimersByTimeAsync(100);
     expect(manager.getState().runs).toEqual([]);
   });
+
+  it("observes the first step again after resetRecord of an in-progress guide", async () => {
+    const { fake, manager } = await triggerSetup({
+      records: { auto: record("in-progress", { stepId: "b" }) },
+    });
+    expect([...fake.visibility][0]?.resolve()).toEqual(fake.driver.query("#b"));
+    manager.resetRecord("auto");
+    expect(fake.visibility.size).toBe(1);
+    expect([...fake.visibility][0]?.resolve()).toEqual(fake.driver.query("#a"));
+  });
+
+  it("notifies the visibility observer when anchors are registered", async () => {
+    const { fake, manager } = await triggerSetup();
+    const [request] = [...fake.visibility];
+    const notify = vi.fn();
+    const unsubscribe = request?.subscribe(notify);
+    const anchor = fake.driver.query("#b")[0] as Element;
+    const cleanup = manager.registerAnchor("a", anchor);
+    expect(notify).toHaveBeenCalledTimes(1);
+    expect(request?.resolve()).toEqual([anchor]);
+    unsubscribe?.();
+    cleanup();
+    expect(notify).toHaveBeenCalledTimes(1);
+  });
 });

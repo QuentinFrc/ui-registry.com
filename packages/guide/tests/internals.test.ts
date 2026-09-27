@@ -150,6 +150,7 @@ describe("headless driver", () => {
       driver.track([], () => undefined),
       driver.observeVisibility({
         resolve: () => [],
+        subscribe: () => () => undefined,
         threshold: 0.5,
         onChange: () => undefined,
       }),

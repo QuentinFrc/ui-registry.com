@@ -21,8 +21,13 @@ export interface KeyIntent {
 export interface VisibilityRequest {
   /** Called with `true` when one of the elements becomes visible, `false` when none is. */
   onChange: (visible: boolean) => void;
-  /** Elements to observe, re-resolved by the driver whenever anchors change. */
+  /**
+   * Elements to observe. The driver calls it again on DOM mutations and on
+   * each `subscribe` notification.
+   */
   resolve: () => readonly Element[];
+  /** Notifies when anchors are (un)registered; returns the unsubscribe. */
+  subscribe: (notify: () => void) => () => void;
   /** Ratio, default 0.5. */
   threshold: number;
 }

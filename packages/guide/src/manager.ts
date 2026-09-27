@@ -73,6 +73,8 @@ interface RunInternal {
 
 /** An armed `visible` trigger. */
 interface Watcher {
+  /** Observed step (first step, or the in-progress record's). */
+  stepId: string;
   stop: () => void;
   timer: ReturnType<typeof setTimeout> | undefined;
 }
@@ -1150,10 +1152,14 @@ export const createGuideManager = (
 
   const arm = (guide: Guide, delay: number, threshold: number) => {
     const step = triggerStep(guide);
-    const watcher: Watcher = { stop: noop, timer: undefined };
+    const watcher: Watcher = { stepId: step.id, stop: noop, timer: undefined };
     watchers.set(guide.id, watcher);
     watcher.stop = driver.observeVisibility({
       resolve: () => resolveElements(step),
+      subscribe: (notify) => {
+        registryListeners.add(notify);
+        return () => registryListeners.delete(notify);
+      },
       threshold,
       onChange: (visible) => {
         clearTimeout(watcher.timer);
@@ -1180,11 +1186,15 @@ export const createGuideManager = (
       if (trigger.on === "manual") {
         continue;
       }
-      const armed = watchers.has(guide.id);
-      if (shouldArm(guide) && !armed) {
-        arm(guide, trigger.delay, trigger.threshold);
-      } else if (!shouldArm(guide) && armed) {
+      const wanted = shouldArm(guide);
+      const armed = watchers.get(guide.id);
+      // Re-armed when the step to observe changed (record written elsewhere,
+      // `resetRecord`).
+      if (armed && !(wanted && armed.stepId === triggerStep(guide).id)) {
         disarm(guide.id);
+      }
+      if (wanted && !watchers.has(guide.id)) {
+        arm(guide, trigger.delay, trigger.threshold);
       }
     }
   }
