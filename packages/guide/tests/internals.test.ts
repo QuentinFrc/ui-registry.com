@@ -136,6 +136,7 @@ describe("headless driver", () => {
       width: 0,
       height: 0,
     });
+    expect(driver.viewport()).toEqual({ width: 0, height: 0 });
     expect(driver.isInViewport(element)).toBe(false);
     expect(driver.contains(element, element)).toBe(true);
     expect(driver.contains(element, null)).toBe(false);
@@ -167,10 +168,12 @@ describe("package entry", () => {
       "GuideTimeoutError",
       "createGuideManager",
       "createGuideStep",
+      "defaultPlacement",
       "defineGuide",
       "localStorageAdapter",
       "memoryAdapter",
       "onPage",
+      "spotlightPath",
     ]);
   });
 });

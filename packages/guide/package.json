@@ -47,6 +47,7 @@
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^22.15.3",
     "@vitest/coverage-v8": "^4.1.7",
+    "jsdom": "^30.1.1",
     "tsup": "^8.5.1",
     "typescript": "5.9.2",
     "vitest": "^4.1.7"

@@ -6,6 +6,7 @@ import {
   withAbort,
 } from "./async.js";
 import { warn } from "./dev.js";
+import { createDomDriver, hasDom } from "./dom-driver.js";
 import type { GuideDriver, KeyIntent } from "./driver.js";
 import { matchRoute } from "./guide.js";
 import { createHeadlessDriver } from "./headless-driver.js";
@@ -38,6 +39,7 @@ import type {
   GuideStep,
   Hook,
   HookContext,
+  Rect,
   StartOptions,
   StartTrigger,
   StepLifecycle,
@@ -45,7 +47,8 @@ import type {
 
 export type CreateGuideManagerOptions = GuideManagerOptions & {
   /**
-   * Environment of the manager (DOM access). Defaults to a headless driver.
+   * Environment of the manager (DOM access). Defaults to the DOM driver when
+   * `window` exists, to a headless driver otherwise.
    *
    * @internal
    */
@@ -127,6 +130,16 @@ const once = (fn: () => void): (() => void) => {
 const isNonEmpty = ({ width, height }: { width: number; height: number }) =>
   width > 0 && height > 0;
 
+const sameRect = (a: Rect, b: Rect): boolean =>
+  a.x === b.x && a.y === b.y && a.width === b.width && a.height === b.height;
+
+const sameLayout = (a: GuideLayout, b: GuideLayout): boolean =>
+  a.rects.length === b.rects.length &&
+  a.rects.every((rect, index) => sameRect(rect, b.rects[index] as Rect)) &&
+  sameRect(a.view, b.view) &&
+  a.viewport.width === b.viewport.width &&
+  a.viewport.height === b.viewport.height;
+
 const effectiveRecord = (
   guide: Guide,
   record: GuideRecord | null
@@ -162,7 +175,8 @@ export const createGuideManager = (
   const guides = indexGuides(options.guides);
   const defaults: ManagerDefaults = resolveManagerDefaults(options);
   const storage = options.storage ?? localStorageAdapter();
-  const driver = options.driver ?? createHeadlessDriver();
+  const driver =
+    options.driver ?? (hasDom() ? createDomDriver() : createHeadlessDriver());
 
   let destroyed = false;
   let runs: RunInternal[] = [];
@@ -451,6 +465,18 @@ export const createGuideManager = (
     }
   };
 
+  const measureView = (): Rect => {
+    let container: Element | null = null;
+    try {
+      container = options.collisionContainer?.() ?? null;
+    } catch (error) {
+      warn("`collisionContainer` threw: using the viewport.", error);
+    }
+    return container
+      ? driver.measure(container)
+      : { x: 0, y: 0, ...driver.viewport() };
+  };
+
   const updateLayout = (run: RunInternal): boolean => {
     const step = (currentEntry(run) as GuideEntry).step;
     const rects = sizedTargets(step).map((element) => driver.measure(element));
@@ -458,8 +484,17 @@ export const createGuideManager = (
       lose(run);
       return false;
     }
-    layouts.set(run.guide.id, { rects });
-    notifyLayout(run.guide.id);
+    const layout: GuideLayout = {
+      rects,
+      view: measureView(),
+      viewport: driver.viewport(),
+    };
+    const previous = layouts.get(run.guide.id);
+    // Scroll and resize notifications that do not move anything are dropped.
+    if (!(previous && sameLayout(previous, layout))) {
+      layouts.set(run.guide.id, layout);
+      notifyLayout(run.guide.id);
+    }
     return true;
   };
 

@@ -211,6 +211,8 @@ describe("manager state", () => {
     await flush();
     expect(manager.getLayout("tour")).toEqual({
       rects: [{ x: 10, y: 20, width: 100, height: 40 }],
+      view: { x: 0, y: 0, width: 1000, height: 800 },
+      viewport: { width: 1000, height: 800 },
     });
     expect(listener).toHaveBeenCalledTimes(1);
     const [tracked] = [...fake.tracked];

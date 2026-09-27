@@ -216,8 +216,12 @@ export interface GuideState {
 }
 
 export interface GuideLayout {
-  /** Non-empty rects of the active step's targets. */
+  /** Non-empty rects of the active step's targets (viewport coordinates). */
   rects: Rect[];
+  /** Placement bounds: the `collisionContainer`'s rect, or the viewport. */
+  view: Rect;
+  /** Size of the viewport (spotlight clamp). */
+  viewport: Size;
 }
 
 export type EndReason =
