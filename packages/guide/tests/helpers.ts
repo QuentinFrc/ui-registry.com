@@ -33,6 +33,7 @@ export interface FakeElement {
 }
 
 export const DEFAULT_RECT: Rect = { x: 10, y: 20, width: 100, height: 40 };
+export const VIEWPORT = { width: 1000, height: 800 };
 export const EMPTY_RECT: Rect = { x: 0, y: 0, width: 0, height: 0 };
 
 export const fakeElement = (
@@ -84,6 +85,7 @@ export const createFakeDriver = () => {
       return selectors.get(selector) ?? [];
     },
     measure: (element) => asFake(element).rect,
+    viewport: () => VIEWPORT,
     isInViewport: (element) => asFake(element).inViewport,
     contains: (container, node) => {
       let current = node as FakeElement | null;

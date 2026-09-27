@@ -5,6 +5,8 @@ export {
   type CreateGuideManagerOptions,
   createGuideManager,
 } from "./manager.js";
+export { defaultPlacement } from "./placement.js";
+export { spotlightPath } from "./spotlight.js";
 export { createGuideStep } from "./step.js";
 export {
   type LocalStorageAdapterOptions,

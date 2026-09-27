@@ -240,6 +240,49 @@ describe("manager missing", () => {
     expect(eventsOf(events, "end")[0]?.reason).toBe("missing");
   });
 
+  it("does not abort the hooks of the committing transition when the target flickers", async () => {
+    const fake = createFakeDriver();
+    const [a] = mountedSteps(fake, "a");
+    let hookSignal: AbortSignal | null = null;
+    let finishHook: () => void = () => undefined;
+    const guide = defineGuide({
+      id: "tour",
+      waitTimeout: WAIT,
+      steps: [
+        {
+          step: a as GuideEntry["step"],
+          afterEnter: ({ signal }) => {
+            hookSignal = signal;
+            return new Promise<void>((resolve) => {
+              finishHook = resolve;
+            });
+          },
+        },
+      ],
+    });
+    const { manager, events } = await setup({ guides: [guide], fake });
+    manager.start("tour");
+    await flush();
+    expect(hookSignal).not.toBeNull();
+
+    const [element] = fake.driver.query("#a");
+    fake.resize(element as Element, EMPTY_RECT);
+    expect(runOf(manager, "tour")?.status).toBe("transitioning");
+    fake.resize(element as Element, { x: 0, y: 0, width: 10, height: 10 });
+    await flush();
+    expect(runOf(manager, "tour")?.status).toBe("active");
+    expect((hookSignal as AbortSignal | null)?.aborted).toBe(false);
+    finishHook();
+    await flush();
+    expect(eventsOf(events, "error")).toEqual([]);
+
+    // A new request still cancels a pending recovery.
+    fake.resize(element as Element, EMPTY_RECT);
+    manager.end("tour");
+    await vi.advanceTimersByTimeAsync(WAIT);
+    expect(eventsOf(events, "missing")).toEqual([]);
+  });
+
   it("stops a recovery when the run ends", async () => {
     const { manager, fake } = await missingSetup();
     manager.start("tour");

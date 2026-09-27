@@ -6,6 +6,7 @@ import {
   withAbort,
 } from "./async.js";
 import { warn } from "./dev.js";
+import { createDomDriver, hasDom } from "./dom-driver.js";
 import type { GuideDriver, KeyIntent } from "./driver.js";
 import { matchRoute } from "./guide.js";
 import { createHeadlessDriver } from "./headless-driver.js";
@@ -38,6 +39,7 @@ import type {
   GuideStep,
   Hook,
   HookContext,
+  Rect,
   StartOptions,
   StartTrigger,
   StepLifecycle,
@@ -45,7 +47,8 @@ import type {
 
 export type CreateGuideManagerOptions = GuideManagerOptions & {
   /**
-   * Environment of the manager (DOM access). Defaults to a headless driver.
+   * Environment of the manager (DOM access). Defaults to the DOM driver when
+   * `window` exists, to a headless driver otherwise.
    *
    * @internal
    */
@@ -68,6 +71,8 @@ interface RunInternal {
   snapshot: GuideRun | null;
   /** Latest requested index. */
   target: number;
+  /** Elements observed while active (sized targets at the last measure). */
+  tracked: readonly Element[];
   untrack: (() => void) | null;
 }
 
@@ -127,6 +132,19 @@ const once = (fn: () => void): (() => void) => {
 const isNonEmpty = ({ width, height }: { width: number; height: number }) =>
   width > 0 && height > 0;
 
+const sameRect = (a: Rect, b: Rect): boolean =>
+  a.x === b.x && a.y === b.y && a.width === b.width && a.height === b.height;
+
+const sameLayout = (a: GuideLayout, b: GuideLayout): boolean =>
+  a.rects.length === b.rects.length &&
+  a.rects.every((rect, index) => sameRect(rect, b.rects[index] as Rect)) &&
+  sameRect(a.view, b.view) &&
+  a.viewport.width === b.viewport.width &&
+  a.viewport.height === b.viewport.height;
+
+const sameElements = (a: readonly Element[], b: readonly Element[]): boolean =>
+  a.length === b.length && a.every((element, index) => element === b[index]);
+
 const effectiveRecord = (
   guide: Guide,
   record: GuideRecord | null
@@ -162,7 +180,8 @@ export const createGuideManager = (
   const guides = indexGuides(options.guides);
   const defaults: ManagerDefaults = resolveManagerDefaults(options);
   const storage = options.storage ?? localStorageAdapter();
-  const driver = options.driver ?? createHeadlessDriver();
+  const driver =
+    options.driver ?? (hasDom() ? createDomDriver() : createHeadlessDriver());
 
   let destroyed = false;
   let runs: RunInternal[] = [];
@@ -446,29 +465,66 @@ export const createGuideManager = (
   const stopTracking = (run: RunInternal) => {
     run.untrack?.();
     run.untrack = null;
+    run.tracked = [];
     if (layouts.delete(run.guide.id)) {
       notifyLayout(run.guide.id);
     }
   };
 
-  const updateLayout = (run: RunInternal): boolean => {
+  const measureView = (): Rect => {
+    let container: Element | null = null;
+    try {
+      container = options.collisionContainer?.() ?? null;
+    } catch (error) {
+      warn("`collisionContainer` threw: using the viewport.", error);
+    }
+    return container
+      ? driver.measure(container)
+      : { x: 0, y: 0, ...driver.viewport() };
+  };
+
+  /**
+   * Measures the active step's targets. Without any left, the run goes back
+   * to the wait (§10). The observed elements follow the resolved ones: a
+   * target replaced or added (selector matching a re-rendered node) is
+   * observed from then on.
+   */
+  const updateLayout = (run: RunInternal) => {
     const step = (currentEntry(run) as GuideEntry).step;
-    const rects = sizedTargets(step).map((element) => driver.measure(element));
+    const elements: Element[] = [];
+    const rects: Rect[] = [];
+    for (const element of resolveElements(step)) {
+      const rect = driver.measure(element);
+      if (isNonEmpty(rect)) {
+        elements.push(element);
+        rects.push(rect);
+      }
+    }
     if (rects.length === 0) {
       lose(run);
-      return false;
+      return;
     }
-    layouts.set(run.guide.id, { rects });
-    notifyLayout(run.guide.id);
-    return true;
+    if (!sameElements(run.tracked, elements)) {
+      run.untrack?.();
+      run.tracked = elements;
+      run.untrack = driver.track(elements, () => updateLayout(run));
+    }
+    const layout: GuideLayout = {
+      rects,
+      view: measureView(),
+      viewport: driver.viewport(),
+    };
+    const previous = layouts.get(run.guide.id);
+    // Scroll and resize notifications that do not move anything are dropped.
+    if (!(previous && sameLayout(previous, layout))) {
+      layouts.set(run.guide.id, layout);
+      notifyLayout(run.guide.id);
+    }
   };
 
   const startTracking = (run: RunInternal) => {
     stopTracking(run);
-    if (updateLayout(run)) {
-      const step = (currentEntry(run) as GuideEntry).step;
-      run.untrack = driver.track(sizedTargets(step), () => updateLayout(run));
-    }
+    updateLayout(run);
   };
 
   const setTransitioning = (run: RunInternal) => {
@@ -494,7 +550,8 @@ export const createGuideManager = (
         !run.ending &&
         currentStepId(run) === stepId
       ) {
-        startTracking(run);
+        // In place: the layout never goes through `null` for subscribers.
+        updateLayout(run);
       }
     }
   };
@@ -803,8 +860,14 @@ export const createGuideManager = (
     reenter(run);
   };
 
+  /**
+   * Waits for the current step again, under the run's current signal: a new
+   * request or `end()` still cancels it, but the hooks of the transition that
+   * committed this step (`afterLeave`, `afterEnter`) are not aborted by a
+   * target that flickers.
+   */
   const reenter = async (run: RunInternal) => {
-    const signal = renewController(run);
+    const { signal } = run.controller;
     const entry = currentEntry(run) as GuideEntry;
     const t: Transition = {
       from: run.current,
@@ -1142,6 +1205,7 @@ export const createGuideManager = (
       controller: new AbortController(),
       ending: false,
       releases: [],
+      tracked: [],
       untrack: null,
       snapshot: null,
     };

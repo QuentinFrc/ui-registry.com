@@ -3,13 +3,14 @@
  *
  * Every DOM concern goes through a driver injected in the manager, so that the
  * core stays pure logic (testable in `node` with a fake driver):
- * - lot 1 ships a headless driver (no DOM: nothing resolves, nothing moves),
- * - lot 2 plugs the real DOM driver (MutationObserver, ResizeObserver,
- *   IntersectionObserver, `scrollend`, key listeners on `document`).
+ * - the headless driver (no DOM: nothing resolves, nothing moves) is used
+ *   without `window` (server, workers),
+ * - the DOM driver (MutationObserver, ResizeObserver, IntersectionObserver,
+ *   `scrollend`, key listeners on `document`) is the default in a browser.
  *
  * @internal Not part of the public API; may change between lots.
  */
-import type { Rect, ScrollOptions } from "./types.js";
+import type { Rect, ScrollOptions, Size } from "./types.js";
 
 export interface KeyIntent {
   /** `KeyboardEvent.key`. Only `Escape`, `ArrowLeft` and `ArrowRight` are handled. */
@@ -60,8 +61,13 @@ export interface GuideDriver {
     options: ResolvedScrollOptions,
     signal: AbortSignal
   ): Promise<void>;
-  /** Tracks the targets of an active step (resize, scroll); returns the cleanup. */
+  /**
+   * Tracks the targets of an active step (resize, child list mutations,
+   * scroll); returns the cleanup.
+   */
   track(elements: readonly Element[], onChange: () => void): () => void;
+  /** Size of the layout viewport (placement view, spotlight clamp). */
+  viewport(): Size;
   /**
    * Notifies when targets may have appeared, changed size or visibility
    * (DOM mutations, scroll, resize). Used while waiting for a step.

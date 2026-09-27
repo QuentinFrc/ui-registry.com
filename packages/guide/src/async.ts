@@ -57,7 +57,8 @@ export const runBounded = <T>(
 
 /**
  * Resolves `true` as soon as `check()` passes (re-checked on each
- * notification of `subscribe`), `false` after `timeout` ms. Rejects when the
+ * notification of `subscribe`, and once more at the deadline), `false` after
+ * `timeout` ms. Rejects when the
  * signal aborts.
  */
 export const waitUntil = (
@@ -84,6 +85,8 @@ export const waitUntil = (
         settle(() => resolve(true));
       }
     });
-    const handle = setTimeout(() => settle(() => resolve(false)), timeout);
+    // A last check before giving up: notifications may be coalesced (animation
+    // frames, paused in background tabs) and lag behind the timeout.
+    const handle = setTimeout(() => settle(() => resolve(check())), timeout);
     signal.addEventListener("abort", onAbort, { once: true });
   });

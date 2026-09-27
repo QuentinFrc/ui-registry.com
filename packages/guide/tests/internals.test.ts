@@ -93,6 +93,20 @@ describe("async helpers", () => {
     await vi.advanceTimersByTimeAsync(100);
     await expect(late).resolves.toBe(false);
 
+    // Ready without notification (coalesced, paused frames): the deadline
+    // checks once more instead of reporting a miss.
+    const unnotified = waitUntil(
+      () => ready,
+      subscribe,
+      100,
+      controller.signal
+    );
+    ready = true;
+    await vi.advanceTimersByTimeAsync(100);
+    await expect(unnotified).resolves.toBe(true);
+    expect(notifiers.size).toBe(0);
+    ready = false;
+
     const aborted = waitUntil(() => ready, subscribe, 100, controller.signal);
     controller.abort(new Error("stop"));
     await expect(aborted).rejects.toThrow("stop");
@@ -136,6 +150,7 @@ describe("headless driver", () => {
       width: 0,
       height: 0,
     });
+    expect(driver.viewport()).toEqual({ width: 0, height: 0 });
     expect(driver.isInViewport(element)).toBe(false);
     expect(driver.contains(element, element)).toBe(true);
     expect(driver.contains(element, null)).toBe(false);
@@ -167,10 +182,12 @@ describe("package entry", () => {
       "GuideTimeoutError",
       "createGuideManager",
       "createGuideStep",
+      "defaultPlacement",
       "defineGuide",
       "localStorageAdapter",
       "memoryAdapter",
       "onPage",
+      "spotlightPath",
     ]);
   });
 });
