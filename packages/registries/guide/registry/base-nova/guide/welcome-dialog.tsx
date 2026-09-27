@@ -2,7 +2,7 @@
 
 import type { GuideState } from "@ui-registry/guide";
 import { useGuide } from "@ui-registry/guide/react";
-import { type ReactNode, useCallback, useState } from "react";
+import { type ReactNode, useCallback, useRef, useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -53,7 +53,8 @@ export interface WelcomeDialogProps {
  * Auto-start example for a `manual` guide. Once the records are hydrated, it
  * opens when the guide has no record (Start) or an in-progress one (Resume /
  * Start over). Skip records the guide as dismissed; Escape only closes the
- * dialog for this visit.
+ * dialog for this visit. The run starts once the dialog has finished closing,
+ * so the dialog's focus restore does not fight the tour frame's focus.
  */
 export function WelcomeDialog({
   className,
@@ -92,11 +93,23 @@ export function WelcomeDialog({
     setDecided(offer);
   }
 
-  const open = enabled && !closed && (decided ?? null) !== null;
+  // `offer === null`: the guide started or got a record elsewhere (another
+  // tab, a `visible` trigger) while the dialog was open.
+  const open =
+    enabled && !closed && (decided ?? null) !== null && offer !== null;
   const resuming = decided === "resume";
 
+  const startFrom = useRef<"resume" | "start" | null>(null);
   const begin = (from: "resume" | "start") => {
+    startFrom.current = from;
     setClosed(true);
+  };
+  const onOpenChangeComplete = (isOpen: boolean) => {
+    const from = startFrom.current;
+    if (isOpen || from === null) {
+      return;
+    }
+    startFrom.current = null;
     start(guideId, { from });
   };
   const skip = () => {
@@ -111,6 +124,7 @@ export function WelcomeDialog({
           setClosed(true);
         }
       }}
+      onOpenChangeComplete={onOpenChangeComplete}
       open={open}
     >
       <AlertDialogContent className={className}>
