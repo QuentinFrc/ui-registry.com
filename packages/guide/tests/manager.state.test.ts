@@ -131,7 +131,8 @@ describe("manager state", () => {
     expect(manager.next("tour")).toBe(false);
     expect(manager.prev("tour")).toBe(false);
     expect(manager.goTo("tour", "a")).toBe(false);
-    expect(manager.end("tour")).toBe(false);
+    expect(manager.end("tour", "completed")).toBe(false);
+    expect(manager.end("nope")).toBe(false);
     expect(manager.getLayout("tour")).toBeNull();
     expect(console.warn).toHaveBeenCalledWith(
       expect.stringContaining('start("nope") refused: unknown guide')

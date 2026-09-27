@@ -382,4 +382,99 @@ describe("manager records", () => {
       expect(runOf(manager, "tour")?.step?.id).toBe("b");
     });
   });
+  describe("end('dismissed') without a run", () => {
+    it("records the guide as dismissed, keeping an in-progress step", async () => {
+      const { manager, events } = await recordsSetup(
+        memoryAdapter({ tour: inProgress("b") })
+      );
+      expect(manager.end("tour")).toBe(true);
+      expect(manager.getState().records.tour).toMatchObject({
+        status: "dismissed",
+        version: 1,
+        stepId: "b",
+      });
+      expect(runOf(manager, "tour")).toBeNull();
+      expect(eventsOf(events, "end")).toEqual([
+        { type: "end", guideId: "tour", stepId: "b", reason: "dismissed" },
+      ]);
+      manager.start("tour");
+      await flush();
+      expect(runOf(manager, "tour")?.step?.id).toBe("a");
+    });
+
+    it("records no step without an in-progress record", async () => {
+      const { manager, events } = await recordsSetup(
+        memoryAdapter({
+          tour: { status: "completed", version: 1, updatedAt: 1 },
+        })
+      );
+      expect(manager.end("tour", "dismissed")).toBe(true);
+      const record = manager.getState().records.tour;
+      expect(record?.status).toBe("dismissed");
+      expect(record).not.toHaveProperty("stepId");
+      expect(eventsOf(events, "end")[0]?.stepId).toBeNull();
+    });
+
+    it("is refused when the guide is not dismissible", async () => {
+      const fake = createFakeDriver();
+      const [a] = mountedSteps(fake, "a");
+      const { manager, events } = await setup({
+        guides: [
+          defineGuide({ id: "locked", dismissible: false, steps: [a] }),
+          defineGuide({ id: "managed", steps: [a] }),
+        ],
+        fake,
+        dismissible: false,
+      });
+      expect(manager.end("locked")).toBe(false);
+      expect(manager.end("managed")).toBe(false);
+      expect(manager.getState().records).toEqual({
+        locked: null,
+        managed: null,
+      });
+      expect(eventsOf(events, "end")).toEqual([]);
+      expect(console.warn).toHaveBeenCalledWith(
+        expect.stringContaining('end("locked", "dismissed") refused')
+      );
+    });
+
+    it("resolves `dismissible` guide > manager", async () => {
+      const fake = createFakeDriver();
+      const [a] = mountedSteps(fake, "a");
+      const { manager } = await setup({
+        guides: [defineGuide({ id: "open", dismissible: true, steps: [a] })],
+        fake,
+        dismissible: false,
+      });
+      expect(manager.end("open")).toBe(true);
+      expect(manager.getState().records.open?.status).toBe("dismissed");
+    });
+
+    it("is ignored while a run of the guide is still ending", async () => {
+      const fake = createFakeDriver();
+      const [a] = mountedSteps(fake, "a");
+      const cleanup = deferred<void>();
+      const { manager, events } = await setup({
+        guides: [
+          defineGuide({
+            id: "tour",
+            steps: [{ step: a, beforeLeave: () => cleanup.promise }],
+          }),
+        ],
+        fake,
+      });
+      manager.start("tour");
+      await flush();
+      expect(runOf(manager, "tour")?.status).toBe("active");
+      expect(manager.end("tour", "completed")).toBe(true);
+      // The Finish click is still cleaning up: a late Skip / veil click.
+      expect(manager.end("tour", "dismissed")).toBe(false);
+      cleanup.resolve();
+      await flush();
+      expect(manager.getState().records.tour?.status).toBe("completed");
+      expect(eventsOf(events, "end")).toEqual([
+        { type: "end", guideId: "tour", stepId: "a", reason: "completed" },
+      ]);
+    });
+  });
 });

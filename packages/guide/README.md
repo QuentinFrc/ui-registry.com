@@ -2,12 +2,15 @@
 
 Guide users through your UI: steps anchored on elements, ordered into guides that can cross pages, with lifecycle hooks, modal and passive modes, triggers and persistence.
 
-> Status: pre-release. The vanilla entry (core, DOM, placement, spotlight) and the React bindings (`@ui-registry/guide/react`) are complete; the registry items (tour frame, spotlight, hint) are coming. API may change.
+> Status: alpha. The vanilla entry (core, DOM, placement, spotlight), the React bindings (`@ui-registry/guide/react`) and the modal registry items (tour frame, spotlight, welcome dialog, Next.js router adapter) are available; the passive `hint` item is coming. API may change.
 
 ## Install
 
 ```sh
 pnpm add @ui-registry/guide
+# Optional: the shadcn frames (files you own once installed)
+pnpm dlx shadcn@latest add https://ui-registry.com/r/guide/tour-frame
+pnpm dlx shadcn@latest add https://ui-registry.com/r/guide/guide-spotlight
 ```
 
 ## Usage
@@ -143,5 +146,39 @@ function Veil() {
 `useGuide(selector?)` returns the state (or the selected slice) with `start`, `next`, `prev`, `goTo`, `end` and `resetRecord`; `useGuideRun(guideId)` returns a run or `null`. `useGuideAnchor` also takes `lifecycle` (local hooks) and `enabled`.
 
 `GuideRoot` pushes the router and its pathname in a layout effect, which runs after the layout effects of its children: start guides from events or `useEffect`, not from a child's `useLayoutEffect` on its first commit (a route would find no router yet).
+
+## Registry
+
+The shadcn registry ships the visible parts for base-nova (Base UI), built on the React bindings:
+
+| Item | Role |
+| --- | --- |
+| `tour-frame` | `TourFrame`: Frame of the modal runs (`Card` + `Button`): content, "Step 1 of 3", Skip / Previous / Next / Finish. Skip is hidden when the step is not dismissible. Props: `labels`, `stepLabel`, `className`. Also `TourTitle` / `TourDescription`, which set the aria ids. |
+| `guide-spotlight` | `GuideSpotlight`: `bg-black/50` veil with one hole per target; a click dismisses the run (`closeOnClick`, default `true`). |
+| `welcome-dialog` | `WelcomeDialog`: `AlertDialog` proposing a `manual` guide once hydrated: Start, or Resume / Start over for an in-progress record, and Skip. |
+| `next-router-adapter` | `nextRouterAdapter({ router, pathname })` for the App Router. |
+
+```sh
+pnpm dlx shadcn@latest add https://ui-registry.com/r/guide/welcome-dialog
+pnpm dlx shadcn@latest add https://ui-registry.com/r/guide/next-router-adapter
+```
+
+```tsx
+<GuideRoot
+  manager={guides}
+  router={nextRouterAdapter({ router: useRouter(), pathname: usePathname() })}
+>
+  {children}
+  <GuideSpotlight />
+  <TourFrame labels={{ finish: "Got it" }} />
+  <WelcomeDialog
+    guideId="onboarding"
+    title="Welcome!"
+    description="A one-minute tour of the essentials."
+  />
+</GuideRoot>
+```
+
+Without a run, `end(guideId, "dismissed")` records the guide as dismissed (keeping the step of an in-progress record): that is the welcome dialog's Skip.
 
 See [ui-registry.com/packages/guide](https://ui-registry.com/packages/guide) for the case study.

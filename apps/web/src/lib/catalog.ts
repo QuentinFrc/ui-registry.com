@@ -66,6 +66,15 @@ export const catalog: readonly CatalogEntry[] = [
     kind: "library",
     href: "/packages/swappable",
   },
+  {
+    slug: "guide",
+    name: "@ui-registry/guide",
+    tagline:
+      "Guide users through your UI — anchored steps, cross-page tours, lifecycle hooks and persistence.",
+    status: "alpha",
+    kind: "library",
+    href: "/packages/guide",
+  },
 ] as const;
 
 export const catalogByKind = (kind: CatalogKind): readonly CatalogEntry[] =>
