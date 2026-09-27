@@ -127,8 +127,12 @@ const FrameItem = ({ run, children }: FrameItemProps) => {
       return;
     }
     const measure = () => {
-      const { width, height } = floating.getBoundingClientRect();
-      const next = { width, height };
+      // Layout size: a transform (an entry animation scaling the Frame in)
+      // does not shrink it, as it would with `getBoundingClientRect`.
+      const next = {
+        width: floating.offsetWidth,
+        height: floating.offsetHeight,
+      };
       setSize((current) => (sameSize(current, next) ? current : next));
     };
     measure();

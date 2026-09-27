@@ -52,6 +52,17 @@ beforeEach(() => {
       } as DOMRect;
     }
   );
+  // Layout size (the Frame's measure), from the same attribute.
+  vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockImplementation(
+    function (this: HTMLElement) {
+      return readRect(this).width;
+    }
+  );
+  vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockImplementation(
+    function (this: HTMLElement) {
+      return readRect(this).height;
+    }
+  );
 });
 
 afterEach(() => {

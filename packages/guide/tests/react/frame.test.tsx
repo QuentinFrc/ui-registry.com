@@ -235,6 +235,79 @@ describe("GuideFrame", () => {
     expect(element.style.top).toBe(`${740 - 16 - FLOATING.height * 2}px`);
   });
 
+  it("is placed from its layout size, not from its transformed rect", async () => {
+    const { manager } = await createManager({ guides: [tour([a])] });
+    const measure = Element.prototype.getBoundingClientRect;
+    // An entry animation scaling the Frame in: its rect is half its size.
+    vi.mocked(measure).mockImplementation(function (this: Element) {
+      const [x = 0, y = 0, width = 0, height = 0] = (
+        this.getAttribute("data-rect") ?? ""
+      )
+        .split(",")
+        .map(Number);
+      const scale = this.getAttribute("role") === "dialog" ? 0.5 : 1;
+      return {
+        x,
+        y,
+        left: x,
+        top: y,
+        width: width * scale,
+        height: height * scale,
+        right: x + width * scale,
+        bottom: y + height * scale,
+        toJSON: () => ({}),
+      } as DOMRect;
+    });
+    render(
+      <App manager={manager}>
+        <Target step={a} />
+        <Frame />
+      </App>
+    );
+    await start(manager);
+    // Centered on the target with its full width: 100 + (200 - 120) / 2.
+    expect(screen.getByTestId("frame-tour").style.left).toBe("140px");
+  });
+
+  it("follows a floating element replaced while its step is active", async () => {
+    const { manager } = await createManager({ guides: [hint([b])] });
+    const Swapping = ({ variant }: { variant: string }) => (
+      <GuideFrame>
+        {(frame) => (
+          <section
+            {...frame.floatingProps}
+            data-rect={rectAttr(
+              variant === "wide" ? { ...FLOATING, width: 200 } : FLOATING
+            )}
+            data-testid={`frame-${variant}`}
+            key={variant}
+          />
+        )}
+      </GuideFrame>
+    );
+    const view = render(
+      <App manager={manager}>
+        <Target step={b} />
+        <Swapping variant="narrow" />
+      </App>
+    );
+    await start(manager, "hint");
+    expect(screen.getByTestId("frame-narrow").style.left).toBe("140px");
+    view.rerender(
+      <App manager={manager}>
+        <Target step={b} />
+        <Swapping variant="wide" />
+      </App>
+    );
+    const wide = screen.getByTestId("frame-wide");
+    // Re-measured: 100 + (200 - 200) / 2.
+    expect(wide.style.left).toBe("100px");
+    // Registered as the run's Frame: Escape inside it ends the run.
+    fireEvent.keyDown(wide, { key: "Escape" });
+    await settle();
+    expect(runOf(manager, "hint")).toBeNull();
+  });
+
   it("works without ResizeObserver", async () => {
     vi.stubGlobal("ResizeObserver", undefined);
     const { manager } = await createManager({ guides: [tour([a])] });
