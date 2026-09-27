@@ -100,4 +100,55 @@ describe("useGuideSpotlight", () => {
     await settle();
     expect(result.current.active).toBe(false);
   });
+
+  it("follows the modal run started while the previous one is still ending", async () => {
+    mountTarget("a");
+    mountTarget("b");
+    const a = createGuideStep({ id: "a", target: "#a" });
+    const b = createGuideStep({ id: "b", target: "#b" });
+    let finishCleanup: (() => void) | undefined;
+    const { manager } = await createManager({
+      guides: [
+        tour([
+          {
+            step: a,
+            afterLeave: () =>
+              new Promise<void>((resolve) => {
+                finishCleanup = resolve;
+              }),
+          },
+        ]),
+        defineGuide({ id: "next", steps: [b] }),
+      ],
+    });
+    const { result } = renderHook(() => useGuideSpotlight(), {
+      wrapper: wrapper(manager),
+    });
+    act(() => {
+      manager.start("tour");
+    });
+    await settle();
+    act(() => {
+      manager.end("tour", "completed");
+      manager.start("next");
+    });
+    await settle();
+    // "tour" is still listed (its cleanup is pending), before "next".
+    expect(manager.getState().runs.map((run) => run.guide.id)).toEqual([
+      "tour",
+      "next",
+    ]);
+    expect(result.current).toMatchObject({
+      active: true,
+      clipPath: spotlightPath([RECT], 8, VIEWPORT),
+      rects: [RECT],
+      run: { guide: { id: "next" }, status: "active" },
+    });
+    await act(async () => {
+      finishCleanup?.();
+      await Promise.resolve();
+    });
+    await settle();
+    expect(result.current.run?.guide.id).toBe("next");
+  });
 });
