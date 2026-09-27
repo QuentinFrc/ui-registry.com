@@ -1064,6 +1064,47 @@ export const createGuideManager = (
     }
   };
 
+  /** Emits `start` and requests the first step of a new run. */
+  const launch = (
+    run: RunInternal,
+    start: StartPoint,
+    from: StartOptions["from"],
+    trigger: StartTrigger
+  ) => {
+    const announce = (index: number, resumed: boolean) =>
+      emit({
+        type: "start",
+        guideId: run.guide.id,
+        stepId: (run.entries[index] as GuideEntry).step.id,
+        resumed,
+        trigger,
+      });
+    const begin = (point: StartPoint) => {
+      announce(point.index, point.resumed);
+      request(run, point.index, point.direction);
+    };
+    const resumes = from === undefined || from === "resume";
+    if (hydrated || !resumes) {
+      begin(start);
+      return;
+    }
+    // The default `from: "resume"` needs the records: the first transition
+    // waits for the hydration (the run is listed, without a step, meanwhile).
+    const initial = run.controller;
+    refresh();
+    whenHydrated.then(() => {
+      if (run.ending) {
+        return;
+      }
+      if (run.controller === initial) {
+        begin(resolveStart(run.guide, run.entries, from) as StartPoint);
+      } else {
+        // Moved (next/prev/goTo) before the hydration: that request stands.
+        announce(run.target, false);
+      }
+    });
+  };
+
   const startRun = (
     guide: Guide,
     { from, replace = false }: StartOptions,
@@ -1112,38 +1153,7 @@ export const createGuideManager = (
       takeOverOrCapture(run);
     }
     syncTriggers();
-    const announce = (index: number, resumed: boolean) =>
-      emit({
-        type: "start",
-        guideId: guide.id,
-        stepId: (entries[index] as GuideEntry).step.id,
-        resumed,
-        trigger,
-      });
-    const begin = (point: StartPoint) => {
-      announce(point.index, point.resumed);
-      request(run, point.index, point.direction);
-    };
-    const resumes = from === undefined || from === "resume";
-    if (hydrated || !resumes) {
-      begin(start);
-      return true;
-    }
-    // The default `from: "resume"` needs the records: the first transition
-    // waits for the hydration (the run is listed, without a step, meanwhile).
-    const initial = run.controller;
-    refresh();
-    whenHydrated.then(() => {
-      if (run.ending) {
-        return;
-      }
-      if (run.controller === initial) {
-        begin(resolveStart(guide, entries, from) as StartPoint);
-      } else {
-        // Moved (next/prev/goTo) before the hydration: that request stands.
-        announce(run.target, false);
-      }
-    });
+    launch(run, start, from, trigger);
     return true;
   };
 
