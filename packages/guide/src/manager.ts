@@ -219,10 +219,20 @@ export const createGuideManager = (
     };
   };
 
+  /**
+   * A run still ending (async cleanup) while a newer run of the same guide
+   * started: hidden from the state and its end record is not written.
+   */
+  const isSuperseded = (run: RunInternal): boolean =>
+    runs
+      .slice(runs.indexOf(run) + 1)
+      .some((other) => other.guide.id === run.guide.id);
+
   const refresh = () => {
     const modalRunning = runs.some((run) => run.guide.mode === "modal");
+    const visible = runs.filter((run) => !isSuperseded(run));
     const events: GuideEvent[] = [];
-    for (const run of runs) {
+    for (const run of visible) {
       const suspended = run.guide.mode === "passive" && modalRunning;
       const wasSuspended = run.snapshot?.status === "suspended";
       if (suspended !== wasSuspended) {
@@ -234,7 +244,7 @@ export const createGuideManager = (
       run.snapshot = buildSnapshot(run, suspended);
     }
     state = {
-      runs: runs.map((run) => run.snapshot as GuideRun),
+      runs: visible.map((run) => run.snapshot as GuideRun),
       records,
       hydrated,
     };
@@ -939,7 +949,9 @@ export const createGuideManager = (
     setTransitioning(run);
     try {
       await cleanupHooks(run);
-      writeEndRecord(run, reason, errorPhase);
+      if (!isSuperseded(run)) {
+        writeEndRecord(run, reason, errorPhase);
+      }
     } finally {
       release(run, reason);
     }
@@ -1003,6 +1015,29 @@ export const createGuideManager = (
     return existing ?? null;
   };
 
+  /**
+   * A modal run starting while another one is still ending (`replace`, or a
+   * start during its cleanup) inherits its focus restore and scroll unlock:
+   * capturing again would restore the focus to the leaving Frame and nest
+   * the scroll lock (the inner lock would restore `overflow: hidden`).
+   */
+  const takeOverOrCapture = (run: RunInternal) => {
+    const leaving = runs.find(
+      (other) =>
+        other.ending &&
+        other.guide.mode === "modal" &&
+        other.releases.length > 0
+    );
+    if (leaving) {
+      run.releases = leaving.releases.splice(0);
+      return;
+    }
+    run.releases.push(driver.captureFocus());
+    if (defaults.scroll.lock) {
+      run.releases.push(driver.lockScroll());
+    }
+  };
+
   const startRun = (
     guide: Guide,
     { from, replace = false }: StartOptions,
@@ -1048,10 +1083,7 @@ export const createGuideManager = (
       unbindKeys = driver.listenKeys(onKey);
     }
     if (guide.mode === "modal") {
-      run.releases.push(driver.captureFocus());
-      if (defaults.scroll.lock) {
-        run.releases.push(driver.lockScroll());
-      }
+      takeOverOrCapture(run);
     }
     emit({
       type: "start",

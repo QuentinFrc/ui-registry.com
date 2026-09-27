@@ -138,4 +138,89 @@ describe("manager modes", () => {
     expect(runOf(manager, "hint")?.status).toBe("active");
     expect(fake.calls.scroll).toHaveLength(0);
   });
+
+  it("hands the focus restore and scroll unlock over to a replacing modal run", async () => {
+    const { manager, fake } = await modesSetup({ lock: true });
+    manager.start("tour");
+    await flush();
+    manager.start("other", { replace: true });
+    await flush();
+    expect(fake.calls).toMatchObject({
+      capture: 1,
+      lock: 1,
+      restore: 0,
+      unlock: 0,
+    });
+    manager.end("other");
+    await flush();
+    expect(fake.calls).toMatchObject({ restore: 1, unlock: 1 });
+  });
+
+  it("hands them over to a modal run started during a slow cleanup", async () => {
+    const fake = createFakeDriver();
+    const [a, b] = mountedSteps(fake, "a", "b");
+    let finishCleanup: (() => void) | undefined;
+    const guides = [
+      defineGuide({
+        id: "tour",
+        steps: [
+          {
+            step: a,
+            afterLeave: () =>
+              new Promise<void>((resolve) => {
+                finishCleanup = resolve;
+              }),
+          },
+        ],
+      }),
+      defineGuide({ id: "other", steps: [b] }),
+    ];
+    const { manager } = await setup({ guides, fake, scroll: { lock: true } });
+    manager.start("tour");
+    await flush();
+    manager.end("tour", "completed");
+    expect(manager.start("other")).toBe(true);
+    finishCleanup?.();
+    await flush();
+    expect(fake.calls).toMatchObject({ capture: 1, lock: 1, unlock: 0 });
+    manager.end("other");
+    await flush();
+    expect(fake.calls).toMatchObject({ restore: 1, unlock: 1 });
+  });
+
+  it("restarting a guide during its cleanup keeps one run and the new record", async () => {
+    const fake = createFakeDriver();
+    const [a] = mountedSteps(fake, "a");
+    let finishCleanup: (() => void) | undefined;
+    const guide = defineGuide({
+      id: "tour",
+      steps: [
+        {
+          step: a,
+          beforeLeave: () =>
+            new Promise<void>((resolve) => {
+              finishCleanup = resolve;
+            }),
+        },
+      ],
+    });
+    const { manager, events } = await setup({ guides: [guide], fake });
+    manager.start("tour");
+    await flush();
+    manager.end("tour");
+    expect(manager.start("tour")).toBe(true);
+    expect(manager.getState().runs).toHaveLength(1);
+    await flush();
+    finishCleanup?.();
+    await flush();
+    expect(manager.getState().runs).toHaveLength(1);
+    expect(runOf(manager, "tour")?.status).toBe("active");
+    expect(manager.getState().records.tour).toMatchObject({
+      status: "in-progress",
+      stepId: "a",
+    });
+    expect(eventsOf(events, "end")).toEqual([
+      { type: "end", guideId: "tour", stepId: "a", reason: "dismissed" },
+    ]);
+  });
 });
