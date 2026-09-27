@@ -3,7 +3,8 @@
   "compilerOptions": {
     "outDir": "dist",
     "paths": {
-      "@/*": ["../ui/src/*"]
+      "@/*": ["../ui/src/*"],
+      "@repo/ui/*": ["../ui/src/*"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.mts"],

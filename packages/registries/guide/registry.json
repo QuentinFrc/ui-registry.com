@@ -1,0 +1,61 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "guide",
+  "homepage": "https://ui-registry.com/packages/guide",
+  "items": [
+    {
+      "name": "tour-frame",
+      "type": "registry:component",
+      "title": "TourFrame",
+      "description": "Frame of the modal guide runs: step content, counter and Skip / Previous / Next / Finish, with CSS entry animations driven by data-side.",
+      "dependencies": ["@ui-registry/guide"],
+      "registryDependencies": ["button", "card"],
+      "files": [
+        {
+          "path": "registry/base-nova/guide/tour-frame.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "guide-spotlight",
+      "type": "registry:component",
+      "title": "GuideSpotlight",
+      "description": "Veil of the modal guide run with one hole per target; clicking it dismisses the run when it is dismissible.",
+      "dependencies": ["@ui-registry/guide"],
+      "files": [
+        {
+          "path": "registry/base-nova/guide/guide-spotlight.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "welcome-dialog",
+      "type": "registry:component",
+      "title": "WelcomeDialog",
+      "description": "Alert dialog that proposes a guide once the records are hydrated: Start, or Resume / Start over for an in-progress one, and Skip.",
+      "dependencies": ["@ui-registry/guide"],
+      "registryDependencies": ["alert-dialog", "button"],
+      "files": [
+        {
+          "path": "registry/base-nova/guide/welcome-dialog.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "next-router-adapter",
+      "type": "registry:lib",
+      "title": "nextRouterAdapter",
+      "description": "Connects the guide manager to the Next.js App Router (router.push and usePathname).",
+      "dependencies": ["@ui-registry/guide"],
+      "files": [
+        {
+          "path": "registry/base-nova/guide/next-router-adapter.ts",
+          "type": "registry:lib"
+        }
+      ]
+    }
+  ]
+}

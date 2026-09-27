@@ -181,6 +181,9 @@ importers:
       '@ui-registry/flash':
         specifier: workspace:*
         version: link:../flash
+      '@ui-registry/guide':
+        specifier: workspace:*
+        version: link:../guide
       '@ui-registry/swappable':
         specifier: workspace:*
         version: link:../swappable
@@ -6030,7 +6033,7 @@ snapshots:
       obug: 2.1.1
       std-env: 4.1.0
       tinyrainbow: 3.1.0
-      vitest: 4.1.7(@types/node@22.19.13)(@vitest/coverage-v8@4.1.7)(jsdom@30.1.1(@noble/hashes@1.8.0))(msw@2.12.10(@types/node@22.19.13)(typescript@5.9.2))(vite@8.0.14(@types/node@22.19.13)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0))
+      vitest: 4.1.7(@types/node@25.3.3)(@vitest/coverage-v8@4.1.7)(jsdom@30.1.1(@noble/hashes@1.8.0))(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.2))(vite@8.0.14(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0))
 
   '@vitest/expect@4.1.7':
     dependencies:
