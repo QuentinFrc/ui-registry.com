@@ -224,6 +224,20 @@ export interface GuideLayout {
   viewport: Size;
 }
 
+/**
+ * Placement options of a run's current step, resolved entry > step > manager
+ * (used by `/react` to place a Frame and draw the spotlight).
+ */
+export interface GuidePresentation {
+  align: Align;
+  /** The manager's `viewportMargin`. */
+  margin: number;
+  placement: PlacementStrategy;
+  side: Side;
+  sideOffset: number;
+  spotlightPadding: number;
+}
+
 export type EndReason =
   | "completed"
   | "dismissed"
@@ -339,6 +353,8 @@ export interface GuideManager {
   /** Latest content registered for a step (used by `/react`). */
   getContent(stepId: string): unknown;
   getLayout(guideId: string): GuideLayout | null;
+  /** Placement options of a run's current step; `null` without one. */
+  getPresentation(guideId: string): GuidePresentation | null;
   getState(): GuideState;
   goTo(guideId: string, stepId: string): boolean;
   next(guideId: string): boolean;
