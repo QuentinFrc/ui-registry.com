@@ -1349,13 +1349,47 @@ export const createGuideManager = (
     return true;
   };
 
+  /**
+   * `end(id, "dismissed")` without a run (a welcome dialog's "Skip"): records
+   * the guide as dismissed, keeping the step of an in-progress record.
+   * Resolved guide > manager for `dismissible`.
+   */
+  const dismissWithoutRun = (guideId: string): boolean => {
+    const guide = guides.get(guideId);
+    if (!guide) {
+      return false;
+    }
+    if (!(guide.dismissible ?? defaults.dismissible)) {
+      warn(`end("${guideId}", "dismissed") refused: not dismissible.`);
+      return false;
+    }
+    const previous = records[guideId];
+    const stepId =
+      previous?.status === "in-progress" ? previous.stepId : undefined;
+    writeRecord(
+      guide,
+      withStepId(
+        { status: "dismissed", version: guide.version, updatedAt: Date.now() },
+        stepId
+      )
+    );
+    syncTriggers();
+    emit({
+      type: "end",
+      guideId,
+      stepId: stepId ?? null,
+      reason: "dismissed",
+    });
+    return true;
+  };
+
   const end = (
     guideId: string,
     reason: "completed" | "dismissed" = "dismissed"
   ): boolean => {
     const run = runOf(guideId);
     if (!run) {
-      return false;
+      return reason === "dismissed" && dismissWithoutRun(guideId);
     }
     if (reason === "dismissed" && !run.snapshot?.dismissible) {
       warn(`end("${guideId}", "dismissed") refused: not dismissible.`);

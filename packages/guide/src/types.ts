@@ -349,6 +349,11 @@ export interface GuideManagerOptions {
 
 export interface GuideManager {
   destroy(): void;
+  /**
+   * Ends the run (`"dismissed"` by default, refused when not dismissible).
+   * Without a run, `"dismissed"` records the guide as dismissed (a welcome
+   * dialog's "Skip").
+   */
   end(guideId: string, reason?: "completed" | "dismissed"): boolean;
   /** Latest content registered for a step (used by `/react`). */
   getContent(stepId: string): unknown;
