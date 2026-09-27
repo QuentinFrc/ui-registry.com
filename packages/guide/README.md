@@ -72,7 +72,13 @@ if (layout) {
     sideOffset: 16,
     margin: 20,
     view: layout.view,
-    obstacles: layout.rects, // avoid covering the spotlights
+    // Modal: avoid covering the (padded) spotlights.
+    obstacles: layout.rects.map((r) => ({
+      x: r.x - 8,
+      y: r.y - 8,
+      width: r.width + 16,
+      height: r.height + 16,
+    })),
   });
 }
 ```
