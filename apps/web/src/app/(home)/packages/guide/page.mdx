@@ -191,6 +191,15 @@ The **frame** is the floating container of a run: position, chrome, counter, nav
 
 `floatingProps` carries the fixed position (hidden until the first measure), `role="dialog"`, `aria-modal`, the aria ids, `tabIndex={-1}` and three data attributes: `data-side` and `data-align`, the **effective** placement after fallbacks, and `data-mode`. The registry's `tour-frame` uses `data-side` for its entry animation, in plain CSS: no animation library.
 
+`tour-frame` is that function written once with `Card` and `Button`: the step's content, a "Step 2 of 5" label, Skip (hidden when the step is not dismissible), Previous, and Next, which becomes Finish on the last step. The labels are props with English defaults:
+
+```tsx
+<TourFrame
+  labels={{ skip: "Passer", previous: "Précédent", next: "Suivant", finish: "Terminer" }}
+  stepLabel={({ current, total }) => `${current} / ${total}`} // null hides it
+/>
+```
+
 Placement is a replaceable strategy. `defaultPlacement` anchors on the largest target, tries the requested side, then the opposite one, then the perpendiculars, avoids the padded spotlights and clamps into the view. The veil is `useGuideSpotlight()`: a `clip-path` with one hole per target, merged when they overlap. The registry's `guide-spotlight` renders it and dismisses the run on click.
 
 ## Persistence
@@ -209,7 +218,7 @@ createGuideManager({
 - Writes are optimistic, with a rollback and an `error` event if the storage fails. The local storage adapter swallows quota and private-mode errors and follows other tabs.
 - `memoryAdapter()` for tests; your own `{ get, set, remove, subscribe? }` for a server.
 
-A `manual` guide never resumes on its own after a reload: the record is exposed in the state and the app decides. The registry's `welcome-dialog` is that decision, written once: it opens when the records are hydrated and the guide has no record (Start) or an in-progress one (Resume, Start over), and Skip records the guide as dismissed.
+A `manual` guide never resumes on its own after a reload: the record is exposed in the state and the app decides. The registry's `welcome-dialog` is that decision, written once: it opens when the records are hydrated and the guide has no record (Start) or an in-progress one (Resume, Start over), and Skip records the guide as dismissed (Escape only closes it for this visit). Its `enabled` prop gates it on whatever your guide's `when` checks.
 
 ## Errors & dismissible
 
@@ -218,7 +227,7 @@ A step whose target never shows up within `waitTimeout` follows `onMissing`: `"s
 - **`"end"`** (default): ends the run, even when it is not dismissible.
 - **`"skip"`**: next step in the same direction.
 - **`"retry"`**: replays the transition once, then ends.
-- **`"stay"`**: stays on the current step.
+- **`"stay"`**: stays on the current step; without a current step, or when it is not dismissible, it ends instead.
 
 Whatever happens, ending a run releases everything it holds: veil, scroll lock, keyboard listeners, observers, focus. Cleanup hooks that throw are reported, not rethrown.
 
@@ -233,7 +242,7 @@ A guide is `modal` or `passive`.
 - **Modal** (available now): one at a time, veil and spotlight, scroll to the target, focus in the frame and restored at the end, global keyboard (Escape, arrows). Starting a second modal guide is refused unless you pass `{ replace: true }`; a modal guide triggered automatically while another runs waits in a queue.
 - **Passive** (coming with the `hint` registry item): several at once, no veil, no scroll, no stolen focus. Passive runs are suspended while a modal run is active. The mechanics already ship in the package; the registry item comes next.
 
-Triggers are `"manual"` (only `start()`) or `"visible"`: the guide starts when the first step's target becomes visible, if it is eligible and was never completed or dismissed.
+Triggers are `"manual"` (only `start()`) or `"visible"`: the guide starts when the target of its first step (or of the step an in-progress record points at) becomes visible, if it is eligible and was never completed or dismissed.
 
 ## Decisions
 
