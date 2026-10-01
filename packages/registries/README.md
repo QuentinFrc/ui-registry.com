@@ -18,6 +18,8 @@ packages/registries/
 
 Each subdirectory containing a `registry.json` file is treated as an independent registry.
 
+One of them is special: [`kit/`](./kit/README.md) is the component kit — shadcn upgraded, one coherent set that every other registry builds on. It has its own consistency check and conventions; see its README and `CONVENTIONS.md`.
+
 ## Creating a new registry
 
 1. Create a new directory under `packages/registries/` (e.g. `my-registry/`).
@@ -91,3 +93,5 @@ pnpm dlx shadcn@latest add https://your-domain.com/r/demo/hello-world.json
 ## Registry dependencies
 
 Components can reference base shadcn components (e.g. `button`, `input`) via `registryDependencies` in `registry.json`. These are automatically installed on the consumer side when using `shadcn add`.
+
+To depend on an item from another registry of this repo, use its public URL (`https://ui-registry.com/r/<registry>/<item>.json`). `validate.mts` checks that every such reference resolves to an existing item, so a rename cannot silently break a dependant.

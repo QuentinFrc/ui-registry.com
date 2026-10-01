@@ -1,4 +1,8 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+
+/* Kit sources rendered in live demos. */
+@source "../../../../packages/registries/kit/registry";
 
 @theme {
   --color-background: oklch(1 0 0);
@@ -6,10 +10,21 @@
   --color-muted: oklch(0.97 0 0);
   --color-muted-foreground: oklch(0.556 0 0);
   --color-border: oklch(0.922 0 0);
+  --color-input: oklch(0.922 0 0);
+  --color-ring: oklch(0.708 0 0);
   --color-primary: oklch(0.205 0 0);
   --color-primary-foreground: oklch(0.985 0 0);
+  --color-accent-kit: oklch(0.66 0.14 160);
   --color-accent-ui: oklch(0.72 0.14 62);
   --color-accent-library: oklch(0.6 0.15 258);
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before {
+    border-color: var(--color-border);
+  }
 }
 
 .prose-content h1 {
@@ -95,8 +110,11 @@ code[data-theme] span {
     --color-muted: oklch(0.205 0 0);
     --color-muted-foreground: oklch(0.708 0 0);
     --color-border: oklch(0.269 0 0);
+    --color-input: oklch(1 0 0 / 15%);
+    --color-ring: oklch(0.556 0 0);
     --color-primary: oklch(0.985 0 0);
     --color-primary-foreground: oklch(0.205 0 0);
+    --color-accent-kit: oklch(0.76 0.13 160);
     --color-accent-ui: oklch(0.78 0.13 62);
     --color-accent-library: oklch(0.72 0.14 258);
   }

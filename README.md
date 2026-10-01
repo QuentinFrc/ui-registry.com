@@ -16,6 +16,7 @@ apps/
 packages/
   ui/                     # internal shadcn-compatible component pool
   registries/             # shadcn registry build pipeline
+    kit/                  # the component kit — shadcn upgraded, source of truth
   typescript-config/      # shared tsconfigs
 ```
 

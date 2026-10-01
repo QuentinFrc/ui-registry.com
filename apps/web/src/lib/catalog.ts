@@ -1,4 +1,4 @@
-export type CatalogKind = "ui" | "library";
+export type CatalogKind = "kit" | "ui" | "library";
 
 export type CatalogMedia =
   | { kind: "video"; src: string; poster?: string }
@@ -25,12 +25,22 @@ export interface LaneMeta {
 }
 
 export const LANE_META: Record<CatalogKind, LaneMeta> = {
+  kit: {
+    label: "Kit",
+    eyebrow: "00 — Kit",
+    heading: "shadcn, upgraded",
+    description:
+      "shadcn's core, reworked for building real apps and scaling them — richer parts and variants, explicit UX behaviours, code that holds up as the app grows.",
+    accent: "var(--color-accent-kit)",
+    href: "/kit",
+    emptyCopy: "First components land soon.",
+  },
   ui: {
     label: "UI",
     eyebrow: "01 — UI",
-    heading: "Components & blocks",
+    heading: "Blocks & add-ons",
     description:
-      "Opinionated shadcn-compatible UI you copy in via the CLI — patterns extracted from real client engagements.",
+      "Opinionated shadcn-compatible blocks built on the kit — patterns extracted from real client engagements.",
     accent: "var(--color-accent-ui)",
     href: "/ui",
     emptyCopy: "First blocks land soon.",

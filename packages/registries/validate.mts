@@ -1,12 +1,23 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { registrySchema } from "shadcn/schema";
+import { checkKit } from "./kit/check.mjs";
 
 const rootDir = resolve(import.meta.dirname);
+
+/** Matches cross-registry references such as https://ui-registry.com/r/kit/dialog.json */
+const INTERNAL_DEPENDENCY_URL =
+  /^https:\/\/ui-registry\.com\/r\/([^/]+)\/([^/]+)\.json$/;
 
 interface ValidationError {
   errors: string[];
   registry: string;
+}
+
+interface ParsedRegistry {
+  dependencies: { from: string; url: string }[];
+  itemNames: Set<string>;
+  name: string;
 }
 
 function findRegistries(): string[] {
@@ -25,7 +36,10 @@ function findRegistries(): string[] {
   return registries;
 }
 
-function validateRegistry(name: string): ValidationError | null {
+function validateRegistry(name: string): {
+  errors: string[];
+  parsed: ParsedRegistry | null;
+} {
   const registryDir = join(rootDir, name);
   const errors: string[] = [];
 
@@ -44,7 +58,7 @@ function validateRegistry(name: string): ValidationError | null {
     errors.push(
       `Invalid JSON in registry.json: ${e instanceof Error ? e.message : e}`
     );
-    return { registry: name, errors };
+    return { errors, parsed: null };
   }
 
   const result = registrySchema.safeParse(raw);
@@ -52,15 +66,26 @@ function validateRegistry(name: string): ValidationError | null {
     for (const issue of result.error.issues) {
       errors.push(`Schema: ${issue.path.join(".")} — ${issue.message}`);
     }
-    return errors.length > 0 ? { registry: name, errors } : null;
+    return { errors, parsed: null };
   }
 
-  // Verify referenced files exist on disk
+  const parsed: ParsedRegistry = {
+    name,
+    itemNames: new Set(),
+    dependencies: [],
+  };
+
   for (const item of result.data.items) {
-    if (!item.files) {
-      continue;
+    parsed.itemNames.add(item.name);
+
+    for (const dependency of item.registryDependencies ?? []) {
+      if (INTERNAL_DEPENDENCY_URL.test(dependency)) {
+        parsed.dependencies.push({ from: item.name, url: dependency });
+      }
     }
-    for (const file of item.files) {
+
+    // Verify referenced files exist on disk
+    for (const file of item.files ?? []) {
       const filePath = join(registryDir, file.path);
       if (!existsSync(filePath)) {
         errors.push(`Item "${item.name}": file not found — ${file.path}`);
@@ -68,7 +93,43 @@ function validateRegistry(name: string): ValidationError | null {
     }
   }
 
-  return errors.length > 0 ? { registry: name, errors } : null;
+  return { errors, parsed };
+}
+
+/**
+ * Every registryDependency pointing at another registry of this repo must
+ * resolve to an item that actually exists.
+ */
+function validateCrossReferences(
+  registries: Map<string, ParsedRegistry>
+): ValidationError[] {
+  const allErrors: ValidationError[] = [];
+
+  for (const registry of registries.values()) {
+    const errors: string[] = [];
+    for (const { from, url } of registry.dependencies) {
+      const match = INTERNAL_DEPENDENCY_URL.exec(url);
+      if (!match) {
+        continue;
+      }
+      const [, targetRegistry, targetItem] = match;
+      const target = targetRegistry ? registries.get(targetRegistry) : null;
+      if (!target) {
+        errors.push(
+          `Item "${from}" depends on unknown registry "${targetRegistry}" (${url})`
+        );
+      } else if (!(targetItem && target.itemNames.has(targetItem))) {
+        errors.push(
+          `Item "${from}" depends on "${targetRegistry}/${targetItem}" which does not exist`
+        );
+      }
+    }
+    if (errors.length > 0) {
+      allErrors.push({ registry: registry.name, errors });
+    }
+  }
+
+  return allErrors;
 }
 
 export function validate(): { ok: boolean; errors: ValidationError[] } {
@@ -84,15 +145,24 @@ export function validate(): { ok: boolean; errors: ValidationError[] } {
   );
 
   const allErrors: ValidationError[] = [];
+  const parsedRegistries = new Map<string, ParsedRegistry>();
 
   for (const name of registries) {
-    const result = validateRegistry(name);
-    if (result) {
-      allErrors.push(result);
+    const { errors, parsed } = validateRegistry(name);
+    if (name === "kit") {
+      errors.push(...checkKit());
+    }
+    if (errors.length > 0) {
+      allErrors.push({ registry: name, errors });
     } else {
       console.log(`  ✓ ${name}`);
     }
+    if (parsed) {
+      parsedRegistries.set(name, parsed);
+    }
   }
+
+  allErrors.push(...validateCrossReferences(parsedRegistries));
 
   if (allErrors.length > 0) {
     console.error("\nValidation failed:\n");
