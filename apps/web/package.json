@@ -15,6 +15,7 @@
     "@mdx-js/react": "^3.1.0",
     "@next/mdx": "^16.1.6",
     "@repo/registries": "workspace:*",
+    "@ui-registry/dialog-stack": "workspace:*",
     "clsx": "^2.1.1",
     "hast-util-to-jsx-runtime": "^2.3.6",
     "lucide-react": "^0.575.0",

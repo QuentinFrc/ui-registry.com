@@ -1,0 +1,123 @@
+import { DialogStackDemo } from "@/components/demos/dialog-stack-demo";
+
+export const metadata = {
+  title: "@ui-registry/dialog-stack",
+  description:
+    "Push dialogs and sheets from anywhere with typed props, rendered as one nested stack.",
+};
+
+# @ui-registry/dialog-stack
+
+Push dialogs and sheets from anywhere with typed props. They render in one place, as a nested stack, and the dialog library handles focus and Escape.
+
+## Origin
+
+Dialogs are rarely opened from where they belong. A confirm triggered from a table row, a sheet opened from a dropdown item, a second dialog opened from the first:
+
+- **Declarative `open` state everywhere**: every trigger holds `useState`, a `<Dialog>` and a piece of UI that has nothing to do with it. Unmount the trigger (a closing dropdown, a removed row) and the dialog goes with it.
+- **Dialogs on top of dialogs**: rendered side by side, they fight over focus, Escape closes the wrong one, and the backdrops pile up.
+
+This package keeps one stack per provider. Components are bound to it once; call sites only pass data. Entries render recursively, so the dialog library sees a regular nested dialog tree and does the rest.
+
+## Install
+
+```sh
+pnpm add @ui-registry/dialog-stack
+pnpm dlx shadcn@latest add https://ui-registry.com/r/dialog-stack/dialog-stack
+```
+
+The npm package is headless (React only). The `dialog-stack` registry item wires it to Base UI. It is designed for the [Dialog](/kit/dialog) and [Sheet](/kit/sheet) from the kit, whose nested styles light up when dialogs stack.
+
+## Quick start
+
+Mount the provider once:
+
+```tsx
+import { DialogStackProvider } from "@/components/ui/dialog-stack";
+
+<DialogStackProvider>
+  <App />
+</DialogStackProvider>;
+```
+
+Bind a component and push it from anywhere below the provider:
+
+```tsx
+import { createDialogStack, type DialogSlotProps } from "@ui-registry/dialog-stack";
+
+function ConfirmDialog({ title, onConfirm, close }: DialogSlotProps & {
+  title: string;
+  onConfirm: () => void;
+}) {
+  return (
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>{title}</DialogTitle>
+      </DialogHeader>
+      <DialogFooter>
+        <Button onClick={() => { onConfirm(); close(); }}>Confirm</Button>
+      </DialogFooter>
+    </DialogContent>
+  );
+}
+
+export const useConfirmDialog = createDialogStack(ConfirmDialog);
+
+const confirm = useConfirmDialog();
+confirm.push({ title: "Delete?", onConfirm: remove }, { dismissible: false });
+```
+
+A stacked component renders `DialogContent` or `SheetContent`, never a `Dialog` root: the stack owns the root. Dialogs and sheets can share one stack.
+
+<DialogStackDemo />
+
+## How it renders
+
+The provider renders the stack recursively: each entry's Base UI root wraps the entries above it. For Base UI this is a regular nested dialog tree, so it handles the hard parts itself:
+
+- focus trapping and focus return per level,
+- Escape closing only the topmost dialog,
+- a single backdrop (nested backdrops are not rendered),
+- `data-nested-dialog-open` and `--nested-dialogs` on every level below the top, for styling.
+
+Closing marks an entry as closing and keeps it mounted until Base UI reports the end of its exit animation. Pushing while a dialog is animating out drops that dialog immediately, so the new one is never nested under a dialog about to unmount.
+
+## API
+
+`createDialogStack(Component)` returns a hook:
+
+- `push(props, options?)`: opens the component on top. `props` are the component props minus `DialogSlotProps`, optional when none is required. Returns the entry id.
+- `replace(props, options?)`: swaps the topmost dialog for the component.
+- `pop()`: closes the topmost dialog.
+- `popTo(id)`: closes the dialog with this id and every dialog above it.
+- `clear()`: closes every dialog.
+- `stack`: the entries, bottom to top.
+
+`options`: `id` (stable id for `popTo`), `dismissible` (default `true`; `false` ignores Escape and outside clicks, close buttons still work), `onClose` (called once the entry has left the stack, after its exit animation).
+
+Injected `DialogSlotProps`:
+
+- `close()`: closes this dialog and every dialog above it.
+- `pop()` / `popTo(id)`: same as the hook.
+- `dialogId`: this entry's id.
+- `depth`: open dialogs above this one, `0` for the topmost.
+- `stackSize`: number of open dialogs.
+
+`useDialogStack()` returns the untyped controls (`pop`, `popTo`, `clear`, `stack`), for code that closes dialogs it did not push.
+
+## Other dialog libraries
+
+The package does not depend on Base UI. `DialogStackProvider` takes a `root` adapter, a controlled dialog root rendered once per entry:
+
+```tsx
+import { DialogStackProvider, type DialogStackRootProps } from "@ui-registry/dialog-stack";
+
+function Root({ dismissible, onOpenChange, ...props }: DialogStackRootProps) {
+  // open, onOpenChangeComplete, children: forward them to your dialog root.
+  // Call onOpenChangeComplete(false) once the exit animation has ended.
+}
+
+<DialogStackProvider root={Root}>{children}</DialogStackProvider>;
+```
+
+Focus, Escape and nested styling then come from that library: the stack only guarantees that each root is rendered inside the one below it.
