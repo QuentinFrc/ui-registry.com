@@ -1,0 +1,74 @@
+import { DialogScrollDemo } from "@/components/demos/dialog-scroll-demo";
+import { KitComponentBadges } from "@/components/kit/kit-component-badges";
+
+export const metadata = {
+  title: "Dialog",
+  description:
+    "The shadcn dialog rebuilt around Header / Body / Footer, with a scroll prop, sticky slots and nested stacking styles.",
+};
+
+# Dialog
+
+The shadcn `Dialog`, rebuilt around a real body slot and an explicit scroll behaviour. Same exports, plus a few new ones. [Sheet](/kit/sheet) shares every part and prop.
+
+<KitComponentBadges name="dialog" />
+
+## Origin
+
+The shadcn dialog works until the content gets long. Then the same questions come back on every project:
+
+- **No body slot**: `DialogContent` is a grid with a gap. Header, content and footer are siblings, so "only the middle scrolls" means rebuilding the layout by hand each time.
+- **One scroll behaviour, implicit**: sometimes the body should scroll, sometimes the whole panel, sometimes the page around it. That choice is a design decision, and it deserves a prop.
+
+## Install
+
+```sh
+pnpm dlx shadcn@latest add https://ui-registry.com/r/kit/dialog.json
+```
+
+Replaces the shadcn file of the same name (Base UI flavour) and keeps its exports.
+
+## Anatomy
+
+```tsx
+<Dialog>
+  <DialogTrigger />
+  <DialogContent scroll="body">
+    <DialogHeader sticky>
+      <DialogTitle />
+      <DialogDescription />
+    </DialogHeader>
+    <DialogBody />
+    <DialogFooter sticky />
+  </DialogContent>
+</Dialog>
+```
+
+`DialogContent` renders `Portal > Overlay > Viewport > Popup`, like the shadcn version. The inner parts are exported for manual composition:
+
+```tsx
+<DialogPortal>
+  <DialogOverlay />
+  <DialogViewport scroll="portal">
+    <DialogPopup scroll="portal">…</DialogPopup>
+  </DialogViewport>
+</DialogPortal>
+```
+
+The popup is a grid with three rows: `auto 1fr auto`. Header, body and footer each claim their row, so a missing slot leaves an empty track that collapses to zero. The same template covers `header + body + footer`, `header + body`, `body + footer`, and so on. It needs no `:has()` and renders the same on the server.
+
+## Scroll
+
+`scroll` decides which element scrolls once the content is taller than the screen.
+
+- **`body`** (default): only `DialogBody` scrolls. Header and footer stay visible.
+- **`content`**: the whole popup scrolls. Header and footer scroll away, unless `sticky`.
+- **`portal`**: the viewport around the popup scrolls, like a page. Header and footer scroll away, unless `sticky`.
+
+<DialogScrollDemo />
+
+`sticky` pins the header to the top and the footer to the bottom of whatever is scrolling. In `portal` mode the popup uses `overflow: clip` rather than `hidden`, so sticky slots stick to the viewport while the rounded corners stay clipped. In `body` mode, `sticky` has no effect because header and footer never move.
+
+## Nested dialogs
+
+Dialogs behind the topmost one are styled with Base UI's nesting hooks: `data-nested-dialog-open` and `--nested-dialogs` (number of dialogs above). A dialog shrinks, lifts and dims. It works with any nested `Dialog` roots.

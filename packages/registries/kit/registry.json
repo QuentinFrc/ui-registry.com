@@ -1,0 +1,51 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "kit",
+  "homepage": "https://ui-registry.com/kit",
+  "items": [
+    {
+      "name": "kit",
+      "type": "registry:style",
+      "title": "Kit",
+      "description": "Everything the kit ships, in one install.",
+      "registryDependencies": [
+        "https://ui-registry.com/r/kit/dialog.json",
+        "https://ui-registry.com/r/kit/sheet.json"
+      ]
+    },
+    {
+      "name": "dialog",
+      "type": "registry:ui",
+      "title": "Dialog",
+      "description": "Header / Body / Footer layout, a scroll prop (body, content, portal), sticky slots and nested stacking styles.",
+      "dependencies": ["@base-ui/react", "lucide-react"],
+      "registryDependencies": ["button"],
+      "meta": {
+        "origin": "shadcn"
+      },
+      "files": [
+        {
+          "path": "registry/base-nova/ui/dialog.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "sheet",
+      "type": "registry:ui",
+      "title": "Sheet",
+      "description": "The dialog's layout, scroll prop and sticky slots on a side panel, with the same nested stacking styles.",
+      "dependencies": ["@base-ui/react", "lucide-react"],
+      "registryDependencies": ["button"],
+      "meta": {
+        "origin": "shadcn"
+      },
+      "files": [
+        {
+          "path": "registry/base-nova/ui/sheet.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    }
+  ]
+}
