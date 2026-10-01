@@ -20,6 +20,7 @@
     "@types/node": "^22.15.3",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "@ui-registry/dialog-stack": "workspace:*",
     "@ui-registry/flash": "workspace:*",
     "@ui-registry/swappable": "workspace:*",
     "lucide-react": "^0.576.0",

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "dialog-stack",
+  "homepage": "https://ui-registry.com/packages/dialog-stack",
+  "items": [
+    {
+      "name": "dialog-stack",
+      "type": "registry:ui",
+      "title": "DialogStackProvider",
+      "description": "Provider wiring @ui-registry/dialog-stack to Base UI: push dialogs and sheets from anywhere, rendered as a nested stack.",
+      "dependencies": ["@ui-registry/dialog-stack", "@base-ui/react"],
+      "files": [
+        {
+          "path": "registry/base-nova/dialog-stack/dialog-stack.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    }
+  ]
+}

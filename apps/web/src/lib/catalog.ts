@@ -76,6 +76,15 @@ export const catalog: readonly CatalogEntry[] = [
     kind: "library",
     href: "/packages/swappable",
   },
+  {
+    slug: "dialog-stack",
+    name: "@ui-registry/dialog-stack",
+    tagline:
+      "Push dialogs and sheets from anywhere with typed props — rendered as one nested stack.",
+    status: "alpha",
+    kind: "library",
+    href: "/packages/dialog-stack",
+  },
 ] as const;
 
 export const catalogByKind = (kind: CatalogKind): readonly CatalogEntry[] =>
