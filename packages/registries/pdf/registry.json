@@ -88,6 +88,49 @@
       ]
     },
     {
+      "name": "alert",
+      "type": "registry:ui",
+      "title": "Alert",
+      "description": "Callout with a title, a description and an optional icon, in default and destructive variants.",
+      "dependencies": ["@ui-registries/pdf"],
+      "files": [
+        {
+          "path": "registry/base-nova/pdf/alert.tsx",
+          "type": "registry:ui",
+          "target": "components/pdf/alert.tsx"
+        }
+      ]
+    },
+    {
+      "name": "item",
+      "type": "registry:ui",
+      "title": "Item",
+      "description": "List row with media, title, description and right-aligned actions such as an amount or a badge.",
+      "dependencies": ["@ui-registries/pdf"],
+      "registryDependencies": ["https://ui-registry.com/r/pdf/separator.json"],
+      "files": [
+        {
+          "path": "registry/base-nova/pdf/item.tsx",
+          "type": "registry:ui",
+          "target": "components/pdf/item.tsx"
+        }
+      ]
+    },
+    {
+      "name": "avatar",
+      "type": "registry:ui",
+      "title": "Avatar",
+      "description": "Round image with an initials fallback, in three sizes, plus an overlapping avatar group.",
+      "dependencies": ["@ui-registries/pdf"],
+      "files": [
+        {
+          "path": "registry/base-nova/pdf/avatar.tsx",
+          "type": "registry:ui",
+          "target": "components/pdf/avatar.tsx"
+        }
+      ]
+    },
+    {
       "name": "invoice",
       "type": "registry:block",
       "title": "Invoice",

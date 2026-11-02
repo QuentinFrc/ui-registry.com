@@ -1,4 +1,14 @@
 {
+  "alert": {
+    "pages": 1,
+    "width": 630,
+    "height": 366
+  },
+  "avatar": {
+    "pages": 1,
+    "width": 630,
+    "height": 211
+  },
   "badge": {
     "pages": 1,
     "width": 630,
@@ -23,6 +33,11 @@
     "pages": 1,
     "width": 892,
     "height": 1262
+  },
+  "item": {
+    "pages": 1,
+    "width": 630,
+    "height": 554
   },
   "page-footer": {
     "pages": 1,

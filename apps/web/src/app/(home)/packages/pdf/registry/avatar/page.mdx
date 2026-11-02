@@ -1,0 +1,63 @@
+export const metadata = {
+  title: "Avatar",
+  description:
+    "Round image with an initials fallback, and overlapping avatar groups.",
+};
+
+# Avatar
+
+Round image with an initials fallback, and overlapping avatar groups.
+
+<PdfPreview name="avatar" height={280} />
+
+## Installation
+
+```bash
+npx shadcn add https://ui-registry.com/r/pdf/avatar.json
+```
+
+## Usage
+
+```tsx
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarGroup,
+  AvatarImage,
+} from "@/components/pdf/avatar";
+
+<Avatar size="lg">
+  <AvatarFallback>AM</AvatarFallback>
+  <AvatarImage src="https://example.com/alice.png" />
+</Avatar>
+```
+
+<Callout>
+  A PDF cannot detect a failed image load. The fallback is always drawn, and the image is stacked on top of it: put `AvatarFallback` first, then `AvatarImage`.
+</Callout>
+
+## Sizes
+
+| `size` | Size |
+|--------|------|
+| `sm` | `size-6` |
+| `default` | `size-8` |
+| `lg` | `size-10` |
+
+For any other size, pass a class: `<Avatar className="size-16 text-xl">`.
+
+## Group
+
+`AvatarGroup` overlaps its avatars and outlines each one with a background-colored ring.
+
+```tsx
+<AvatarGroup>
+  <Avatar>
+    <AvatarFallback>AM</AvatarFallback>
+    <AvatarImage src={alice} />
+  </Avatar>
+  <Avatar>
+    <AvatarFallback>+3</AvatarFallback>
+  </Avatar>
+</AvatarGroup>
+```
