@@ -1,0 +1,37 @@
+{
+	"root": false,
+	"$schema": "../../node_modules/@biomejs/biome/configuration_schema.json",
+	"extends": ["ultracite/biome/react"],
+	"linter": {
+		"rules": {
+			"suspicious": {
+				"noExplicitAny": "warn"
+			},
+			"style": {
+				"noParameterAssign": "warn",
+				"noNonNullAssertion": "warn"
+			},
+			"complexity": {
+				"noForEach": "warn",
+				"noExcessiveCognitiveComplexity": "warn"
+			},
+			"performance": {
+				"noBarrelFile": "off"
+			}
+		}
+	},
+	"overrides": [
+		{
+			// Class order passed to tw() is part of what the tests assert
+			// (e.g. transform composition), so it must not be re-sorted.
+			"includes": ["src/__tests__/**"],
+			"linter": {
+				"rules": {
+					"nursery": {
+						"useSortedClasses": "off"
+					}
+				}
+			}
+		}
+	]
+}
