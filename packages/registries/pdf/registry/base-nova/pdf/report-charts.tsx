@@ -6,7 +6,7 @@ import {
   Rect,
   Svg,
   SvgText,
-  useTw,
+  useThemeColor,
 } from "@ui-registries/pdf";
 
 // Small dependency-free charts drawn with Svg primitives. Colors are resolved
@@ -56,10 +56,7 @@ export const niceScale = (min: number, max: number, count = 4): Scale => {
   return { max: niceMax, min: niceMin, ticks };
 };
 
-const useColor = (token: string) => {
-  const tw = useTw();
-  return String(tw(`text-${token}`).color ?? "");
-};
+const useColor = (token: string) => useThemeColor(token) ?? "";
 
 const useChartColors = () => ({
   axis: useColor("muted-foreground"),
@@ -310,6 +307,3 @@ export const TrendArrow = ({ color, direction, size = 6 }: TrendArrowProps) => {
     </Svg>
   );
 };
-
-/** Resolves a theme color token (e.g. "primary") to a color string. */
-export const useThemeColor = useColor;

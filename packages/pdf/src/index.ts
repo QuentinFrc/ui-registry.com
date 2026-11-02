@@ -1,6 +1,7 @@
 export { cn } from "./cn";
 export type { DefineFontOptions, FontResult, FontVariant } from "./font";
-export { defineFont } from "./font";
+export { defineFont, disableHyphenation } from "./font";
+export { pdfSafe, toPdfSafe } from "./format";
 export type {
 	BlockProps,
 	CanvasProps,
@@ -38,7 +39,14 @@ export {
 	usePDF,
 } from "./re-exports";
 export type { Style } from "./styles";
-export type { GProps, SvgProps, SvgTextProps } from "./svg";
+export type {
+	CircleProps,
+	GProps,
+	PathProps,
+	RectProps,
+	SvgProps,
+	SvgTextProps,
+} from "./svg";
 export {
 	Circle,
 	ClipPath,
@@ -56,6 +64,7 @@ export {
 	Svg,
 	SvgText,
 	Tspan,
+	useThemeColor,
 } from "./svg";
 export { Tailwind, useTw } from "./tailwind";
 export type { StyleObject, StyleValue, ThemeVars, TwFn } from "./tw";

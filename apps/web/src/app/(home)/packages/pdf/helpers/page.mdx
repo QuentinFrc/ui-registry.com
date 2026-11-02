@@ -98,3 +98,30 @@ interface ResolvedTheme {
   colors: Record<string, string>;
 }
 ```
+
+## pdfSafe()
+
+Wraps an `Intl` formatter so its output renders with the built-in fonts. Some locales (`fr-FR`…) use a narrow no-break space (U+202F) or a minus sign (U+2212), which Helvetica, Times and Courier can't draw: they become a regular no-break space and a hyphen-minus.
+
+```ts
+import { pdfSafe } from "@ui-registries/pdf";
+
+const money = pdfSafe(
+  new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" })
+);
+
+money.format(-1234.5); // "-1 234,50 €"
+```
+
+`toPdfSafe(text)` does the same on a string. You don't need either with a [custom font](/packages/pdf/fonts) that has those characters.
+
+## useThemeColor()
+
+Returns a color of the current theme, for props that don't take classes (SVG gradient stops, computed colors). Accepts the same names and opacity modifiers as color utilities.
+
+```tsx
+import { useThemeColor } from "@ui-registries/pdf";
+
+const accent = useThemeColor("primary"); // "#171717", or your theme's value
+const faded = useThemeColor("primary/20"); // "rgba(23, 23, 23, 0.2)"
+```

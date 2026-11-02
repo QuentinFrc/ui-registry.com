@@ -97,6 +97,16 @@ tw(`${inter.className} text-lg font-bold`);
 // → { fontFamily: "Inter", fontSize: 18, fontWeight: 700 }
 ```
 
+## Hyphenation
+
+react-pdf hyphenates long words automatically ("pay-ment"). To only wrap at spaces, call `disableHyphenation()` once at startup, next to your `defineFont` calls. react-pdf only has a global setting, so it applies to every document rendered afterwards.
+
+```ts
+import { disableHyphenation } from "@ui-registries/pdf/font";
+
+disableHyphenation();
+```
+
 ## Types
 
 ```ts

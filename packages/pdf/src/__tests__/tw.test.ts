@@ -307,12 +307,12 @@ describe("tw() — default theme", () => {
 	});
 
 	// ── Letter spacing ──
-	it("tracking-wide → 0.3", () => {
-		expect(tw("tracking-wide")).toStrictEqual({ letterSpacing: 0.3 });
+	it("tracking-wide → 0.025em", () => {
+		expect(tw("tracking-wide")).toStrictEqual({ letterSpacing: "0.025em" });
 	});
 
-	it("tracking-tighter → -0.6", () => {
-		expect(tw("tracking-tighter")).toStrictEqual({ letterSpacing: -0.6 });
+	it("tracking-tighter → -0.05em", () => {
+		expect(tw("tracking-tighter")).toStrictEqual({ letterSpacing: "-0.05em" });
 	});
 
 	// ── Max lines ──
@@ -490,6 +490,24 @@ describe("createTw() — custom theme", () => {
 	it("custom line height via --leading-extra", () => {
 		const custom = createTw({ "--leading-extra": 3 });
 		expect(custom("leading-extra")).toStrictEqual({ lineHeight: 3 });
+	});
+
+	it("svg fill and stroke", () => {
+		expect(tw("fill-primary")).toStrictEqual({ fill: "#171717" });
+		expect(tw("fill-none")).toStrictEqual({ fill: "none" });
+		expect(tw("stroke-border")).toStrictEqual({ stroke: "#e5e5e5" });
+		expect(tw("stroke-2")).toStrictEqual({ strokeWidth: 2 });
+		expect(tw("stroke-[1.5]")).toStrictEqual({ strokeWidth: 1.5 });
+	});
+
+	it("chart colors", () => {
+		expect(tw("bg-chart-1")).toStrictEqual({ backgroundColor: "#f54a00" });
+	});
+
+	it("arbitrary tracking values", () => {
+		expect(tw("tracking-[0.2em]")).toStrictEqual({ letterSpacing: "0.2em" });
+		expect(tw("tracking-[2px]")).toStrictEqual({ letterSpacing: 1.5 });
+		expect(tw("tracking-[1.5]")).toStrictEqual({ letterSpacing: 1.5 });
 	});
 
 	it("custom letter spacing via --tracking-extra", () => {

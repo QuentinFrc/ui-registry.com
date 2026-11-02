@@ -1,5 +1,13 @@
 import type { ThemeVars } from "@ui-registries/pdf";
-import { Block, cn, Document, Link, Page, Text } from "@ui-registries/pdf";
+import {
+  Block,
+  cn,
+  Document,
+  Link,
+  Page,
+  pdfSafe,
+  Text,
+} from "@ui-registries/pdf";
 import type { ReactNode } from "react";
 
 import { Badge } from "./badge";
@@ -105,20 +113,6 @@ const defaultLabels: ResumeLabels = {
   projects: "Projects",
   skills: "Skills",
 };
-
-// Some locales (fr-FR…) format with a narrow no-break space (U+202F) or a
-// minus sign (U+2212), which the built-in PDF fonts lack. Swap them for a
-// regular no-break space and a hyphen-minus.
-const NARROW_NO_BREAK_SPACE = /\u202f/g;
-const MINUS_SIGN = /\u2212/g;
-
-const pdfSafe = <T,>(formatter: { format: (value: T) => string }) => ({
-  format: (value: T) =>
-    formatter
-      .format(value)
-      .replace(NARROW_NO_BREAK_SPACE, "\u00a0")
-      .replace(MINUS_SIGN, "-"),
-});
 
 type Formatter = ReturnType<typeof pdfSafe<Date>>;
 

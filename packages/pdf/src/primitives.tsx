@@ -24,8 +24,10 @@ import {
 } from "@react-pdf/renderer";
 import type React from "react";
 
+import { type PageSizeProp, resolvePageSize } from "./page-size";
+
 import type { Style } from "./styles";
-import { useStyles } from "./styles";
+import { TypographyProvider, useStyles, useTypography } from "./styles";
 import type { ThemeVars } from "./tailwind";
 import { Tailwind } from "./tailwind";
 
@@ -49,8 +51,12 @@ export const Block = ({
 	breakable,
 	...props
 }: BlockProps) => {
-	const merged = useStyles(className, style);
-	return <RPView style={merged} {...wrapProp(breakable)} {...props} />;
+	const t = useTypography(useStyles(className, style));
+	return (
+		<TypographyProvider parent={t.parent} value={t.typography}>
+			<RPView style={t.style} {...wrapProp(breakable)} {...props} />
+		</TypographyProvider>
+	);
 };
 
 /** @deprecated Use `Block` instead */
@@ -65,8 +71,12 @@ export interface TextProps extends Omit<RPTextProps, "style"> {
 }
 
 export const Text = ({ className, style, ...props }: TextProps) => {
-	const merged = useStyles(className, style);
-	return <RPText style={merged} {...props} />;
+	const t = useTypography(useStyles(className, style));
+	return (
+		<TypographyProvider parent={t.parent} value={t.typography}>
+			<RPText style={t.style} {...props} />
+		</TypographyProvider>
+	);
 };
 
 // ─── Page ────────────────────────────────────────────────────────────────────
@@ -79,8 +89,34 @@ export interface PageProps extends Omit<RPPageProps, "style" | "wrap"> {
 }
 
 export const Page = ({ className, style, breakable, ...props }: PageProps) => {
-	const merged = useStyles(className, style);
-	return <RPPage style={merged} {...wrapProp(breakable)} {...props} />;
+	const t = useTypography(useStyles(className, style));
+	const { height } = resolvePageSize({
+		dpi: props.dpi,
+		orientation: props.orientation,
+		size: props.size as PageSizeProp | undefined,
+	});
+	// react-pdf sizes an unbreakable page to its content and ignores the
+	// requested height: pin it with min/max height (overflow is cut off).
+	const keepHeight = breakable === false && height !== undefined;
+	const pageStyle = keepHeight
+		? [
+				...(Array.isArray(t.style) ? t.style : [t.style]).filter(Boolean),
+				{ maxHeight: height, minHeight: height },
+			]
+		: t.style;
+	// A page without a height grows with its content and never breaks; react-pdf
+	// still tries to paginate it and pushes every unbreakable node (Svg, Image,
+	// unbreakable Block) onto a page of its own, so turn pagination off.
+	const autoHeight = height === undefined;
+	return (
+		<TypographyProvider parent={t.parent} value={t.typography}>
+			<RPPage
+				style={pageStyle}
+				{...wrapProp(autoHeight ? false : breakable)}
+				{...props}
+			/>
+		</TypographyProvider>
+	);
 };
 
 // ─── Image ───────────────────────────────────────────────────────────────────
@@ -110,8 +146,12 @@ export interface LinkProps extends Omit<RPLinkProps, "style"> {
 }
 
 export const Link = ({ className, style, ...props }: LinkProps) => {
-	const merged = useStyles(className, style);
-	return <RPLink style={merged} {...props} />;
+	const t = useTypography(useStyles(className, style));
+	return (
+		<TypographyProvider parent={t.parent} value={t.typography}>
+			<RPLink style={t.style} {...props} />
+		</TypographyProvider>
+	);
 };
 
 // ─── Document ────────────────────────────────────────────────────────────────
@@ -175,10 +215,10 @@ export const PageNumber = ({
 	render,
 	...props
 }: PageNumberProps) => {
-	const merged = useStyles(className, style);
+	const typography = useTypography(useStyles(className, style));
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const renderFn = render
 		? (p: any) => render({ pageNumber: p.pageNumber, totalPages: p.totalPages })
 		: ({ pageNumber, totalPages }: any) => `${pageNumber} / ${totalPages}`;
-	return <RPText render={renderFn} style={merged} {...props} />;
+	return <RPText render={renderFn} style={typography.style} {...props} />;
 };

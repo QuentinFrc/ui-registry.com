@@ -10,7 +10,7 @@ describe("resolveTheme()", () => {
 		expect(t.fontWeight.bold).toBe(700);
 		expect(t.opacity["50"]).toBe(0.5);
 		expect(t.lineHeight.normal).toBe(1.5);
-		expect(t.letterSpacing.normal).toBe(0);
+		expect(t.letterSpacing.normal).toBe("0em");
 		expect(t.colors["red-500"]).toBe("#ef4444");
 		expect(t.colors.white).toBe("#ffffff");
 		expect(t.colors.transparent).toBe("rgba(0,0,0,0)");

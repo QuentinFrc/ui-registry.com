@@ -8,9 +8,10 @@ import {
   Link,
   Page,
   Polygon,
+  pdfSafe,
   Svg,
   Text,
-  useTw,
+  useThemeColor,
 } from "@ui-registries/pdf";
 import type { ReactNode } from "react";
 
@@ -69,20 +70,6 @@ const defaultLabels: CertificateLabels = {
   verify: "Verify at",
 };
 
-// Some locales (fr-FR…) format with a narrow no-break space (U+202F) or a
-// minus sign (U+2212), which the built-in PDF fonts lack. Swap them for a
-// regular no-break space and a hyphen-minus.
-const NARROW_NO_BREAK_SPACE = /\u202f/g;
-const MINUS_SIGN = /\u2212/g;
-
-const pdfSafe = <T,>(formatter: { format: (value: T) => string }) => ({
-  format: (value: T) =>
-    formatter
-      .format(value)
-      .replace(NARROW_NO_BREAK_SPACE, "\u00a0")
-      .replace(MINUS_SIGN, "-"),
-});
-
 const PROTOCOL = /^(https?:)?\/\//;
 
 // ─── Seal ────────────────────────────────────────────────────────────────────
@@ -117,16 +104,9 @@ const ribbon = (side: -1 | 1) => {
   ].join(" ");
 };
 
-const colorOf = (style: Record<string, unknown>, key: string) => {
-  const value = style[key];
-  return typeof value === "string" ? value : undefined;
-};
-
 const Seal = ({ seal }: { seal: CertificateSeal }) => {
-  // SVG shapes take colors as props, not classes: resolve the theme tokens.
-  const tw = useTw();
-  const primary = colorOf(tw("bg-primary"), "backgroundColor");
-  const foreground = colorOf(tw("bg-primary-foreground"), "backgroundColor");
+  const primary = useThemeColor("primary");
+  const foreground = useThemeColor("primary-foreground");
   const height = SEAL_SIZE + RIBBON_DROP / 2 + 4;
 
   return (

@@ -69,3 +69,12 @@ export const defineFont = (options: DefineFontOptions): FontResult => {
 		style: { fontFamily: family },
 	};
 };
+
+/**
+ * Turns off react-pdf's automatic hyphenation ("pay-ment") for every document
+ * rendered afterwards: words then only wrap at spaces. react-pdf only offers a
+ * global setting, so call it once at startup, next to `defineFont`.
+ */
+export const disableHyphenation = (): void => {
+	Font.registerHyphenationCallback((word) => [word]);
+};

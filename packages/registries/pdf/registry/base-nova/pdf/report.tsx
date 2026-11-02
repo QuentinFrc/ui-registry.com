@@ -1,5 +1,13 @@
 import type { ThemeVars } from "@ui-registries/pdf";
-import { Block, cn, Document, Page, Text } from "@ui-registries/pdf";
+import {
+  Block,
+  cn,
+  Document,
+  Page,
+  pdfSafe,
+  Text,
+  useThemeColor,
+} from "@ui-registries/pdf";
 
 import {
   Card,
@@ -10,12 +18,7 @@ import {
 } from "./card";
 import { Heading } from "./heading";
 import { PageFooter } from "./page-footer";
-import {
-  BarChart,
-  LineChart,
-  TrendArrow,
-  useThemeColor,
-} from "./report-charts";
+import { BarChart, LineChart, TrendArrow } from "./report-charts";
 import {
   Table,
   TableBody,
@@ -121,20 +124,6 @@ const defaultLabels: ReportLabels = {
   vsPrevious: "vs. previous period",
 };
 
-// Some locales (fr-FR…) format with a narrow no-break space (U+202F) or a
-// minus sign (U+2212), which the built-in PDF fonts lack. Swap them for a
-// regular no-break space and a hyphen-minus.
-const NARROW_NO_BREAK_SPACE = /\u202f/g;
-const MINUS_SIGN = /\u2212/g;
-
-const pdfSafe = <T,>(formatter: { format: (value: T) => string }) => ({
-  format: (value: T) =>
-    formatter
-      .format(value)
-      .replace(NARROW_NO_BREAK_SPACE, "\u00a0")
-      .replace(MINUS_SIGN, "-"),
-});
-
 // A4 width (595pt) minus page padding (2 × 30pt) and card padding (2 × 12pt).
 const CHART_WIDTH = 509;
 
@@ -232,7 +221,7 @@ interface DeltaProps {
 
 const Delta = ({ className, diff, lowerIsBetter, text }: DeltaProps) => {
   const isGood = lowerIsBetter ? diff <= 0 : diff >= 0;
-  const color = useThemeColor(isGood ? "foreground" : "destructive");
+  const color = useThemeColor(isGood ? "foreground" : "destructive") ?? "";
   return (
     <Block className={cn("flex-row items-center gap-1", className)}>
       {diff !== 0 && (

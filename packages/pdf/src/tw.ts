@@ -213,13 +213,15 @@ const defaultLineHeight: Record<string, number> = {
 };
 
 // Tailwind v4 letter-spacing in pt (based on em at ~12pt base)
-const defaultLetterSpacing: Record<string, number> = {
-	normal: 0,
-	tight: -0.3,
-	tighter: -0.6,
-	wide: 0.3,
-	wider: 0.6,
-	widest: 1.2,
+// Tailwind's scale, in em: relative to the element's font size like in CSS.
+// react-pdf has no em unit; primitives convert it (see styles.tsx).
+const defaultLetterSpacing: Record<string, number | string> = {
+	normal: "0em",
+	tight: "-0.025em",
+	tighter: "-0.05em",
+	wide: "0.025em",
+	wider: "0.05em",
+	widest: "0.1em",
 };
 
 const defaultFontFamily: Record<string, string> = {
@@ -549,6 +551,12 @@ function buildDefaultColors(): Record<string, string> {
 	flat.border = "#e5e5e5";
 	flat.input = "#e5e5e5";
 	flat.ring = "#a3a3a3";
+	// Chart palette (shadcn defaults)
+	flat["chart-1"] = "#f54a00";
+	flat["chart-2"] = "#009689";
+	flat["chart-3"] = "#104e64";
+	flat["chart-4"] = "#ffb900";
+	flat["chart-5"] = "#fe9a00";
 
 	return flat;
 }
@@ -561,7 +569,7 @@ export interface ResolvedTheme {
 	fontFamily: Record<string, string>;
 	fontSize: Record<string, number>;
 	fontWeight: Record<string, number>;
-	letterSpacing: Record<string, number>;
+	letterSpacing: Record<string, number | string>;
 	lineHeight: Record<string, number>;
 	opacity: Record<string, number>;
 	spacing: Record<string, number>;
@@ -658,7 +666,7 @@ export function resolveTheme(vars?: ThemeVars): ResolvedTheme {
 		} else if (name.startsWith("leading-")) {
 			lineHeight[name.slice(8)] = Number(val);
 		} else if (name.startsWith("tracking-")) {
-			letterSpacing[name.slice(9)] = Number(val);
+			letterSpacing[name.slice(9)] = letterSpacingValue(val) ?? 0;
 		} else if (name.startsWith("opacity-")) {
 			opacity[name.slice(8)] = Number(val);
 		}
@@ -686,6 +694,23 @@ type Parser = (value: string) => any;
 // Arbitrary length: "12" → 12 (pt), "12px" → 9 (1px = 0.75pt), "1rem" → 12
 // (1rem = 16px), other units (pt, in, mm, cm, vw, vh, %) pass through as-is.
 // Returns undefined for values that are not lengths (e.g. colors).
+const ARBITRARY = /^\[(.+)\]$/;
+const EM = /^-?\d*\.?\d+em$/;
+
+// Letter spacing: em values stay strings (resolved by the primitives against
+// the font size), everything else becomes pt.
+function letterSpacingValue(raw: unknown): number | string | undefined {
+	if (typeof raw === "number") {
+		return raw;
+	}
+	const value = String(raw).trim();
+	if (EM.test(value)) {
+		return value;
+	}
+	const length = arbitraryLength(value);
+	return typeof length === "number" ? length : undefined;
+}
+
 function arbitraryLength(inner: string): number | string | undefined {
 	const m = inner.match(/^(-?\d*\.?\d+)(px|rem|pt|in|mm|cm|vw|vh|%)?$/);
 	if (!m) {
@@ -1191,6 +1216,30 @@ function buildMatchers(t: ResolvedTheme): Parser[] {
 			return c ? { color: c } : null;
 		},
 
+		// ── SVG fill & stroke: fill-primary, fill-none, stroke-border,
+		//    stroke-2, stroke-[1.5] ──
+		(cls) => {
+			if (!(cls.startsWith("fill-") || cls.startsWith("stroke-"))) {
+				return null;
+			}
+			const isFill = cls.startsWith("fill-");
+			const key = isFill ? "fill" : "stroke";
+			const value = cls.slice(key.length + 1);
+			if (value === "none") {
+				return { [key]: "none" };
+			}
+			if (!isFill) {
+				const width = /^\d*\.?\d+$/.test(value)
+					? Number(value)
+					: arbitraryLength(value.match(ARBITRARY)?.[1] ?? "");
+				if (typeof width === "number") {
+					return { strokeWidth: width };
+				}
+			}
+			const c = resolveColorAlpha(value);
+			return c ? { [key]: c } : null;
+		},
+
 		// ── Background color ──
 		(cls) => {
 			if (!cls.startsWith("bg-")) {
@@ -1280,9 +1329,16 @@ function buildMatchers(t: ResolvedTheme): Parser[] {
 				return null;
 			}
 			const v = cls.slice(9);
-			return v in t.letterSpacing
-				? { letterSpacing: t.letterSpacing[v] }
-				: null;
+			if (v in t.letterSpacing) {
+				return { letterSpacing: t.letterSpacing[v] };
+			}
+			// Arbitrary: tracking-[0.2em], tracking-[2px], tracking-[1.5]
+			const inner = v.match(ARBITRARY)?.[1];
+			if (!inner) {
+				return null;
+			}
+			const value = letterSpacingValue(inner);
+			return value === undefined ? null : { letterSpacing: value };
 		},
 
 		// ── Max lines ──

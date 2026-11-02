@@ -51,9 +51,29 @@ import { Block, Svg, G, SvgText, Circle, Path } from "@ui-registries/pdf";
 </Block>
 ```
 
-### Shape components (inline props)
+### Shape components
 
-Shape components (`Path`, `Rect`, `Circle`, `Ellipse`, `Line`, `Polyline`, `Polygon`) use SVG presentation attributes as props — `fill`, `stroke`, `strokeWidth`, `opacity`, etc. These map directly to SVG, not CSS, so `className` is not applicable.
+Shape components (`Path`, `Rect`, `Circle`, `Ellipse`, `Line`, `Polyline`, `Polygon`) take SVG presentation attributes as props — `fill`, `stroke`, `strokeWidth`, `opacity`, etc. Their `className` accepts the `fill-*` and `stroke-*` utilities, resolved against the document theme; other classes are ignored. Explicit props win over classes.
+
+```tsx
+<Svg width={120} height={40} viewBox="0 0 120 40">
+  <Rect className="fill-muted stroke-border" width={120} height={40} rx={6} />
+  <Circle className="fill-primary" cx={20} cy={20} r={10} />
+  <Path className="fill-none stroke-chart-2 stroke-2" d="M40 30 L60 10 L80 25 L110 8" />
+</Svg>
+```
+
+Colors with an opacity modifier (`fill-primary/50`) become a hex color plus `fillOpacity` / `strokeOpacity`, which react-pdf's SVG renderer needs.
+
+To use a theme color in a prop (a gradient stop, a computed color), read it with `useThemeColor`:
+
+```tsx
+import { Stop, useThemeColor } from "@ui-registries/pdf";
+
+const Brand = () => <Stop offset="0%" stopColor={useThemeColor("primary")} />;
+```
+
+Raw props still work everywhere:
 
 ```tsx
 <Svg width={40} height={40} viewBox="0 0 40 40">

@@ -80,6 +80,20 @@ import { Document, Page, Block, Text, Tailwind } from "@ui-registries/pdf";
 </Page>
 ```
 
+### Auto height
+
+A size without height (`size={{ width: 420 }}`) gives a single page that grows with its content — handy for receipts, tickets or previews. Such a page never breaks, so `breakable={false}` on its children has no effect.
+
+```tsx
+<Page size={{ width: 420 }} className="gap-4 p-10">
+  …
+</Page>
+```
+
+### Single page
+
+By default, content that doesn't fit flows onto new pages. `breakable={false}` keeps everything on one page of the requested size: content that is too long is cut off at the bottom of the page instead of creating a new one.
+
 ## Props
 
 <PropsTable name="PageProps" />

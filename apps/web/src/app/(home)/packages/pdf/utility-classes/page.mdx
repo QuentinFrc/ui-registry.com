@@ -311,16 +311,22 @@ Spacing scale (absolute, like Tailwind v4): `leading-6` → 18pt.
 
 Arbitrary: `leading-[1.2]` (multiplier of the font size), `leading-[18px]` (absolute).
 
+Multipliers behave like in CSS: they apply to the element's own font size, inherited or not, and a child with a different `text-*` size gets the same multiplier against its own size. A `text-2xl` heading inside a `text-sm leading-relaxed` page gets 1.625 × 24pt, not the page's line height.
+
 ### Letter Spacing
 
-| Class | pt |
-|-------|-----|
-| `tracking-tighter` | -0.6 |
-| `tracking-tight` | -0.3 |
-| `tracking-normal` | 0 |
-| `tracking-wide` | 0.3 |
-| `tracking-wider` | 0.6 |
-| `tracking-widest` | 1.2 |
+| Class | Value |
+|-------|-------|
+| `tracking-tighter` | -0.05em |
+| `tracking-tight` | -0.025em |
+| `tracking-normal` | 0em |
+| `tracking-wide` | 0.025em |
+| `tracking-wider` | 0.05em |
+| `tracking-widest` | 0.1em |
+
+`em` values are relative to the element's font size, like in Tailwind: `tracking-widest` on a `text-xs` label is narrower than on a heading.
+
+Arbitrary: `tracking-[0.2em]`, `tracking-[2px]`, `tracking-[1.5]` (pt).
 
 ### Text Indent
 
@@ -331,6 +337,20 @@ Arbitrary: `leading-[1.2]` (multiplier of the font size), `leading-[18px]` (abso
 `line-clamp-{n}` — sets `maxLines` on the text element.
 
 ## Colors
+
+Besides the Tailwind palette, the default theme has the shadcn/ui semantic tokens (`background`, `foreground`, `primary`, `muted`, `border`, `destructive`…) and a chart palette: `chart-1` to `chart-5`.
+
+### SVG fill & stroke
+
+| Class | Output |
+|-------|--------|
+| `fill-{color}` | `fill` (e.g. `fill-primary`, `fill-chart-1/50`) |
+| `fill-none` | `fill: none` |
+| `stroke-{color}` | `stroke` |
+| `stroke-{n}`, `stroke-[1.5]` | `strokeWidth` |
+| `stroke-none` | `stroke: none` |
+
+They work on [SVG elements](/packages/pdf/svg) only.
 
 ### Background
 
