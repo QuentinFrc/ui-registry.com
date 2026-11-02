@@ -85,10 +85,16 @@ export const Page = ({ className, style, breakable, ...props }: PageProps) => {
 
 // ─── Image ───────────────────────────────────────────────────────────────────
 
-export interface ImageProps extends Omit<RPImageProps, "style"> {
+// react-pdf's ImageProps is a union (src | source); a plain Omit would keep
+// only the keys shared by every member and drop both.
+type DistributiveOmit<T, K extends PropertyKey> = T extends unknown
+	? Omit<T, K>
+	: never;
+
+export type ImageProps = DistributiveOmit<RPImageProps, "style"> & {
 	className?: string;
 	style?: Style;
-}
+};
 
 export const Image = ({ className, style, ...props }: ImageProps) => {
 	const merged = useStyles(className, style);
