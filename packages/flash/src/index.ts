@@ -10,20 +10,20 @@ export const FLASH_PARAM = "flash";
 
 export type FlashLevel = "info" | "success" | "warning" | "error";
 
-export type Flash<TData = unknown> = {
-  message: string;
-  level?: FlashLevel;
+export interface Flash<TData = unknown> {
   data?: TData;
-};
+  level?: FlashLevel;
+  message: string;
+}
 
 export type FlashStorage = "searchParam" | "hash";
 
-export type FlashOptions = {
+export interface FlashOptions {
   /** URL parameter name. Defaults to {@link FLASH_PARAM}. */
   param?: string;
   /** Where to encode the flash. Defaults to `"searchParam"`. */
   storage?: FlashStorage;
-};
+}
 
 type ResolvedOptions = Required<FlashOptions>;
 

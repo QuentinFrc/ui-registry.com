@@ -8,6 +8,7 @@ export function Logo(props: ComponentProps<"svg">) {
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >
+      <title>ui-registry</title>
       <path
         className="fill-current"
         clipRule="evenodd"

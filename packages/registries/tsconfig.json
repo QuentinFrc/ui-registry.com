@@ -7,21 +7,10 @@
         "./kit/registry/base-nova/ui/*",
         "../ui/src/components/ui/*"
       ],
-      "@/*": [
-        "../ui/src/*"
-      ],
-      "@repo/ui/*": [
-        "../ui/src/*"
-      ]
+      "@/*": ["../ui/src/*"],
+      "@repo/ui/*": ["../ui/src/*"]
     }
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "**/*.mts"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "include": ["**/*.ts", "**/*.tsx", "**/*.mts"],
+  "exclude": ["node_modules", "dist"]
 }
