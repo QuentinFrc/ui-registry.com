@@ -1,0 +1,76 @@
+export const metadata = {
+  title: "Typeset Markdown",
+  description:
+    "Renders Markdown into a PDF with the Typeset components: tables, task lists, code, quotes and more.",
+};
+
+# Typeset Markdown
+
+Renders Markdown into a PDF with the [Typeset](/packages/pdf/registry/typeset) components. Useful for content that already lives as text: terms and conditions from a CMS, release notes, AI-generated reports.
+
+<PdfPreview name="typeset-markdown" height={720} />
+
+## Installation
+
+```bash
+npx shadcn add https://ui-registry.com/r/pdf/typeset-markdown.json
+```
+
+This installs `typeset-markdown.tsx`, the `typeset` component it uses, and [`marked`](https://marked.js.org) to parse the Markdown.
+
+## Usage
+
+```tsx
+import { Document, Page } from "@ui-registries/pdf";
+import { TypesetMarkdown } from "@/components/pdf/typeset-markdown";
+
+const terms = await getTerms(); // a Markdown string
+
+<Document>
+  <Page size="A4" className="p-12">
+    <TypesetMarkdown preset="compact">{terms}</TypesetMarkdown>
+  </Page>
+</Document>
+```
+
+`TypesetMarkdown` takes the same props as `Typeset` (`preset`, `size`, `leading`, `flow`, `fonts`, `className`…).
+
+## Supported syntax
+
+CommonMark plus the GitHub extensions:
+
+- Headings (levels 5 and 6 render as level 4), paragraphs, line breaks
+- **Bold**, *italic*, ~~strikethrough~~, `inline code`, links
+- Ordered, unordered and nested lists; task lists (`- [x]`) with a drawn checkbox
+- Quotes, code blocks, horizontal rules
+- Tables with column alignment (`:--`, `:-:`, `--:`)
+- Images on their own line (inline images become their alt text)
+
+Raw HTML is ignored.
+
+## Custom components
+
+Replace any element with your own component, like `react-markdown`:
+
+```tsx
+import { Text } from "@ui-registries/pdf";
+import { TypesetMarkdown } from "@/components/pdf/typeset-markdown";
+
+<TypesetMarkdown
+  components={{
+    link: ({ children, href }) => (
+      <Text className="text-primary">
+        {children} ({href})
+      </Text>
+    ),
+  }}
+>
+  {markdown}
+</TypesetMarkdown>
+```
+
+Keys: `heading`, `paragraph`, `list`, `listItem`, `blockquote`, `codeBlock`, `rule`, `image`, `table`, `tableRow`, `tableCell`, `strong`, `em`, `del`, `code`, `link`.
+
+<Callout title="Fonts">
+The built-in fonts only cover Western European characters. For other scripts or emoji, register a font with [`defineFont`](/packages/pdf/fonts) and pass it as `fonts={{ body: … }}`.
+</Callout>

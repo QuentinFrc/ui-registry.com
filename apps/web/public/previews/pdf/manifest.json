@@ -73,5 +73,15 @@
     "pages": 1,
     "width": 630,
     "height": 237
+  },
+  "typeset": {
+    "pages": 1,
+    "width": 630,
+    "height": 434
+  },
+  "typeset-markdown": {
+    "pages": 2,
+    "width": 629,
+    "height": 892
   }
 }

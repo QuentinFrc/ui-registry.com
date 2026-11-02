@@ -131,6 +131,35 @@
       ]
     },
     {
+      "name": "typeset",
+      "type": "registry:ui",
+      "title": "Typeset",
+      "description": "Rhythm for long-form content: headings, paragraphs, lists, quotes, code and tables driven by three tokens (size, leading, flow).",
+      "dependencies": ["@ui-registries/pdf"],
+      "files": [
+        {
+          "path": "registry/base-nova/pdf/typeset.tsx",
+          "type": "registry:ui",
+          "target": "components/pdf/typeset.tsx"
+        }
+      ]
+    },
+    {
+      "name": "typeset-markdown",
+      "type": "registry:ui",
+      "title": "Typeset Markdown",
+      "description": "Renders Markdown (with GFM tables, task lists and strikethrough) into a PDF with the Typeset components.",
+      "dependencies": ["@ui-registries/pdf", "marked"],
+      "registryDependencies": ["https://ui-registry.com/r/pdf/typeset.json"],
+      "files": [
+        {
+          "path": "registry/base-nova/pdf/typeset-markdown.tsx",
+          "type": "registry:ui",
+          "target": "components/pdf/typeset-markdown.tsx"
+        }
+      ]
+    },
+    {
       "name": "invoice",
       "type": "registry:block",
       "title": "Invoice",
