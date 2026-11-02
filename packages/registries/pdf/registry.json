@@ -112,6 +112,129 @@
           "target": "components/pdf/invoice-example.ts"
         }
       ]
+    },
+    {
+      "name": "quote",
+      "type": "registry:block",
+      "title": "Quote",
+      "description": "Quote / estimate with project intro, line items, discount, taxes, terms and a signature block.",
+      "dependencies": ["@ui-registries/pdf"],
+      "registryDependencies": [
+        "https://ui-registry.com/r/pdf/badge.json",
+        "https://ui-registry.com/r/pdf/heading.json",
+        "https://ui-registry.com/r/pdf/page-footer.json",
+        "https://ui-registry.com/r/pdf/separator.json",
+        "https://ui-registry.com/r/pdf/table.json"
+      ],
+      "files": [
+        {
+          "path": "registry/base-nova/pdf/quote.tsx",
+          "type": "registry:component",
+          "target": "components/pdf/quote.tsx"
+        },
+        {
+          "path": "registry/base-nova/pdf/quote-example.ts",
+          "type": "registry:lib",
+          "target": "components/pdf/quote-example.ts"
+        }
+      ]
+    },
+    {
+      "name": "receipt",
+      "type": "registry:block",
+      "title": "Receipt",
+      "description": "Compact A5 payment receipt with an amount-paid highlight, payment method, items and taxes.",
+      "dependencies": ["@ui-registries/pdf"],
+      "registryDependencies": [
+        "https://ui-registry.com/r/pdf/heading.json",
+        "https://ui-registry.com/r/pdf/page-footer.json",
+        "https://ui-registry.com/r/pdf/separator.json",
+        "https://ui-registry.com/r/pdf/table.json"
+      ],
+      "files": [
+        {
+          "path": "registry/base-nova/pdf/receipt.tsx",
+          "type": "registry:component",
+          "target": "components/pdf/receipt.tsx"
+        },
+        {
+          "path": "registry/base-nova/pdf/receipt-example.ts",
+          "type": "registry:lib",
+          "target": "components/pdf/receipt-example.ts"
+        }
+      ]
+    },
+    {
+      "name": "report",
+      "type": "registry:block",
+      "title": "Report",
+      "description": "Monthly business report with a cover header, KPI cards, bar and line charts, a breakdown table and highlights.",
+      "dependencies": ["@ui-registries/pdf"],
+      "registryDependencies": [
+        "https://ui-registry.com/r/pdf/card.json",
+        "https://ui-registry.com/r/pdf/heading.json",
+        "https://ui-registry.com/r/pdf/page-footer.json",
+        "https://ui-registry.com/r/pdf/table.json"
+      ],
+      "files": [
+        {
+          "path": "registry/base-nova/pdf/report.tsx",
+          "type": "registry:component",
+          "target": "components/pdf/report.tsx"
+        },
+        {
+          "path": "registry/base-nova/pdf/report-charts.tsx",
+          "type": "registry:component",
+          "target": "components/pdf/report-charts.tsx"
+        },
+        {
+          "path": "registry/base-nova/pdf/report-example.ts",
+          "type": "registry:lib",
+          "target": "components/pdf/report-example.ts"
+        }
+      ]
+    },
+    {
+      "name": "resume",
+      "type": "registry:block",
+      "title": "Resume",
+      "description": "Two-column CV with experience, education, skills, languages and projects that flows cleanly across pages.",
+      "dependencies": ["@ui-registries/pdf"],
+      "registryDependencies": [
+        "https://ui-registry.com/r/pdf/badge.json",
+        "https://ui-registry.com/r/pdf/heading.json"
+      ],
+      "files": [
+        {
+          "path": "registry/base-nova/pdf/resume.tsx",
+          "type": "registry:component",
+          "target": "components/pdf/resume.tsx"
+        },
+        {
+          "path": "registry/base-nova/pdf/resume-example.ts",
+          "type": "registry:lib",
+          "target": "components/pdf/resume-example.ts"
+        }
+      ]
+    },
+    {
+      "name": "certificate",
+      "type": "registry:block",
+      "title": "Certificate",
+      "description": "Landscape certificate of completion with a decorative frame, signatures, credential ID and a themed seal.",
+      "dependencies": ["@ui-registries/pdf"],
+      "files": [
+        {
+          "path": "registry/base-nova/pdf/certificate.tsx",
+          "type": "registry:component",
+          "target": "components/pdf/certificate.tsx"
+        },
+        {
+          "path": "registry/base-nova/pdf/certificate-example.ts",
+          "type": "registry:lib",
+          "target": "components/pdf/certificate-example.ts"
+        }
+      ]
     }
   ]
 }

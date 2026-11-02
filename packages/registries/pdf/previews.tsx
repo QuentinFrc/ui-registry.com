@@ -13,10 +13,20 @@ import {
   CardHeader,
   CardTitle,
 } from "./registry/base-nova/pdf/card";
+import { Certificate } from "./registry/base-nova/pdf/certificate";
+import { exampleCertificate } from "./registry/base-nova/pdf/certificate-example";
 import { Heading } from "./registry/base-nova/pdf/heading";
 import { Invoice } from "./registry/base-nova/pdf/invoice";
 import { exampleInvoice } from "./registry/base-nova/pdf/invoice-example";
 import { PageFooter } from "./registry/base-nova/pdf/page-footer";
+import { Quote } from "./registry/base-nova/pdf/quote";
+import { exampleQuote } from "./registry/base-nova/pdf/quote-example";
+import { Receipt } from "./registry/base-nova/pdf/receipt";
+import { exampleReceipt } from "./registry/base-nova/pdf/receipt-example";
+import { Report } from "./registry/base-nova/pdf/report";
+import { exampleReport } from "./registry/base-nova/pdf/report-example";
+import { Resume } from "./registry/base-nova/pdf/resume";
+import { exampleResume } from "./registry/base-nova/pdf/resume-example";
 import { Separator } from "./registry/base-nova/pdf/separator";
 import {
   Table,
@@ -27,9 +37,21 @@ import {
   TableRow,
 } from "./registry/base-nova/pdf/table";
 
-const Sheet = ({ children }: { children: ReactNode }) => (
+const SHEET_WIDTH = 420;
+
+// Component previews: fixed width, height fitted to the content unless set.
+const Sheet = ({
+  children,
+  height,
+}: {
+  children: ReactNode;
+  height?: number;
+}) => (
   <Document>
-    <Page className="gap-6 bg-background p-10 pb-20 text-sm" size="A5">
+    <Page
+      className="gap-6 bg-background p-10 text-sm"
+      size={height ? { width: SHEET_WIDTH, height } : { width: SHEET_WIDTH }}
+    >
       {children}
     </Page>
   </Document>
@@ -78,7 +100,7 @@ export const componentPreviews = {
     </Sheet>
   ),
   "page-footer": (
-    <Sheet>
+    <Sheet height={200}>
       <Text>The footer is repeated at the bottom of every page.</Text>
       <PageFooter>Acme Studio · Annual report</PageFooter>
     </Sheet>
@@ -122,7 +144,12 @@ export const componentPreviews = {
 
 // Full documents. Each one gets a thumbnail in the docs block grid.
 export const blockPreviews = {
+  certificate: <Certificate data={exampleCertificate} />,
   invoice: <Invoice data={exampleInvoice} />,
+  quote: <Quote data={exampleQuote} />,
+  receipt: <Receipt data={exampleReceipt} />,
+  report: <Report data={exampleReport} />,
+  resume: <Resume data={exampleResume} />,
 } satisfies Record<string, ReactElement>;
 
 export const previews = { ...componentPreviews, ...blockPreviews };

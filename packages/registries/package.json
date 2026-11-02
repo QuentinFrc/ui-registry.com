@@ -9,7 +9,9 @@
     "kit:check": "tsx kit/check.mts",
     "kit:sync": "tsx kit/check.mts --sync",
     "check-types": "tsc --noEmit",
-    "pdf:render": "tsx pdf/scripts/render.ts"
+    "pdf:render": "tsx pdf/scripts/render.ts",
+    "pdf:previews": "tsx pdf/scripts/render.ts --all-pages --scale 1.5 --out ../../apps/web/public/previews/pdf",
+    "test": "vitest run"
   },
   "dependencies": {
     "@repo/ui": "workspace:*",
