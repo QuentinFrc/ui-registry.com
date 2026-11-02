@@ -1,0 +1,117 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "pdf",
+  "homepage": "https://ui-registry.com/packages/pdf",
+  "items": [
+    {
+      "name": "heading",
+      "type": "registry:ui",
+      "title": "Heading",
+      "description": "Document headings (levels 1–4).",
+      "dependencies": ["@ui-registries/pdf"],
+      "files": [
+        {
+          "path": "registry/base-nova/pdf/heading.tsx",
+          "type": "registry:ui",
+          "target": "components/pdf/heading.tsx"
+        }
+      ]
+    },
+    {
+      "name": "separator",
+      "type": "registry:ui",
+      "title": "Separator",
+      "description": "Horizontal or vertical divider.",
+      "dependencies": ["@ui-registries/pdf"],
+      "files": [
+        {
+          "path": "registry/base-nova/pdf/separator.tsx",
+          "type": "registry:ui",
+          "target": "components/pdf/separator.tsx"
+        }
+      ]
+    },
+    {
+      "name": "badge",
+      "type": "registry:ui",
+      "title": "Badge",
+      "description": "Small status label with default, secondary, destructive and outline variants.",
+      "dependencies": ["@ui-registries/pdf"],
+      "files": [
+        {
+          "path": "registry/base-nova/pdf/badge.tsx",
+          "type": "registry:ui",
+          "target": "components/pdf/badge.tsx"
+        }
+      ]
+    },
+    {
+      "name": "card",
+      "type": "registry:ui",
+      "title": "Card",
+      "description": "Bordered container with header, title, description, content and footer.",
+      "dependencies": ["@ui-registries/pdf"],
+      "files": [
+        {
+          "path": "registry/base-nova/pdf/card.tsx",
+          "type": "registry:ui",
+          "target": "components/pdf/card.tsx"
+        }
+      ]
+    },
+    {
+      "name": "table",
+      "type": "registry:ui",
+      "title": "Table",
+      "description": "Table with a header that repeats on every page and rows that never split across pages.",
+      "dependencies": ["@ui-registries/pdf"],
+      "files": [
+        {
+          "path": "registry/base-nova/pdf/table.tsx",
+          "type": "registry:ui",
+          "target": "components/pdf/table.tsx"
+        }
+      ]
+    },
+    {
+      "name": "page-footer",
+      "type": "registry:ui",
+      "title": "Page Footer",
+      "description": "Footer fixed on every page, with page numbers.",
+      "dependencies": ["@ui-registries/pdf"],
+      "files": [
+        {
+          "path": "registry/base-nova/pdf/page-footer.tsx",
+          "type": "registry:ui",
+          "target": "components/pdf/page-footer.tsx"
+        }
+      ]
+    },
+    {
+      "name": "invoice",
+      "type": "registry:block",
+      "title": "Invoice",
+      "description": "Multi-page invoice with line items, taxes, totals and localized amounts.",
+      "dependencies": ["@ui-registries/pdf"],
+      "registryDependencies": [
+        "https://ui-registry.com/r/pdf/badge.json",
+        "https://ui-registry.com/r/pdf/heading.json",
+        "https://ui-registry.com/r/pdf/page-footer.json",
+        "https://ui-registry.com/r/pdf/separator.json",
+        "https://ui-registry.com/r/pdf/table.json"
+      ],
+      "files": [
+        {
+          "path": "registry/base-nova/pdf/invoice.tsx",
+          "type": "registry:component",
+          "target": "components/pdf/invoice.tsx"
+        },
+        {
+          "path": "registry/base-nova/pdf/invoice-example.ts",
+          "type": "registry:lib",
+          "target": "components/pdf/invoice-example.ts"
+        }
+      ]
+    }
+  ]
+}

@@ -2,12 +2,14 @@
   "name": "@repo/registries",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "validate": "tsx validate.mts",
     "build": "tsx build.mts",
     "kit:check": "tsx kit/check.mts",
     "kit:sync": "tsx kit/check.mts --sync",
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "pdf:render": "tsx pdf/scripts/render.ts"
   },
   "dependencies": {
     "@repo/ui": "workspace:*",
@@ -16,16 +18,23 @@
   },
   "devDependencies": {
     "@base-ui/react": "^1.3.0",
+    "@react-pdf/renderer": "^4.3.2",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^22.15.3",
+    "@types/pngjs": "^6.0.5",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@ui-registries/flash": "workspace:*",
+    "@ui-registries/pdf": "workspace:*",
     "@ui-registries/swappable": "workspace:*",
     "lucide-react": "^0.576.0",
+    "pdf-to-img": "^7.0.2",
+    "pixelmatch": "^8.0.0",
+    "pngjs": "^7.0.0",
     "shadcn": "^3.8.5",
     "sonner": "^2.0.7",
     "tsx": "^4.20.3",
-    "typescript": "5.9.2"
+    "typescript": "5.9.2",
+    "vitest": "^4.1.7"
   }
 }
