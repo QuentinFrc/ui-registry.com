@@ -60,7 +60,7 @@ export const LANE_META: Record<CatalogKind, LaneMeta> = {
 export const catalog: readonly CatalogEntry[] = [
   {
     slug: "flash",
-    name: "@ui-registry/flash",
+    name: "@ui-registries/flash",
     tagline:
       "Encode flash messages in the URL so they survive a redirect — Rails-style.",
     status: "alpha",
@@ -69,7 +69,7 @@ export const catalog: readonly CatalogEntry[] = [
   },
   {
     slug: "swappable",
-    name: "@ui-registry/swappable",
+    name: "@ui-registries/swappable",
     tagline:
       "Swap component implementations by variant — responsive, platform, feature flag — with typed slots.",
     status: "alpha",

@@ -6,7 +6,7 @@ See [`ui-registry-spec.md`](./ui-registry-spec.md) for the project vision and sc
 
 ## Status
 
-Early. Base scaffolding in place; first package (`@ui-registry/flash`) not yet published.
+Early. Base scaffolding in place; first package (`@ui-registries/flash`) not yet published.
 
 ## Layout
 

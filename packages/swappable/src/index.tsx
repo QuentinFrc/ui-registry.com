@@ -1,5 +1,5 @@
 /**
- * @ui-registry/swappable — swap component implementations by variant.
+ * @ui-registries/swappable — swap component implementations by variant.
  *
  * Two-step factory: describe the mechanics first (variants, fallback, how the
  * current variant is resolved), then the slots (one implementation per

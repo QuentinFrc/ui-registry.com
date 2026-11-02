@@ -1,10 +1,10 @@
 export const metadata = {
-  title: "@ui-registry/flash",
+  title: "@ui-registries/flash",
   description:
     "Encode flash messages in the URL so they survive a redirect — Rails-style, for React and Next.js apps.",
 };
 
-# @ui-registry/flash
+# @ui-registries/flash
 
 Encode a flash message in the URL so it survives a redirect — the Rails / Laravel pattern, for React and Next.js.
 
@@ -23,7 +23,7 @@ This package is that pattern, extracted from a real mission and packaged so I ne
 ## Install
 
 ```sh
-pnpm add @ui-registry/flash
+pnpm add @ui-registries/flash
 pnpm dlx shadcn@latest add https://ui-registry.com/r/flash/flash-toaster
 ```
 
@@ -38,7 +38,7 @@ import {
   stripFlash,
   consumeFlash,
   FLASH_PARAM,
-} from "@ui-registry/flash";
+} from "@ui-registries/flash";
 
 type Flash<T = unknown> = {
   message: string;
@@ -59,7 +59,7 @@ consumeFlash(opts?);              // window only — read + strip + return
 ```tsx
 // app/orders/actions.ts
 "use server";
-import { appendFlash } from "@ui-registry/flash";
+import { appendFlash } from "@ui-registries/flash";
 import { redirect } from "next/navigation";
 
 export async function placeOrder(formData: FormData) {
@@ -98,7 +98,7 @@ That's it — the destination page renders normally, and `FlashToaster` surfaces
 
 ```tsx
 "use client";
-import { appendFlash } from "@ui-registry/flash";
+import { appendFlash } from "@ui-registries/flash";
 import { useRouter } from "next/navigation";
 
 export function Logout() {

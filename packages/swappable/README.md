@@ -1,4 +1,4 @@
-# @ui-registry/swappable
+# @ui-registries/swappable
 
 Swap component implementations by variant (responsive, platform, feature flag) with typed slots.
 
@@ -7,13 +7,13 @@ Swap component implementations by variant (responsive, platform, feature flag) w
 ## Install
 
 ```sh
-pnpm add @ui-registry/swappable
+pnpm add @ui-registries/swappable
 ```
 
 ## Usage
 
 ```tsx
-import { createSwappable } from "@ui-registry/swappable";
+import { createSwappable } from "@ui-registries/swappable";
 
 const Layout = createSwappable({
   name: "Layout",

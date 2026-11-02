@@ -1,10 +1,10 @@
 export const metadata = {
-  title: "@ui-registry/swappable",
+  title: "@ui-registries/swappable",
   description:
     "Swap component implementations by variant — responsive, platform, feature flag — with typed slots.",
 };
 
-# @ui-registry/swappable
+# @ui-registries/swappable
 
 Declare a component once, implement it per variant, and let a Provider decide which implementation renders. Typed end to end.
 
@@ -21,7 +21,7 @@ What we actually want is a **slot**: a name (`Layout.Header`) with one implement
 ## Install
 
 ```sh
-pnpm add @ui-registry/swappable
+pnpm add @ui-registries/swappable
 pnpm dlx shadcn@latest add https://ui-registry.com/r/swappable/responsive
 ```
 
@@ -30,7 +30,7 @@ The npm package is the headless core (React only). The shadcn registry ships rea
 ## Quick start
 
 ```tsx
-import { createSwappable } from "@ui-registry/swappable";
+import { createSwappable } from "@ui-registries/swappable";
 
 const Layout = createSwappable({
   name: "Layout",

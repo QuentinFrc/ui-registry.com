@@ -1,5 +1,5 @@
 {
-  "name": "@ui-registry/swappable",
+  "name": "@ui-registries/swappable",
   "version": "0.0.0",
   "description": "Swap component implementations by variant (responsive, platform, feature flag) with typed slots.",
   "keywords": [
@@ -13,7 +13,7 @@
   "homepage": "https://ui-registry.com/packages/swappable",
   "repository": {
     "type": "git",
-    "url": "https://github.com/QuentinFrc/ui-registry.git",
+    "url": "https://github.com/QuentinFrc/ui-registry.com.git",
     "directory": "packages/swappable"
   },
   "license": "MIT",

@@ -1,5 +1,5 @@
 /**
- * @ui-registry/flash — encode flash messages in the URL so they survive a redirect.
+ * @ui-registries/flash — encode flash messages in the URL so they survive a redirect.
  *
  * Zero-dep, framework-agnostic. All functions take a URL string and return a URL
  * string, except `consumeFlash` which reads from `window.location` and cleans up

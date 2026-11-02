@@ -4,7 +4,7 @@ import {
   consumeFlash,
   type Flash,
   type FlashOptions,
-} from "@ui-registry/flash";
+} from "@ui-registries/flash";
 import { useEffect, useState } from "react";
 
 /**

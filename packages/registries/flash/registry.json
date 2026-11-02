@@ -8,7 +8,7 @@
       "type": "registry:hook",
       "title": "useFlash",
       "description": "React hook that consumes a flash message from the URL on mount and clears it from history.",
-      "dependencies": ["@ui-registry/flash"],
+      "dependencies": ["@ui-registries/flash"],
       "files": [
         {
           "path": "registry/base-nova/flash/use-flash.ts",
@@ -21,7 +21,7 @@
       "type": "registry:component",
       "title": "FlashToaster",
       "description": "Drop-in component that surfaces URL flash messages through Sonner toasts.",
-      "dependencies": ["@ui-registry/flash", "sonner"],
+      "dependencies": ["@ui-registries/flash", "sonner"],
       "registryDependencies": ["sonner"],
       "files": [
         {
