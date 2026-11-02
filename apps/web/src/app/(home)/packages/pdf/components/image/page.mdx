@@ -1,0 +1,70 @@
+export const metadata = {
+  title: "Image",
+  description:
+    "Renders images in PDF documents.",
+};
+
+# Image
+
+Renders images in PDF documents.
+
+Displays images from URLs, local paths, or buffers.
+
+## Demo
+
+### Basic image with sizing
+
+```tsx
+import { Document, Page, Block, Image, Text, Tailwind } from "@ui-registries/pdf";
+
+<Tailwind>
+  <Document>
+    <Page size="A4" className="p-12 bg-white">
+      <Block className="flex flex-row gap-4 items-start">
+        <Image
+          src="https://placehold.co/200x200/3b82f6/ffffff?text=Logo"
+          className="w-16 h-16 rounded-lg"
+        />
+        <Block className="flex flex-col gap-1">
+          <Text className="text-lg font-bold text-gray-900">Company Name</Text>
+          <Text className="text-sm text-gray-500">Premium Plan</Text>
+        </Block>
+      </Block>
+    </Page>
+  </Document>
+</Tailwind>
+```
+
+### Object fit modes
+
+```tsx
+<Block className="flex flex-row gap-4">
+  <Block className="flex flex-col items-center gap-1">
+    <Image
+      src="/photo.jpg"
+      className="w-20 h-20 object-cover rounded-md"
+    />
+    <Text className="text-xs text-gray-500">object-cover</Text>
+  </Block>
+  <Block className="flex flex-col items-center gap-1">
+    <Image
+      src="/photo.jpg"
+      className="w-20 h-20 object-contain rounded-md"
+    />
+    <Text className="text-xs text-gray-500">object-contain</Text>
+  </Block>
+</Block>
+```
+
+### Full-width banner
+
+```tsx
+<Image
+  src="/banner.jpg"
+  className="w-full h-32 object-cover rounded-xl"
+/>
+```
+
+## Props
+
+<PropsTable name="ImageProps" />

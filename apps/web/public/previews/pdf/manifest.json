@@ -1,0 +1,62 @@
+{
+  "badge": {
+    "pages": 1,
+    "width": 630,
+    "height": 112
+  },
+  "card": {
+    "pages": 1,
+    "width": 630,
+    "height": 241
+  },
+  "certificate": {
+    "pages": 1,
+    "width": 1262,
+    "height": 892
+  },
+  "heading": {
+    "pages": 1,
+    "width": 630,
+    "height": 282
+  },
+  "invoice": {
+    "pages": 1,
+    "width": 892,
+    "height": 1262
+  },
+  "page-footer": {
+    "pages": 1,
+    "width": 630,
+    "height": 300
+  },
+  "quote": {
+    "pages": 1,
+    "width": 892,
+    "height": 1262
+  },
+  "receipt": {
+    "pages": 1,
+    "width": 629,
+    "height": 892
+  },
+  "report": {
+    "pages": 2,
+    "width": 892,
+    "height": 1262
+  },
+  "resume": {
+    "pages": 2,
+    "width": 892,
+    "height": 1262
+  },
+  "separator": {
+    "pages": 1,
+    "width": 630,
+    "height": 207
+  },
+  "table": {
+    "pages": 1,
+    "width": 630,
+    "height": 237
+  }
+}

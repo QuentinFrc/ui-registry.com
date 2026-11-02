@@ -1,0 +1,248 @@
+export const metadata = {
+  title: "API Reference",
+  description:
+    "Complete reference of all exports from @ui-registries/pdf.",
+};
+
+# API Reference
+
+Complete reference of all exports from @ui-registries/pdf.
+
+## Components
+
+### Layout Components
+
+All layout components accept `className` and `style` props. Styles from `className` are applied first, then `style` overrides.
+
+| Component | Wraps | Description |
+|-----------|-------|-------------|
+| `Block` | `View` | General-purpose container (flexbox layout) |
+| `Text` | `Text` | Text content |
+| `Page` | `Page` | PDF page |
+| `Image` | `Image` | JPG/PNG image |
+| `Link` | `Link` | Hyperlink |
+| `Document` | `Document` | PDF document root (pass-through, no styling) |
+| `Canvas` | `Canvas` | Custom drawing via paint callback |
+| `Note` | `Note` | PDF annotation (sticky note) |
+| `PageNumber` | `Text` | Page number display via render prop |
+
+`View` is exported as a deprecated alias for `Block`.
+
+### SVG Components
+
+| Component | `className` | Description |
+|-----------|:-----------:|-------------|
+| `Svg` | ✓ | SVG container |
+| `G` | ✓ | SVG group |
+| `SvgText` | ✓ | SVG text element |
+| `Path` | — | Path element |
+| `Rect` | — | Rectangle |
+| `Circle` | — | Circle |
+| `Ellipse` | — | Ellipse |
+| `Line` | — | Line |
+| `Polyline` | — | Polyline |
+| `Polygon` | — | Polygon |
+| `Tspan` | — | Text span |
+| `Defs` | — | Definitions container |
+| `ClipPath` | — | Clip path |
+| `Stop` | — | Gradient stop |
+| `LinearGradient` | — | Linear gradient |
+| `RadialGradient` | — | Radial gradient |
+
+---
+
+## Styling
+
+### `Tailwind`
+
+Provider component that supplies a themed `tw` engine to all child components.
+
+```tsx
+<Tailwind theme={{ "--color-brand": "#0073e6" }}>
+  <Document>...</Document>
+</Tailwind>
+```
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `theme` | `ThemeVars` | Optional theme variable overrides |
+| `children` | `ReactNode` | Child components |
+
+### `useTw()`
+
+Hook that returns the `TwFn` from the nearest `<Tailwind>` provider, or the default `tw` if none is present.
+
+```ts
+const tw = useTw();
+const styles = tw("p-4 bg-white");
+```
+
+**Returns:** `TwFn`
+
+### `createTw(vars?)`
+
+Creates a standalone `tw` function with an optional custom theme.
+
+```ts
+const tw = createTw({ "--color-brand": "#0073e6" });
+const styles = tw("p-4 bg-brand");
+```
+
+| Param | Type | Description |
+|-------|------|-------------|
+| `vars` | `ThemeVars` | Optional theme variable overrides |
+
+**Returns:** `TwFn`
+
+### `tw`
+
+Pre-created `TwFn` instance with the default theme. Equivalent to `createTw()`.
+
+```ts
+import { tw } from "@ui-registries/pdf";
+const styles = tw("flex flex-row gap-2 p-4");
+```
+
+### `resolveTheme(vars?)`
+
+Resolves theme variables into a structured theme object. Useful for inspecting computed values.
+
+```ts
+const theme = resolveTheme({ "--color-brand": "#0073e6" });
+// theme.colors.brand → "#0073e6"
+// theme.spacing["4"] → 12
+// theme.fontSize.base → 12
+```
+
+| Param | Type | Description |
+|-------|------|-------------|
+| `vars` | `ThemeVars` | Optional theme variable overrides |
+
+**Returns:** `ResolvedTheme`
+
+### `cn(...args)`
+
+Lightweight class name joiner. Filters falsy values and joins with spaces.
+
+```ts
+cn("p-4", isActive && "bg-blue-500", undefined, "text-white");
+// → "p-4 bg-blue-500 text-white"
+```
+
+| Param | Type | Description |
+|-------|------|-------------|
+| `...args` | `(string \| false \| null \| undefined)[]` | Class names to join |
+
+**Returns:** `string`
+
+---
+
+## Fonts
+
+### `defineFont(options)`
+
+Registers a font family and returns a `FontResult` with `family`, `className`, and `style`.
+
+```ts
+const inter = defineFont({
+  family: "Inter",
+  src: [
+    { src: "/fonts/Inter-Regular.ttf", weight: 400 },
+    { src: "/fonts/Inter-Bold.ttf", weight: 700 },
+  ],
+});
+// inter.family → "Inter"
+// inter.className → "font-[Inter]"
+// inter.style → { fontFamily: "Inter" }
+```
+
+| Param | Type | Description |
+|-------|------|-------------|
+| `options.family` | `string` | Font family name |
+| `options.src` | `string \| FontVariant[]` | Single source URL/path, or array of variants |
+
+**Returns:** `FontResult`
+
+See the [Fonts guide](/packages/pdf/fonts) for full usage details.
+
+---
+
+## Re-exports
+
+These are passed through directly from `@react-pdf/renderer`:
+
+| Export | Type | Description |
+|--------|------|-------------|
+| `Font` | object | Font registration and management |
+| `StyleSheet` | object | `StyleSheet.create()` for typed style objects |
+| `PDFViewer` | component | Iframe PDF viewer (web only) |
+| `PDFDownloadLink` | component | Download link (web only) |
+| `BlobProvider` | component | Blob access (web only) |
+| `usePDF` | hook | PDF instance hook (web only) |
+| `pdf` | function | Programmatic PDF generation |
+
+---
+
+## Types
+
+### Component Props
+
+| Type | For |
+|------|-----|
+| `BlockProps` | `Block` |
+| `TextProps` | `Text` |
+| `PageProps` | `Page` |
+| `ImageProps` | `Image` |
+| `LinkProps` | `Link` |
+| `CanvasProps` | `Canvas` |
+| `NoteProps` | `Note` |
+| `PageNumberProps` | `PageNumber` |
+| `SvgProps` | `Svg` |
+| `GProps` | `G` |
+| `SvgTextProps` | `SvgText` |
+
+### Engine Types
+
+```ts
+type StyleValue = string | number;
+type StyleObject = Record<string, StyleValue>;
+type TwFn = (classString: string) => StyleObject;
+type ThemeVars = Record<string, string | number | "initial">;
+
+interface ResolvedTheme {
+  spacingBase: number;
+  spacing: Record<string, number>;
+  fontSize: Record<string, number>;
+  borderRadius: Record<string, number>;
+  fontWeight: Record<string, number>;
+  fontFamily: Record<string, string>;
+  opacity: Record<string, number>;
+  lineHeight: Record<string, number>;
+  letterSpacing: Record<string, number>;
+  colors: Record<string, string>;
+}
+```
+
+---
+
+## Subpath Exports
+
+### `@ui-registries/pdf/tw`
+
+Standalone tw engine without any React dependency. Use this in Node scripts, workers, or non-React contexts.
+
+```ts
+import { createTw, tw, resolveTheme } from "@ui-registries/pdf/tw";
+```
+
+Exports: `createTw`, `tw`, `resolveTheme`, and all engine types.
+
+### `@ui-registries/pdf/font`
+
+Standalone font registration without React. Use in build scripts or non-React contexts.
+
+```ts
+import { defineFont } from "@ui-registries/pdf/font";
+```
+
+Exports: `defineFont`, and font types (`DefineFontOptions`, `FontVariant`, `FontResult`).

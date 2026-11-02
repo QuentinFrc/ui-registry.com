@@ -1,0 +1,66 @@
+export const metadata = {
+  title: "Link",
+  description:
+    "Renders clickable hyperlinks in PDF documents.",
+};
+
+# Link
+
+Renders clickable hyperlinks in PDF documents.
+
+Creates a tappable/clickable link in the PDF. Links can point to external URLs or internal anchors.
+
+## Demo
+
+### Inline link
+
+```tsx
+import { Document, Page, Block, Text, Link, Tailwind } from "@ui-registries/pdf";
+
+<Tailwind>
+  <Document>
+    <Page size="A4" className="p-12 bg-white">
+      <Text className="text-base text-gray-700">
+        Visit our website at{" "}
+        <Link src="https://example.com" className="text-blue-600 underline">
+          example.com
+        </Link>{" "}
+        for more information.
+      </Text>
+    </Page>
+  </Document>
+</Tailwind>
+```
+
+### Styled link button
+
+```tsx
+<Link
+  src="https://example.com/signup"
+  className="bg-blue-600 px-4 py-2 rounded-lg"
+>
+  <Text className="text-white text-sm font-semibold text-center">
+    Sign Up Now
+  </Text>
+</Link>
+```
+
+### Footer with multiple links
+
+```tsx
+<Block className="flex flex-row gap-4 justify-center border-t border-gray-200 pt-4">
+  <Link src="https://example.com/terms" className="text-xs text-gray-500 underline">
+    Terms of Service
+  </Link>
+  <Link src="https://example.com/privacy" className="text-xs text-gray-500 underline">
+    Privacy Policy
+  </Link>
+  <Link src="https://example.com/contact" className="text-xs text-gray-500 underline">
+    Contact Us
+  </Link>
+</Block>
+```
+
+## Props
+
+<PropsTable name="LinkProps" />

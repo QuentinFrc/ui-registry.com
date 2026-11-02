@@ -1,0 +1,38 @@
+export const metadata = {
+  title: "Installation",
+  description:
+    "Install @ui-registries/pdf and configure your project.",
+};
+
+# Installation
+
+Install @ui-registries/pdf and configure your project.
+
+## Install
+
+```bash
+npm install @ui-registries/pdf react
+```
+
+## Exclude from Tailwind source detection
+
+@ui-registries/pdf uses the same class name conventions as Tailwind CSS but has its own independent styling engine. If your app uses Tailwind CSS, you should exclude your PDF files from Tailwind's content sources to avoid generating unnecessary CSS classes.
+
+In your `tailwind.config` (or `@source` directive in CSS), exclude the files that use @ui-registries/pdf:
+
+```ts title="tailwind.config.ts"
+export default {
+  content: [
+    "./src/**/*.{js,ts,jsx,tsx}",
+    "!./src/**/*.pdf.tsx",  // exclude PDF template files
+  ],
+};
+```
+
+Or with Tailwind v4's CSS `@source` directive:
+
+```css title="app.css"
+@source not "../src/pdf";
+```
+
+The exact pattern depends on how you organize your PDF files. The key is to keep them out of Tailwind's source scanning.

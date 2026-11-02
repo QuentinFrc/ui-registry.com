@@ -1,0 +1,58 @@
+export const metadata = {
+  title: "Table",
+  description:
+    "Table with a header that repeats on every page.",
+};
+
+# Table
+
+Table with a header that repeats on every page.
+
+<PdfPreview name="table" height={360} />
+
+## Installation
+
+```bash
+npx shadcn add https://ui-registry.com/r/pdf/table.json
+```
+
+## Usage
+
+```tsx
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/pdf/table";
+
+<Table>
+  <TableHeader>
+    <TableRow className="border-b-0">
+      <TableHead className="flex-[2]">Name</TableHead>
+      <TableHead className="text-right">Status</TableHead>
+    </TableRow>
+  </TableHeader>
+  <TableBody>
+    {rows.map((row) => (
+      <TableRow key={row.id}>
+        <TableCell className="flex-[2]">{row.name}</TableCell>
+        <TableCell className="text-right">{row.status}</TableCell>
+      </TableRow>
+    ))}
+  </TableBody>
+</Table>
+```
+
+### Page breaks
+
+- `TableHeader` is repeated at the top of each page the table spans. Pass `repeat={false}` to disable it.
+- A `TableRow` never splits across two pages.
+
+### Column widths
+
+Cells are `flex-1` by default, so columns share the width equally. Use the same class on the header and body cells of a column to resize it: `flex-[2]`, `w-20`, `w-1/4`…
+
+Strings and numbers inside `TableHead` / `TableCell` are wrapped in a `Text` automatically. Pass any element (a `Badge`, a `Block`…) for richer content.

@@ -1,0 +1,38 @@
+export const metadata = {
+  title: "Note",
+  description:
+    "Adds PDF annotations and notes.",
+};
+
+# Note
+
+Adds PDF annotations and notes.
+
+Creates a PDF annotation (sticky note) that viewers can display. Notes appear as icons or popups in PDF readers.
+
+## Demo
+
+### Basic annotation
+
+```tsx
+import { Document, Page, Block, Text, Note, Tailwind } from "@ui-registries/pdf";
+
+<Tailwind>
+  <Document>
+    <Page size="A4" className="p-12 bg-white">
+      <Block className="flex flex-col gap-4">
+        <Text className="text-base text-gray-700">
+          This paragraph has an annotation attached to it.
+        </Text>
+        <Note className="p-2">
+          Review this section before publishing.
+        </Note>
+      </Block>
+    </Page>
+  </Document>
+</Tailwind>
+```
+
+## Props
+
+<PropsTable name="NoteProps" />

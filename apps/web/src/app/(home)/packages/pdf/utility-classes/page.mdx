@@ -1,0 +1,496 @@
+export const metadata = {
+  title: "Utility Classes",
+  description:
+    "Complete reference of supported Tailwind-style utility classes.",
+};
+
+# Utility Classes
+
+Complete reference of supported Tailwind-style utility classes.
+
+@ui-registries/pdf supports a subset of Tailwind CSS utilities, adapted for `@react-pdf/renderer`'s layout engine. All numeric values are in **PDF points (pt)** where 1 Tailwind unit = 3pt.
+
+## Arbitrary Values
+
+Any utility that accepts a numeric value also supports arbitrary values with `[...]`:
+
+```tsx
+<Block className="w-[210mm] h-[297mm]" />        {/* A4 page size */}
+<Block className="p-[20]" />                       {/* 20pt padding */}
+<Text className="text-[14]" />                     {/* 14pt font */}
+<Text className="text-[12px]" />                   {/* 12px → 9pt */}
+<Block className="aspect-[4/3]" />                 {/* 4:3 ratio */}
+```
+
+Plain numbers and `pt` values are points. `px` and `rem` are converted to points with the same ratio as the rest of the scale (1px = 0.75pt, 1rem = 12pt). Other units (`mm`, `cm`, `in`, `%`, `vw`, `vh`) are passed to react-pdf as-is.
+
+## Layout & Display
+
+| Class | Style |
+|-------|-------|
+| `flex` | `display: flex` |
+| `hidden` | `display: none` |
+
+## Flex Direction & Wrap
+
+| Class | Style |
+|-------|-------|
+| `flex-row` | `flexDirection: row` |
+| `flex-col` | `flexDirection: column` |
+| `flex-row-reverse` | `flexDirection: row-reverse` |
+| `flex-col-reverse` | `flexDirection: column-reverse` |
+| `flex-wrap` | `flexWrap: wrap` |
+| `flex-nowrap` | `flexWrap: nowrap` |
+| `flex-wrap-reverse` | `flexWrap: wrap-reverse` |
+
+## Flex Grow & Shrink
+
+| Class | Style |
+|-------|-------|
+| `flex-1` | `flex: 1` |
+| `flex-auto` | `flexGrow: 1, flexShrink: 1, flexBasis: auto` |
+| `flex-initial` | `flexGrow: 0, flexShrink: 1, flexBasis: auto` |
+| `flex-none` | `flex: 0` |
+| `grow` | `flexGrow: 1` |
+| `grow-0` | `flexGrow: 0` |
+| `shrink` | `flexShrink: 1` |
+| `shrink-0` | `flexShrink: 0` |
+
+## Alignment
+
+| Class | Style |
+|-------|-------|
+| `items-start` | `alignItems: flex-start` |
+| `items-end` | `alignItems: flex-end` |
+| `items-center` | `alignItems: center` |
+| `items-baseline` | `alignItems: baseline` |
+| `items-stretch` | `alignItems: stretch` |
+
+| Class | Style |
+|-------|-------|
+| `self-auto` | `alignSelf: auto` |
+| `self-start` | `alignSelf: flex-start` |
+| `self-end` | `alignSelf: flex-end` |
+| `self-center` | `alignSelf: center` |
+| `self-stretch` | `alignSelf: stretch` |
+| `self-baseline` | `alignSelf: baseline` |
+
+| Class | Style |
+|-------|-------|
+| `justify-start` | `justifyContent: flex-start` |
+| `justify-end` | `justifyContent: flex-end` |
+| `justify-center` | `justifyContent: center` |
+| `justify-between` | `justifyContent: space-between` |
+| `justify-around` | `justifyContent: space-around` |
+| `justify-evenly` | `justifyContent: space-evenly` |
+
+| Class | Style |
+|-------|-------|
+| `content-start` | `alignContent: flex-start` |
+| `content-end` | `alignContent: flex-end` |
+| `content-center` | `alignContent: center` |
+| `content-between` | `alignContent: space-between` |
+| `content-around` | `alignContent: space-around` |
+| `content-stretch` | `alignContent: stretch` |
+
+## Spacing
+
+Padding and margin utilities follow the standard Tailwind pattern. Negative values are supported with the `-` prefix (e.g. `-mt-2`).
+
+### Padding
+
+`p-{n}`, `px-{n}`, `py-{n}`, `pt-{n}`, `pr-{n}`, `pb-{n}`, `pl-{n}`
+
+### Margin
+
+`m-{n}`, `mx-{n}`, `my-{n}`, `mt-{n}`, `mr-{n}`, `mb-{n}`, `ml-{n}`
+
+Auto margins: `m-auto`, `mx-auto` (center horizontally), `ml-auto` (push to the right in a row), etc.
+
+### Gap
+
+`gap-{n}`, `gap-x-{n}`, `gap-y-{n}`
+
+### Default Spacing Scale
+
+| Key | pt | Key | pt | Key | pt |
+|-----|-----|-----|-----|-----|-----|
+| `0` | 0 | `8` | 24 | `36` | 108 |
+| `px` | 0.75 | `9` | 27 | `40` | 120 |
+| `0.5` | 1.5 | `10` | 30 | `44` | 132 |
+| `1` | 3 | `11` | 33 | `48` | 144 |
+| `1.5` | 4.5 | `12` | 36 | `52` | 156 |
+| `2` | 6 | `14` | 42 | `56` | 168 |
+| `2.5` | 7.5 | `16` | 48 | `60` | 180 |
+| `3` | 9 | `20` | 60 | `64` | 192 |
+| `3.5` | 10.5 | `24` | 72 | `72` | 216 |
+| `4` | 12 | `28` | 84 | `80` | 240 |
+| `5` | 15 | `32` | 96 | `96` | 288 |
+| `6` | 18 | | | | |
+| `7` | 21 | | | | |
+
+## Sizing
+
+### Size (width + height)
+
+`size-{n}`, `size-full`, `size-auto`, `size-{fraction}` — sets both `width` and `height` to the same value.
+
+### Width
+
+`w-{n}`, `w-full`, `w-auto`, `w-{fraction}`
+
+### Height
+
+`h-{n}`, `h-full`, `h-auto`, `h-{fraction}`
+
+### Min / Max
+
+`min-w-{n}`, `max-w-{n}`, `max-w-full`, `max-w-none`, `min-h-{n}`, `max-h-{n}`
+
+Fractions and `full` work with min/max variants too.
+
+### Fractions
+
+| Class | Value | Class | Value |
+|-------|-------|-------|-------|
+| `w-1/2` | 50% | `w-1/5` | 20% |
+| `w-1/3` | 33.33% | `w-2/5` | 40% |
+| `w-2/3` | 66.67% | `w-3/5` | 60% |
+| `w-1/4` | 25% | `w-4/5` | 80% |
+| `w-3/4` | 75% | `w-1/6` | 16.67% |
+| | | `w-5/6` | 83.33% |
+
+Twelfths (`1/12` through `11/12`) are also supported. All fractions work with `h-`, `basis-`, `min-w-`, `max-w-`, etc.
+
+## Flex Basis
+
+`basis-auto`, `basis-full`, `basis-{n}`, `basis-{fraction}`
+
+## Order
+
+| Class | Value |
+|-------|-------|
+| `order-{1-12}` | 1–12 |
+| `order-first` | -9999 |
+| `order-last` | 9999 |
+| `order-none` | 0 |
+
+## Aspect Ratio
+
+| Class | Value |
+|-------|-------|
+| `aspect-square` | 1 |
+| `aspect-video` | 16/9 |
+| `aspect-auto` | auto |
+| `aspect-[4/3]` | 4/3 |
+
+## Position
+
+| Class | Style |
+|-------|-------|
+| `relative` | `position: relative` |
+| `absolute` | `position: absolute` |
+| `fixed` | `position: fixed` |
+
+### Insets
+
+`top-{n}`, `right-{n}`, `bottom-{n}`, `left-{n}` — uses the spacing scale. Negative values supported (`-top-2`, etc.).
+
+#### Inset Shorthands
+
+| Class | Sets |
+|-------|------|
+| `inset-{n}` | `top`, `right`, `bottom`, `left` |
+| `inset-x-{n}` | `left`, `right` |
+| `inset-y-{n}` | `top`, `bottom` |
+
+Negative values supported: `-inset-x-4`, `-inset-y-2`, `-inset-4`.
+
+### Z-Index
+
+`z-{n}` — any integer, or arbitrary `z-[50]`.
+
+### Overflow
+
+| Class | Style |
+|-------|-------|
+| `overflow-hidden` | `overflow: hidden` |
+| `overflow-visible` | `overflow: visible` |
+
+## Typography
+
+### Font Size
+
+| Class | pt | px equivalent |
+|-------|-----|---------------|
+| `text-xs` | 9 | 12px |
+| `text-sm` | 10.5 | 14px |
+| `text-base` | 12 | 16px |
+| `text-lg` | 13.5 | 18px |
+| `text-xl` | 15 | 20px |
+| `text-2xl` | 18 | 24px |
+| `text-3xl` | 22.5 | 30px |
+| `text-4xl` | 27 | 36px |
+| `text-5xl` | 36 | 48px |
+
+Arbitrary: `text-[14]` for 14pt, `text-[12px]`, `text-[1rem]`.
+
+Font size with line height: `text-sm/6` (line height from the spacing scale), `text-sm/[1.4]` (multiplier).
+
+### Font Weight
+
+| Class | Weight |
+|-------|--------|
+| `font-thin` | 100 |
+| `font-extralight` | 200 |
+| `font-light` | 300 |
+| `font-normal` | 400 |
+| `font-medium` | 500 |
+| `font-semibold` | 600 |
+| `font-bold` | 700 |
+| `font-extrabold` | 800 |
+| `font-black` | 900 |
+
+### Font Family
+
+| Class | Value |
+|-------|-------|
+| `font-sans` | Helvetica |
+| `font-serif` | Times-Roman |
+| `font-mono` | Courier |
+
+Arbitrary: `font-[Inter]` for any registered font name. Custom families can be added via the theme (`--font-{name}`).
+
+### Font Style
+
+| Class | Style |
+|-------|-------|
+| `italic` | `fontStyle: italic` |
+| `not-italic` | `fontStyle: normal` |
+
+### Text Alignment
+
+`text-left`, `text-center`, `text-right`, `text-justify`
+
+### Text Transform
+
+`uppercase`, `lowercase`, `capitalize`, `normal-case`
+
+### Text Decoration
+
+| Class | Style |
+|-------|-------|
+| `underline` | `textDecoration: underline` |
+| `line-through` | `textDecoration: line-through` |
+| `no-underline` | `textDecoration: none` |
+
+Decoration color: `decoration-{color}` (e.g. `decoration-red-500`)
+
+Decoration style: `decoration-solid`, `decoration-dashed`, `decoration-dotted`, `decoration-double`, `decoration-wavy`
+
+### Text Overflow
+
+| Class | Style |
+|-------|-------|
+| `truncate` | `maxLines: 1`, `textOverflow: ellipsis` |
+| `text-ellipsis` | `textOverflow: ellipsis` |
+| `text-clip` | `textOverflow: clip` |
+
+### Line Height
+
+| Class | Value |
+|-------|-------|
+| `leading-none` | 1 |
+| `leading-tight` | 1.25 |
+| `leading-snug` | 1.375 |
+| `leading-normal` | 1.5 |
+| `leading-relaxed` | 1.625 |
+| `leading-loose` | 2 |
+
+Spacing scale (absolute, like Tailwind v4): `leading-6` → 18pt.
+
+Arbitrary: `leading-[1.2]` (multiplier of the font size), `leading-[18px]` (absolute).
+
+### Letter Spacing
+
+| Class | pt |
+|-------|-----|
+| `tracking-tighter` | -0.6 |
+| `tracking-tight` | -0.3 |
+| `tracking-normal` | 0 |
+| `tracking-wide` | 0.3 |
+| `tracking-wider` | 0.6 |
+| `tracking-widest` | 1.2 |
+
+### Text Indent
+
+`indent-{n}` — uses the spacing scale.
+
+### Line Clamp
+
+`line-clamp-{n}` — sets `maxLines` on the text element.
+
+## Colors
+
+### Background
+
+`bg-{color}`, `bg-{color}/{opacity}`
+
+### Text
+
+`text-{color}`, `text-{color}/{opacity}`
+
+### Border
+
+`border-{color}`, `border-{color}/{opacity}`
+
+### Alpha Modifier
+
+Append `/{0-100}` to any color utility for alpha transparency:
+
+```tsx
+<Block className="bg-blue-500/50" />   {/* 50% opacity blue */}
+<Text className="text-black/75" />     {/* 75% opacity black */}
+```
+
+### Arbitrary Colors
+
+Use `[...]` for any color value:
+
+```tsx
+<Block className="bg-[#ff6600]" />
+<Text className="text-[rgb(100,200,50)]" />
+```
+
+### Default Palette
+
+The full Tailwind v4 color palette is included:
+
+**Grays:** slate, gray, zinc, neutral, stone (50–950)
+
+**Colors:** red, orange, amber, yellow, lime, green, emerald, teal, cyan, sky, blue, indigo, violet, purple, fuchsia, pink, rose (50–950)
+
+**Special:** transparent, black, white
+
+### Semantic Tokens
+
+Pre-configured shadcn/ui tokens (light theme):
+
+| Token | Color | Token | Color |
+|-------|-------|-------|-------|
+| `background` | #ffffff | `muted` | #f5f5f5 |
+| `foreground` | #0a0a0a | `muted-foreground` | #737373 |
+| `primary` | #171717 | `accent` | #f5f5f5 |
+| `primary-foreground` | #fafafa | `accent-foreground` | #171717 |
+| `secondary` | #f5f5f5 | `destructive` | #ef4444 |
+| `secondary-foreground` | #171717 | `destructive-foreground` | #fafafa |
+| `card` | #ffffff | `border` | #e5e5e5 |
+| `card-foreground` | #0a0a0a | `input` | #e5e5e5 |
+| | | `ring` | #a3a3a3 |
+
+Usage: `bg-primary`, `text-muted-foreground`, `border-border`, etc.
+
+## Borders
+
+### Width
+
+| Class | Value |
+|-------|-------|
+| `border` | 1 |
+| `border-0` | 0 |
+| `border-{2-8}` | 2–8 |
+| `border-t`, `border-r`, `border-b`, `border-l` | 1 (single side) |
+| `border-{t\|r\|b\|l}-{n}` | n (single side) |
+| `border-x`, `border-y` | 1 (two sides) |
+| `border-{x\|y}-{n}` | n (two sides) |
+
+### Style
+
+`border-solid`, `border-dashed`, `border-dotted`
+
+Per-side style: `border-{t|r|b|l|x|y}-solid`, `border-{t|r|b|l}-dashed`, `border-{t|r|b|l}-dotted`
+
+### Per-Side Color
+
+`border-{t|r|b|l|x|y}-{color}` — applies color to one side (or two with `x` / `y`).
+
+```tsx
+<Block className="border-t-red-500 border-b-blue-500" />
+<Block className="border-l-[#ff0000]" />
+```
+
+### Radius
+
+| Class | pt |
+|-------|-----|
+| `rounded-none` | 0 |
+| `rounded-xs` | 0.75 |
+| `rounded-sm` | 1.5 |
+| `rounded` | 3 |
+| `rounded-md` | 4.5 |
+| `rounded-lg` | 6 |
+| `rounded-xl` | 9 |
+| `rounded-2xl` | 12 |
+| `rounded-3xl` | 18 |
+| `rounded-4xl` | 24 |
+| `rounded-full` | 999 |
+
+Side-specific: `rounded-{t|b|l|r}-{size}`, `rounded-{tl|tr|bl|br}-{size}`
+
+## Effects
+
+### Opacity
+
+`opacity-{0|5|10|15|...|95|100}` — in 5% increments.
+
+## Object Fit & Position
+
+For `Image` components:
+
+**Fit:** `object-contain`, `object-cover`, `object-fill`, `object-none`, `object-scale-down`
+
+**Position:** `object-bottom`, `object-center`, `object-left`, `object-right`, `object-top`
+
+## Transforms
+
+### Rotate
+
+`rotate-{deg}` or `rotate-[30]` — value in degrees.
+
+### Scale
+
+`scale-{n}`, `scale-x-{n}`, `scale-y-{n}` — value as percentage (e.g. `scale-150` = 1.5x).
+
+### Translate
+
+`translate-x-{n}`, `translate-y-{n}` — uses the spacing scale, output in pt.
+
+### Skew
+
+`skew-x-{deg}`, `skew-y-{deg}` — value in degrees. Arbitrary: `skew-x-[15]`.
+
+### Transform Origin
+
+| Class | Value |
+|-------|-------|
+| `origin-center` | `center center` |
+| `origin-top` | `center top` |
+| `origin-top-right` | `right top` |
+| `origin-right` | `right center` |
+| `origin-bottom-right` | `right bottom` |
+| `origin-bottom` | `center bottom` |
+| `origin-bottom-left` | `left bottom` |
+| `origin-left` | `left center` |
+| `origin-top-left` | `left top` |
+
+### Transform Composition
+
+Multiple transform utilities are automatically composed into a single `transform` string:
+
+```tsx
+<Block className="rotate-45 scale-50" />
+{/* → transform: "rotate(45deg) scale(0.5)" */}
+
+<Block className="rotate-45 scale-50 translate-x-4" />
+{/* → transform: "rotate(45deg) scale(0.5) translateX(12pt)" */}
+```

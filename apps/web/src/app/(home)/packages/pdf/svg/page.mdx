@@ -1,0 +1,85 @@
+export const metadata = {
+  title: "SVG Elements",
+  description:
+    "SVG components for drawing vector graphics in PDF documents.",
+};
+
+# SVG Elements
+
+SVG components for drawing vector graphics in PDF documents.
+
+@ui-registries/pdf includes SVG components for drawing vector graphics. `Svg`, `G`, and `SvgText` support `className` for layout and typography styles. Shape and gradient components use SVG attributes directly.
+
+## Available Components
+
+| Component | `className` | Description |
+|-----------|:-----------:|-------------|
+| `Svg` | ✓ | SVG container (supports full layout styles) |
+| `G` | ✓ | Group element (supports full layout styles) |
+| `SvgText` | ✓ | Text element (supports typography + layout styles) |
+| `Path` | — | Path element |
+| `Rect` | — | Rectangle |
+| `Circle` | — | Circle |
+| `Ellipse` | — | Ellipse |
+| `Line` | — | Line |
+| `Polyline` | — | Polyline |
+| `Polygon` | — | Polygon |
+| `Tspan` | — | Text span |
+| `Defs` | — | Definitions container |
+| `ClipPath` | — | Clip path |
+| `Stop` | — | Gradient stop |
+| `LinearGradient` | — | Linear gradient |
+| `RadialGradient` | — | Radial gradient |
+
+## Usage
+
+### With className (Svg, G, SvgText)
+
+```tsx
+import { Block, Svg, G, SvgText, Circle, Path } from "@ui-registries/pdf";
+
+<Block className="flex items-center gap-2">
+  <Svg className="w-10 h-10" viewBox="0 0 40 40">
+    <G className="opacity-80">
+      <Circle cx={20} cy={20} r={18} fill="#3b82f6" />
+      <Path d="M14 20l4 4 8-8" stroke="#ffffff" strokeWidth={2} fill="none" />
+    </G>
+    <SvgText className="text-xs font-bold" x={20} y={36}>
+      ✓
+    </SvgText>
+  </Svg>
+</Block>
+```
+
+### Shape components (inline props)
+
+Shape components (`Path`, `Rect`, `Circle`, `Ellipse`, `Line`, `Polyline`, `Polygon`) use SVG presentation attributes as props — `fill`, `stroke`, `strokeWidth`, `opacity`, etc. These map directly to SVG, not CSS, so `className` is not applicable.
+
+```tsx
+<Svg width={40} height={40} viewBox="0 0 40 40">
+  <Defs>
+    <LinearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+      <Stop offset="0%" stopColor="#3b82f6" />
+      <Stop offset="100%" stopColor="#8b5cf6" />
+    </LinearGradient>
+  </Defs>
+  <Circle cx={20} cy={20} r={18} fill="url(#grad)" />
+  <Rect x={5} y={5} width={30} height={30} rx={4} fill="none" stroke="#000" strokeWidth={1} />
+</Svg>
+```
+
+> `SvgText` is exported under that name because `Text` is already used by the className-enabled text component.
+
+## Props
+
+### Svg
+
+<PropsTable name="SvgProps" />
+
+### G
+
+<PropsTable name="GProps" />
+
+### SvgText
+
+<PropsTable name="SvgTextProps" />

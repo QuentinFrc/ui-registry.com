@@ -2,7 +2,9 @@ export type CatalogKind = "kit" | "ui" | "library";
 
 export type CatalogMedia =
   | { kind: "video"; src: string; poster?: string }
-  | { kind: "image"; src: string; alt: string };
+  | { kind: "image"; src: string; alt: string }
+  /** A few document pages fanned out, front page last. */
+  | { kind: "pages"; srcs: readonly string[]; alt: string };
 
 export interface CatalogEntry {
   href: string;
@@ -75,6 +77,24 @@ export const catalog: readonly CatalogEntry[] = [
     status: "alpha",
     kind: "library",
     href: "/packages/swappable",
+  },
+  {
+    slug: "pdf",
+    name: "@ui-registries/pdf",
+    tagline:
+      "Build PDFs with React and Tailwind classes — plus copy-in components and ready-made blocks: invoice, quote, receipt, report, resume, certificate.",
+    status: "alpha",
+    kind: "library",
+    href: "/packages/pdf",
+    media: {
+      kind: "pages",
+      srcs: [
+        "/previews/pdf/resume-1.png",
+        "/previews/pdf/invoice-1.png",
+        "/previews/pdf/report-1.png",
+      ],
+      alt: "Report, invoice and resume PDF blocks",
+    },
   },
 ] as const;
 

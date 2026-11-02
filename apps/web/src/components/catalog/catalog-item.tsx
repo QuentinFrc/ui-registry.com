@@ -36,8 +36,45 @@ const MediaPreview = ({ entry, accent }: MediaPreviewProps) => {
     );
   }
 
+  if (entry.media?.kind === "pages") {
+    return <PagesPreview alt={entry.media.alt} srcs={entry.media.srcs} />;
+  }
+
   return <CodePreviewPlaceholder accent={accent} entry={entry} />;
 };
+
+// Fan of A4 pages: the last one sits in front, the others peek out behind it.
+const PAGE_POSES = [
+  "-translate-x-[42%] -rotate-6 group-hover:-translate-x-[48%] group-hover:-rotate-8",
+  "translate-x-[42%] rotate-6 group-hover:translate-x-[48%] group-hover:rotate-8",
+  "-translate-y-1 group-hover:-translate-y-2",
+] as const;
+
+const PagesPreview = ({
+  srcs,
+  alt,
+}: {
+  srcs: readonly string[];
+  alt: string;
+}) => (
+  <div
+    aria-label={alt}
+    className="relative flex h-full w-full items-end justify-center overflow-hidden"
+    role="img"
+  >
+    {srcs.slice(0, PAGE_POSES.length).map((src, index) => (
+      <Image
+        alt=""
+        className={`absolute top-[12%] h-auto w-[34%] bg-white shadow-xl ring-1 ring-black/10 transition-transform duration-500 ${PAGE_POSES[index]}`}
+        height={892}
+        key={src}
+        sizes="(min-width: 640px) 200px, 34vw"
+        src={src}
+        width={629}
+      />
+    ))}
+  </div>
+);
 
 interface CodePreviewProps {
   accent: string;

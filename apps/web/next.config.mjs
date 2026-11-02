@@ -11,6 +11,7 @@ const prettyCodeOptions = {
 
 const withMDX = createMDX({
   options: {
+    remarkPlugins: ["remark-gfm"],
     rehypePlugins: [["rehype-pretty-code", prettyCodeOptions]],
   },
 });
@@ -19,6 +20,8 @@ const withMDX = createMDX({
 const config = {
   pageExtensions: ["ts", "tsx", "md", "mdx"],
   reactStrictMode: true,
+  // Used at build time by the PDF docs props tables (src/lib/pdf-props.ts).
+  serverExternalPackages: ["typescript"],
 };
 
 export default withMDX(config);

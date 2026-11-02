@@ -1,0 +1,30 @@
+export const metadata = {
+  title: "Badge",
+  description:
+    "Small status label.",
+};
+
+# Badge
+
+Small status label.
+
+<PdfPreview name="badge" height={240} />
+
+## Installation
+
+```bash
+npx shadcn add https://ui-registry.com/r/pdf/badge.json
+```
+
+## Usage
+
+```tsx
+import { Badge } from "@/components/pdf/badge";
+
+<Badge>Paid</Badge>
+<Badge variant="secondary">Due</Badge>
+<Badge variant="destructive">Overdue</Badge>
+<Badge variant="outline">Draft</Badge>
+```
+
+In a row, a badge only takes the width of its content (`self-start`). Override with `className` if needed.

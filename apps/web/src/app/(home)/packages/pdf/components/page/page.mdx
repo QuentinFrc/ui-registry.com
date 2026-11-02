@@ -1,0 +1,85 @@
+export const metadata = {
+  title: "Page",
+  description:
+    "Defines a page in the PDF document.",
+};
+
+# Page
+
+Defines a page in the PDF document.
+
+Every PDF needs at least one `Page` inside a `Document`. Pages define the paper size, orientation, and background.
+
+## Demo
+
+### A4 page with content
+
+```tsx
+import { Document, Page, Block, Text, Tailwind } from "@ui-registries/pdf";
+
+<Tailwind>
+  <Document>
+    <Page size="A4" className="p-12 bg-white flex flex-col">
+      <Text className="text-2xl font-bold text-gray-900">Report Title</Text>
+      <Text className="text-sm text-muted-foreground mt-1">
+        Generated on January 15, 2025
+      </Text>
+
+      <Block className="flex-1 mt-8">
+        <Text className="text-base text-gray-700 leading-relaxed">
+          Page content goes here.
+        </Text>
+      </Block>
+
+      <Text className="text-xs text-gray-400 text-center">
+        Page 1 of 1
+      </Text>
+    </Page>
+  </Document>
+</Tailwind>
+```
+
+### Landscape letter size
+
+```tsx
+<Page size="LETTER" orientation="landscape" className="p-8 bg-white">
+  <Block className="flex flex-row gap-6">
+    <Block className="flex-1">
+      <Text className="text-lg font-bold">Slide Title</Text>
+    </Block>
+    <Block className="flex-1">
+      <Text className="text-sm text-gray-600">Supporting content</Text>
+    </Block>
+  </Block>
+</Page>
+```
+
+### Custom page size
+
+```tsx
+<Page size={{ width: 400, height: 200 }} className="p-6 bg-gray-900">
+  <Text className="text-xl font-bold text-white text-center">
+    Custom Size Card
+  </Text>
+</Page>
+```
+
+### Fixed header across pages
+
+```tsx
+<Page size="A4" className="p-12 bg-white">
+  <Block fixed className="absolute top-6 left-12 right-12 flex flex-row justify-between">
+    <Text className="text-xs text-gray-400">Acme Corp</Text>
+    <Text className="text-xs text-gray-400">Confidential</Text>
+  </Block>
+
+  {/* Scrollable content below the fixed header */}
+  <Block className="mt-8">
+    <Text className="text-base text-gray-700">Report body...</Text>
+  </Block>
+</Page>
+```
+
+## Props
+
+<PropsTable name="PageProps" />
