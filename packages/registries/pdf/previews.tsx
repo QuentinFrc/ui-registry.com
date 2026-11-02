@@ -100,7 +100,7 @@ export const componentPreviews = {
     </Sheet>
   ),
   "page-footer": (
-    <Sheet height={200}>
+    <Sheet height={420}>
       <Text>The footer is repeated at the bottom of every page.</Text>
       <PageFooter>Acme Studio · Annual report</PageFooter>
     </Sheet>

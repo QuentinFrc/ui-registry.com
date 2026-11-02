@@ -12,7 +12,8 @@ const prettyCodeOptions = {
 const withMDX = createMDX({
   options: {
     remarkPlugins: ["remark-gfm"],
-    rehypePlugins: [["rehype-pretty-code", prettyCodeOptions]],
+    // rehype-slug gives headings an id, used by the table of contents.
+    rehypePlugins: ["rehype-slug", ["rehype-pretty-code", prettyCodeOptions]],
   },
 });
 

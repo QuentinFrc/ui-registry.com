@@ -1,17 +1,14 @@
 import registryJson from "@registry/pdf/registry.json";
+import type {
+  DocsNavLink,
+  DocsNavSection,
+} from "@/components/docs/docs-sidebar";
 
+/** Library docs. */
 export const PDF_DOCS_BASE = "/packages/pdf";
+/** Blocks live in the UI lane, next to the other copy-in blocks. */
+export const PDF_BLOCKS_BASE = "/ui/pdf";
 export const PDF_INSTALL_BASE = "https://ui-registry.com/r/pdf";
-
-export interface PdfDocsLink {
-  href: string;
-  title: string;
-}
-
-export interface PdfDocsSection {
-  links: readonly PdfDocsLink[];
-  title: string;
-}
 
 interface RegistryItemLike {
   description?: string;
@@ -30,25 +27,25 @@ export interface PdfRegistryItem {
 }
 
 const toItem =
-  (section: "registry" | "blocks") =>
+  (base: string) =>
   (item: RegistryItemLike): PdfRegistryItem => ({
     name: item.name,
     title: item.title ?? item.name,
     description: item.description ?? "",
-    href: `${PDF_DOCS_BASE}/${section}/${item.name}`,
+    href: `${base}/${item.name}`,
   });
 
 /** Copy-in components (`registry:ui` items), in registry order. */
 export const pdfComponents: readonly PdfRegistryItem[] = registry.items
   .filter((item) => item.type === "registry:ui")
-  .map(toItem("registry"));
+  .map(toItem(`${PDF_DOCS_BASE}/registry`));
 
 /** Full documents (`registry:block` items), in registry order. */
 export const pdfBlocks: readonly PdfRegistryItem[] = registry.items
   .filter((item) => item.type === "registry:block")
-  .map(toItem("blocks"));
+  .map(toItem(PDF_BLOCKS_BASE));
 
-const page = (slug: string, title: string): PdfDocsLink => ({
+const page = (slug: string, title: string): DocsNavLink => ({
   href: slug ? `${PDF_DOCS_BASE}/${slug}` : PDF_DOCS_BASE,
   title,
 });
@@ -65,7 +62,7 @@ const PRIMITIVES = [
   ["page-number", "PageNumber"],
 ] as const;
 
-export const pdfDocsNav: readonly PdfDocsSection[] = [
+export const pdfDocsNav: readonly DocsNavSection[] = [
   {
     title: "Getting started",
     links: [
@@ -78,13 +75,6 @@ export const pdfDocsNav: readonly PdfDocsSection[] = [
   {
     title: "Primitives",
     links: PRIMITIVES.map(([slug, title]) => page(`components/${slug}`, title)),
-  },
-  {
-    title: "Blocks",
-    links: [
-      page("blocks", "Overview"),
-      ...pdfBlocks.map(({ href, title }) => ({ href, title })),
-    ],
   },
   {
     title: "UI components",
@@ -111,3 +101,18 @@ export const pdfDocsNav: readonly PdfDocsSection[] = [
     ],
   },
 ];
+
+export const pdfBlocksNav: readonly DocsNavSection[] = [
+  {
+    title: "PDF blocks",
+    links: [
+      { href: PDF_BLOCKS_BASE, title: "Overview" },
+      ...pdfBlocks.map(({ href, title }) => ({ href, title })),
+    ],
+  },
+];
+
+/** Every page of a nav, in reading order (previous / next links). */
+export const flattenNav = (
+  sections: readonly DocsNavSection[]
+): readonly DocsNavLink[] => sections.flatMap((section) => section.links);

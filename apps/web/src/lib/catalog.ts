@@ -82,10 +82,19 @@ export const catalog: readonly CatalogEntry[] = [
     slug: "pdf",
     name: "@ui-registries/pdf",
     tagline:
-      "Build PDFs with React and Tailwind classes — plus copy-in components and ready-made blocks: invoice, quote, receipt, report, resume, certificate.",
+      "Build PDFs with React primitives and Tailwind classes, on top of react-pdf — themes, fonts, SVG, multi-page layouts.",
     status: "alpha",
     kind: "library",
     href: "/packages/pdf",
+  },
+  {
+    slug: "pdf-blocks",
+    name: "PDF blocks",
+    tagline:
+      "Ready-made documents you copy in with the shadcn CLI: invoice, quote, receipt, report, resume, certificate.",
+    status: "alpha",
+    kind: "ui",
+    href: "/ui/pdf",
     media: {
       kind: "pages",
       srcs: [

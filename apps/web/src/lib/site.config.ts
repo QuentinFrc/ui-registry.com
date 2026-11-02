@@ -12,4 +12,14 @@ export const siteConfig = {
     name: "Quentin",
     malt: "https://www.malt.fr",
   },
+  // Card shown in the right column of every docs page.
+  sponsor: {
+    // TODO(quentin): replace with your site's URL.
+    href: "https://www.malt.fr",
+    eyebrow: "Built by Quentin",
+    title: "Need this in your product?",
+    description:
+      "These packages come from real client work. I help teams ship design systems, document generation and polished React UIs.",
+    cta: "Work with me",
+  },
 } as const;
