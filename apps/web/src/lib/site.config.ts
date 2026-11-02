@@ -14,8 +14,7 @@ export const siteConfig = {
   },
   // Card shown in the right column of every docs page.
   sponsor: {
-    // TODO(quentin): replace with your site's URL.
-    href: "https://www.malt.fr",
+    href: "https://quent1.com/?utm_source=ui-registry&utm_medium=referral&utm_campaign=docs-sponsor-card",
     eyebrow: "Built by Quentin",
     title: "Need this in your product?",
     description:

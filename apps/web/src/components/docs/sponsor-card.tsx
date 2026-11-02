@@ -1,12 +1,20 @@
+"use client";
+
+import { usePathname } from "next/navigation";
 import { siteConfig } from "@/lib/site.config";
 
 const { sponsor } = siteConfig;
 
 export function SponsorCard() {
+  // utm_content = the docs page the click came from.
+  const pathname = usePathname();
+  const href = new URL(sponsor.href);
+  href.searchParams.set("utm_content", pathname);
+
   return (
     <a
       className="group relative flex flex-col gap-2 overflow-hidden rounded-xl border bg-muted/40 p-4 transition-colors hover:border-foreground/20 hover:bg-muted"
-      href={sponsor.href}
+      href={href.toString()}
       rel="noopener"
       target="_blank"
     >
