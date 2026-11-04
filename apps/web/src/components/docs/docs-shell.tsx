@@ -5,6 +5,8 @@ import { SponsorCard } from "./sponsor-card";
 import { TableOfContents } from "./toc";
 
 interface DocsShellProps {
+  /** Extra card in the right column, between the TOC and the sponsor card. */
+  aside?: ReactNode;
   children: ReactNode;
   /** Breadcrumb / tabs row above the columns. */
   header: ReactNode;
@@ -18,6 +20,7 @@ interface DocsShellProps {
  * sponsor card. Columns collapse from the outside in on smaller screens.
  */
 export function DocsShell({
+  aside,
   children,
   header,
   pager,
@@ -55,6 +58,7 @@ export function DocsShell({
         <aside className="hidden xl:block">
           <div className="sticky top-8 flex max-h-[calc(100vh-4rem)] flex-col gap-8 overflow-y-auto pb-8">
             <TableOfContents />
+            {aside}
             <SponsorCard />
           </div>
         </aside>

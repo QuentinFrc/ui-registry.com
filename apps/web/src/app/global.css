@@ -153,7 +153,8 @@
   color: var(--color-muted-foreground);
 }
 
-.prose-content .not-prose a {
+.prose-content .not-prose a,
+.prose-content a.not-prose {
   text-decoration: none;
 }
 

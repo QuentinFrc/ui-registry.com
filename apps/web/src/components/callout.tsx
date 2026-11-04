@@ -1,9 +1,11 @@
-import type { ReactNode } from "react";
+import { Info, Lightbulb, TriangleAlert } from "lucide-react";
+import type { CSSProperties, ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
 const tones = {
-  info: "border-accent-library/40 bg-accent-library/5",
-  warning: "border-accent-ui/50 bg-accent-ui/5",
+  info: { accent: "var(--color-accent-library)", Icon: Info },
+  tip: { accent: "var(--color-accent-kit)", Icon: Lightbulb },
+  warning: { accent: "var(--color-accent-ui)", Icon: TriangleAlert },
 } as const;
 
 interface CalloutProps {
@@ -19,16 +21,37 @@ export function Callout({
   title,
   type = "info",
 }: CalloutProps) {
+  const { accent, Icon } = tones[type];
+  const style = {
+    "--callout": accent,
+    background:
+      "linear-gradient(to right, color-mix(in oklch, var(--callout) 9%, transparent), transparent 70%)",
+  } as CSSProperties;
+
   return (
     <aside
       className={cn(
-        "flex flex-col gap-2 rounded-lg border px-4 py-3 text-sm [&_p]:m-0",
-        tones[type],
+        "relative flex gap-3 overflow-hidden rounded-xl border border-[color-mix(in_oklch,var(--callout)_30%,var(--color-border))] py-3.5 pr-4 pl-4 text-sm",
         className
       )}
+      style={style}
     >
-      {title ? <p className="font-medium text-foreground">{title}</p> : null}
-      <div className="flex flex-col gap-2">{children}</div>
+      <span
+        aria-hidden="true"
+        className="absolute inset-y-0 left-0 w-0.5 bg-[var(--callout)]"
+      />
+      <span
+        aria-hidden="true"
+        className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[color-mix(in_oklch,var(--callout)_16%,transparent)] text-[var(--callout)]"
+      >
+        <Icon className="size-4" strokeWidth={2.25} />
+      </span>
+      <div className="flex min-w-0 flex-col gap-1 pt-0.5 leading-relaxed [&_p]:m-0">
+        {title ? (
+          <span className="font-medium text-foreground">{title}</span>
+        ) : null}
+        {children}
+      </div>
     </aside>
   );
 }
