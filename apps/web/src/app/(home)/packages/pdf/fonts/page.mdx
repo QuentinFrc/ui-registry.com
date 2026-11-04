@@ -1,0 +1,134 @@
+export const metadata = {
+  title: "Fonts",
+  description:
+    "Register custom fonts with defineFont() for a type-safe, ergonomic experience.",
+};
+
+# Fonts
+
+Register custom fonts with defineFont() for a type-safe, ergonomic experience.
+
+## `defineFont()`
+
+Inspired by `next/font`, `defineFont()` registers a font family and returns a ready-to-use object with `family`, `className`, and `style` properties.
+
+```ts
+import { defineFont } from "@ui-registries/pdf";
+// or standalone:
+import { defineFont } from "@ui-registries/pdf/font";
+```
+
+### Single source
+
+```ts
+const inter = defineFont({
+  family: "Inter",
+  src: "/fonts/Inter-Regular.ttf",
+});
+```
+
+### Multiple variants
+
+```ts
+const inter = defineFont({
+  family: "Inter",
+  src: [
+    { src: "/fonts/Inter-Regular.ttf", weight: 400 },
+    { src: "/fonts/Inter-Bold.ttf", weight: 700 },
+    { src: "/fonts/Inter-Italic.ttf", weight: 400, style: "italic" },
+  ],
+});
+```
+
+### Remote fonts
+
+Pass extra fetch options like `headers` alongside the source:
+
+```ts
+const custom = defineFont({
+  family: "Custom",
+  src: [
+    {
+      src: "https://example.com/font.woff2",
+      weight: 400,
+      headers: { Authorization: "Bearer token" },
+    },
+  ],
+});
+```
+
+## Using the result
+
+`defineFont()` returns a `FontResult` object:
+
+```ts
+interface FontResult {
+  family: string;    // "Inter"
+  className: string; // "font-[Inter]"
+  style: object;     // { fontFamily: "Inter" }
+}
+```
+
+### With `className`
+
+```tsx
+<Text className={inter.className}>Hello in Inter</Text>
+```
+
+### With `cn()`
+
+```tsx
+<Text className={cn("text-lg", inter.className)}>Styled text</Text>
+```
+
+### With inline style
+
+```tsx
+<Text style={inter.style}>Hello in Inter</Text>
+```
+
+### With the `tw` engine
+
+The `className` uses the `font-[family]` arbitrary value syntax, so it works seamlessly with `tw()`:
+
+```ts
+tw(inter.className); // → { fontFamily: "Inter" }
+tw(`${inter.className} text-lg font-bold`);
+// → { fontFamily: "Inter", fontSize: 18, fontWeight: 700 }
+```
+
+## Hyphenation
+
+react-pdf hyphenates long words automatically ("pay-ment"). To only wrap at spaces, call `disableHyphenation()` once at startup, next to your `defineFont` calls. react-pdf only has a global setting, so it applies to every document rendered afterwards.
+
+```ts
+import { disableHyphenation } from "@ui-registries/pdf/font";
+
+disableHyphenation();
+```
+
+## Types
+
+```ts
+interface DefineFontOptions {
+  family: string;
+  src: string | FontVariant[];
+}
+
+interface FontVariant {
+  src: string;
+  weight?: number;
+  style?: "normal" | "italic";
+  [key: string]: any; // extra fetch options (headers, etc.)
+}
+
+interface FontResult {
+  family: string;
+  className: string;
+  style: { fontFamily: string };
+}
+```
+
+<Callout type="info" className="leading-7">
+Need more control? The raw `Font` object from react-pdf is also [re-exported](/packages/pdf/re-exports) for advanced use cases like `Font.registerHyphenationCallback` or `Font.registerEmojiSource`.
+</Callout>

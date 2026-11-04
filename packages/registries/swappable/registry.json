@@ -8,7 +8,7 @@
       "type": "registry:lib",
       "title": "responsive",
       "description": "Swappable config that resolves mobile/desktop from a media query, SSR-safe via an initial variant.",
-      "dependencies": ["@ui-registry/swappable"],
+      "dependencies": ["@ui-registries/swappable"],
       "files": [
         {
           "path": "registry/base-nova/swappable/responsive.ts",

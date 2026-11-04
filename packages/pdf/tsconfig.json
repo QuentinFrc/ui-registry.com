@@ -1,0 +1,11 @@
+{
+	"extends": "@repo/typescript-config/react-library.json",
+	"compilerOptions": {
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"verbatimModuleSyntax": true,
+		"noEmit": true
+	},
+	"include": ["src/**/*", "tsup.config.ts", "vitest.config.ts"],
+	"exclude": ["dist", "node_modules"]
+}

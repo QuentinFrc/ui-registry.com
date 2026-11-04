@@ -1,0 +1,67 @@
+export const metadata = {
+  title: "Item",
+  description:
+    "List row with media, title, description and right-aligned actions.",
+};
+
+# Item
+
+List row with media, title, description and right-aligned actions.
+
+<PdfPreview name="item" height={580} />
+
+## Installation
+
+```bash
+npx shadcn add https://ui-registry.com/r/pdf/item.json
+```
+
+## Usage
+
+```tsx
+import { Badge } from "@/components/pdf/badge";
+import {
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemDescription,
+  ItemGroup,
+  ItemMedia,
+  ItemSeparator,
+  ItemTitle,
+} from "@/components/pdf/item";
+
+<ItemGroup>
+  <Item size="sm">
+    <ItemContent>
+      <ItemTitle>Northwind Traders</ItemTitle>
+      <ItemDescription>INV-2041 · Due Nov 14, 2026</ItemDescription>
+    </ItemContent>
+    <ItemActions>
+      <Badge>Paid</Badge>
+      <Text className="font-medium">€ 4,250.00</Text>
+    </ItemActions>
+  </Item>
+  <ItemSeparator />
+  <Item size="sm">…</Item>
+</ItemGroup>
+```
+
+An item never splits across two pages.
+
+## Variants
+
+| Prop | Values | Description |
+|------|--------|-------------|
+| `Item` `variant` | `default`, `outline`, `muted` | No border, bordered, or muted background |
+| `Item` `size` | `default`, `sm` | Padding and gap |
+| `ItemMedia` `variant` | `default`, `icon`, `image` | Plain, 24pt bordered square for an icon, or 30pt clipped square for an `Image` |
+
+## Parts
+
+- `ItemGroup`: vertical list of items.
+- `ItemMedia`: icon, image or avatar on the left.
+- `ItemContent`: takes the remaining width; holds `ItemTitle` and `ItemDescription` (clamped to 2 lines).
+- `ItemActions`: right-aligned area, e.g. an amount or a badge. A string child is wrapped in `Text`.
+- `ItemHeader` / `ItemFooter`: full-width rows above or below the media and content.
+- `ItemSeparator`: divider between items.

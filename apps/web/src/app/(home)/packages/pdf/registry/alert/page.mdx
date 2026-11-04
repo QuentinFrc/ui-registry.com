@@ -1,0 +1,58 @@
+export const metadata = {
+  title: "Alert",
+  description:
+    "Callout with a title, a description and an optional icon.",
+};
+
+# Alert
+
+Callout with a title, a description and an optional icon.
+
+<PdfPreview name="alert" height={400} />
+
+## Installation
+
+```bash
+npx shadcn add https://ui-registry.com/r/pdf/alert.json
+```
+
+## Usage
+
+```tsx
+import {
+  Alert,
+  AlertDescription,
+  AlertIconWarning,
+  AlertTitle,
+} from "@/components/pdf/alert";
+
+<Alert icon={<AlertIconWarning />} variant="destructive">
+  <AlertTitle>Payment overdue</AlertTitle>
+  <AlertDescription>
+    Please settle the outstanding balance within 7 days.
+  </AlertDescription>
+</Alert>
+```
+
+An alert never splits across two pages.
+
+## Variants
+
+| `variant` | Description |
+|-----------|-------------|
+| `default` | Card background, muted description |
+| `destructive` | Destructive border and text |
+
+## Icon
+
+react-pdf has no CSS grid, so unlike shadcn/ui the icon is not the first child but the `icon` prop: it is placed in a left column, next to the title and description.
+
+Three icons are included: `AlertIconInfo`, `AlertIconWarning` and `AlertIconCheck`. They follow the alert variant (foreground or destructive color) and take a `size-*` or `text-*` class to override the size or color:
+
+```tsx
+<Alert icon={<AlertIconInfo className="text-blue-600" />}>
+  <AlertTitle>Prices include VAT at 20%</AlertTitle>
+</Alert>
+```
+
+Any `Svg` works as an icon.

@@ -1,0 +1,127 @@
+export const metadata = {
+  title: "Helpers",
+  description:
+    "Utility functions for class names and style generation.",
+};
+
+# Helpers
+
+Utility functions for class names and style generation.
+
+## cn()
+
+Lightweight class name joiner. Filters falsy values and joins with a space.
+
+```ts
+import { cn } from "@ui-registries/pdf";
+
+cn("p-4", "bg-white")                    // "p-4 bg-white"
+cn("p-4", false, null, undefined, "m-2") // "p-4 m-2"
+cn()                                      // ""
+```
+
+Use it for conditional classes:
+
+```tsx
+<Block className={cn(
+  "p-4 rounded-lg",
+  isActive && "bg-blue-50 border border-blue-200",
+  isDisabled && "opacity-50",
+)} />
+```
+
+### Signature
+
+```ts
+function cn(...args: (string | false | null | undefined | 0 | "")[]): string
+```
+
+## createTw()
+
+Create a tw function with an optional custom theme. See [Theming](/packages/pdf/theming#createtwvars) for details.
+
+```ts
+import { createTw } from "@ui-registries/pdf";
+
+const tw = createTw({ "--color-brand": "#0073e6" });
+const styles = tw("bg-brand p-4");
+```
+
+### Signature
+
+```ts
+function createTw(vars?: ThemeVars): TwFn
+
+type ThemeVars = Record<string, string | number | "initial">;
+type TwFn = (classString: string) => StyleObject;
+type StyleObject = Record<string, string | number>;
+```
+
+## tw
+
+Default tw instance (no custom theme). Convenience export for quick usage.
+
+```ts
+import { tw } from "@ui-registries/pdf";
+
+const styles = tw("flex flex-row gap-2 p-4 bg-white");
+```
+
+## resolveTheme()
+
+Process theme variables into a resolved theme object. Handles wildcard resets and merging with defaults.
+
+```ts
+import { resolveTheme } from "@ui-registries/pdf";
+
+const theme = resolveTheme({
+  "--color-*": "initial",
+  "--color-brand": "#0073e6",
+});
+// theme.colors → { brand: "#0073e6" }
+```
+
+### Signature
+
+```ts
+function resolveTheme(vars?: ThemeVars): ResolvedTheme
+
+interface ResolvedTheme {
+  spacingBase: number;
+  spacing: Record<string, number>;
+  fontSize: Record<string, number>;
+  borderRadius: Record<string, number>;
+  fontWeight: Record<string, number>;
+  opacity: Record<string, number>;
+  lineHeight: Record<string, number>;
+  letterSpacing: Record<string, number>;
+  colors: Record<string, string>;
+}
+```
+
+## pdfSafe()
+
+Wraps an `Intl` formatter so its output renders with the built-in fonts. Some locales (`fr-FR`…) use a narrow no-break space (U+202F) or a minus sign (U+2212), which Helvetica, Times and Courier can't draw: they become a regular no-break space and a hyphen-minus.
+
+```ts
+import { pdfSafe } from "@ui-registries/pdf";
+
+const money = pdfSafe(
+  new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" })
+);
+
+money.format(-1234.5); // "-1 234,50 €"
+```
+
+`toPdfSafe(text)` does the same on a string. You don't need either with a [custom font](/packages/pdf/fonts) that has those characters.
+
+## useThemeColor()
+
+Returns a color of the current theme, for props that don't take classes (SVG gradient stops, computed colors). Accepts the same names and opacity modifiers as color utilities.
+
+```tsx
+import { useThemeColor } from "@ui-registries/pdf";
+
+const accent = useThemeColor("primary"); // "#171717", or your theme's value
+const faded = useThemeColor("primary/20"); // "rgba(23, 23, 23, 0.2)"
+```

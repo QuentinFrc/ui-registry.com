@@ -1,0 +1,59 @@
+export const metadata = {
+  title: "Key Concepts",
+  description:
+    "Core concepts behind @ui-registries/pdf.",
+};
+
+# Key Concepts
+
+Core concepts behind @ui-registries/pdf.
+
+## className prop
+
+Every layout component (`Block`, `Text`, `Page`, `Image`, `Link`, `Canvas`, `Note`) accepts a `className` prop. Classes are parsed at render time and converted to style objects.
+
+```tsx
+<Block className="p-4 bg-white rounded-lg border border-gray-200" />
+```
+
+You can combine `className` with `style` — inline styles are applied after class styles:
+
+```tsx
+<Block className="p-4" style={{ backgroundColor: "#custom" }} />
+```
+
+## Tailwind Provider
+
+Wrap your document tree in `<Tailwind>` to use the default theme, or pass a custom `theme` prop to override colors, spacing, font sizes, and more. See [Theming](/packages/pdf/theming) for details.
+
+```tsx
+<Tailwind theme={{ "--color-brand": "#0073e6" }}>
+  <Document>...</Document>
+</Tailwind>
+```
+
+## tw engine
+
+Under the hood, a lightweight Tailwind-to-style parser converts class strings to style objects. It supports the most common utility classes — layout, spacing, typography, colors, borders, transforms, and more. See [Utility Classes](/packages/pdf/utility-classes) for the full reference.
+
+You can also use the engine standalone:
+
+```ts
+import { createTw } from "@ui-registries/pdf";
+
+const tw = createTw({ "--color-brand": "#0073e6" });
+const styles = tw("p-4 bg-brand text-white font-bold");
+// → { paddingTop: 12, paddingRight: 12, ..., backgroundColor: "#0073e6", color: "#ffffff", fontWeight: 700 }
+```
+
+## Units — pt, not rem
+
+In a standard web app, Tailwind uses `rem` as the base unit (1rem = 16px). PDF documents use a different unit: **points (pt)**, where 1in = 72pt.
+
+@ui-registries/pdf automatically converts the Tailwind scale to points:
+
+- 1 Tailwind unit = 4px = **3pt**
+- `p-4` → 12pt padding (not 1rem)
+- `text-base` → 12pt font size (equivalent to 16px on web)
+
+This means the same class names produce visually similar results, but the underlying values are different. See [Utility Classes](/packages/pdf/utility-classes) for the full scale reference.

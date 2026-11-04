@@ -1,5 +1,5 @@
 {
-  "name": "@ui-registry/flash",
+  "name": "@ui-registries/flash",
   "version": "0.0.0",
   "description": "Encode flash messages in the URL so they survive a redirect.",
   "keywords": [
@@ -13,7 +13,7 @@
   "homepage": "https://ui-registry.com/packages/flash",
   "repository": {
     "type": "git",
-    "url": "https://github.com/QuentinFrc/ui-registry.git",
+    "url": "https://github.com/QuentinFrc/ui-registry.com.git",
     "directory": "packages/flash"
   },
   "license": "MIT",

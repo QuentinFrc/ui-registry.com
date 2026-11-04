@@ -8,6 +8,9 @@ import {
   stripFlash,
 } from "../src/index.js";
 
+const RELATIVE_WITH_QUERY = /^\/dashboard\?ref=email&flash=/;
+const HASH_FLASH = /^\/dashboard#flash=/;
+
 describe("constants", () => {
   it("exposes the default URL param name", () => {
     expect(FLASH_PARAM).toBe("flash");
@@ -25,12 +28,14 @@ describe("appendFlash / readFlash — searchParam (default)", () => {
   it("round-trips on a relative URL and preserves the rest", () => {
     const flash: Flash = { message: "Hi" };
     const url = appendFlash("/dashboard?ref=email", flash);
-    expect(url).toMatch(/^\/dashboard\?ref=email&flash=/);
+    expect(url).toMatch(RELATIVE_WITH_QUERY);
     expect(readFlash(url)).toEqual(flash);
   });
 
   it("preserves a typed data payload", () => {
-    type Payload = { orderId: number };
+    interface Payload {
+      orderId: number;
+    }
     const flash: Flash<Payload> = {
       message: "Order placed",
       level: "success",
@@ -69,7 +74,7 @@ describe("appendFlash / readFlash — hash storage", () => {
 
   it("round-trips through the URL hash", () => {
     const url = appendFlash("/dashboard", { message: "Hi" }, opts);
-    expect(url).toMatch(/^\/dashboard#flash=/);
+    expect(url).toMatch(HASH_FLASH);
     expect(readFlash(url, opts)).toEqual({ message: "Hi" });
   });
 
@@ -110,7 +115,7 @@ describe("consumeFlash", () => {
     vi.stubGlobal("window", { location: { href: initialUrl } });
     vi.stubGlobal("history", {
       state: { foo: "bar" },
-      replaceState: vi.fn((state, _title, url) => {
+      replaceState: vi.fn((_state, _title, url) => {
         (
           globalThis as { window: { location: { href: string } } }
         ).window.location.href = url;

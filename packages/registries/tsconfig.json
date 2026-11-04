@@ -1,27 +1,18 @@
 {
   "extends": "@repo/typescript-config/react-library.json",
   "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "outDir": "dist",
     "paths": {
       "@/components/ui/*": [
         "./kit/registry/base-nova/ui/*",
         "../ui/src/components/ui/*"
       ],
-      "@/*": [
-        "../ui/src/*"
-      ],
-      "@repo/ui/*": [
-        "../ui/src/*"
-      ]
+      "@/*": ["../ui/src/*"],
+      "@repo/ui/*": ["../ui/src/*"]
     }
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "**/*.mts"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "include": ["**/*.ts", "**/*.tsx", "**/*.mts"],
+  "exclude": ["node_modules", "dist"]
 }

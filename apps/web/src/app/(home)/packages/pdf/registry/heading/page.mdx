@@ -1,0 +1,26 @@
+export const metadata = {
+  title: "Heading",
+  description:
+    "Document headings, levels 1 to 4.",
+};
+
+# Heading
+
+Document headings, levels 1 to 4.
+
+<PdfPreview name="heading" height={360} />
+
+## Installation
+
+```bash
+npx shadcn add https://ui-registry.com/r/pdf/heading.json
+```
+
+## Usage
+
+```tsx
+import { Heading } from "@/components/pdf/heading";
+
+<Heading level={1}>Annual report</Heading>
+<Heading level={2}>Highlights</Heading>
+```

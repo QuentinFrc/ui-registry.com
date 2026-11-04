@@ -1,0 +1,32 @@
+import { BlockGrid } from "@/components/pdf/block-grid";
+
+export const metadata = {
+  title: "PDF blocks",
+  description:
+    "Complete, ready-to-use PDF documents built with the registry components.",
+};
+
+# PDF blocks
+
+Complete, ready-to-use PDF documents built with [`@ui-registries/pdf`](/packages/pdf) and its [UI components](/packages/pdf/registry).
+
+Blocks are full documents — not single components. Each block renders a complete `<Document>` from typed data, so you can pass it straight to `PDFViewer` or `renderToBuffer`.
+
+<BlockGrid />
+
+## Installation
+
+Like [UI components](/packages/pdf/registry), blocks are installed with the shadcn CLI: the source is copied into `components/pdf/` along with the components it uses, and you own the code.
+
+```bash
+npx shadcn add https://ui-registry.com/r/pdf/invoice.json
+```
+
+## Conventions
+
+Every block follows the same rules:
+
+- **Typed data in, document out**: content comes from a `data` prop, nothing is hard-coded.
+- **Themeable**: only semantic colors are used; pass a `theme` prop to match your brand.
+- **Translatable**: visible labels can be overridden with a `labels` prop.
+- **Multi-page safe**: headers and footers repeat, rows and summary sections never split across pages.

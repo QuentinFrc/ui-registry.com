@@ -1,0 +1,81 @@
+export const metadata = {
+  title: "UI components",
+  description:
+    "Copy-paste PDF components and blocks, installed with the shadcn CLI.",
+};
+
+# UI components
+
+Copy-paste PDF components and blocks, installed with the shadcn CLI.
+
+The registry works like [shadcn/ui](https://ui.shadcn.com), for PDFs. Components are not a dependency: the shadcn CLI copies their source into your project, and you own and edit the code.
+
+- **`@ui-registries/pdf`** (npm) provides the primitives: `Block`, `Text`, `Page`, the Tailwind engine, fonts.
+- **The registry** provides components (`Table`, `Card`, `Badge`…) and complete blocks (`Invoice`) built on top of them.
+
+## Installation
+
+Your project needs a `components.json` (created by `npx shadcn init`). Then add any item by URL:
+
+```bash
+npx shadcn add https://ui-registry.com/r/pdf/invoice.json
+```
+
+The CLI installs `@ui-registries/pdf` and the components the item depends on.
+
+### With a namespace
+
+Register the namespace once in your `components.json`:
+
+```json title="components.json"
+{
+  "registries": {
+    "@pdf": "https://ui-registry.com/r/pdf/{name}.json"
+  }
+}
+```
+
+Then add items by name:
+
+```bash
+npx shadcn add @pdf/invoice @pdf/table
+```
+
+## Where files go
+
+PDF components are installed in **`components/pdf/`**, not `components/ui/`, so they never overwrite the HTML shadcn components with the same name (`card`, `table`, `badge`…).
+
+```
+components/
+├── ui/          ← your HTML shadcn components
+│   └── card.tsx
+└── pdf/         ← PDF components from this registry
+    ├── card.tsx
+    ├── table.tsx
+    └── invoice.tsx
+```
+
+## Theming
+
+Components only use semantic colors (`bg-primary`, `text-muted-foreground`, `border-border`…). Pass your theme to `<Document theme>` — or to the `theme` prop of a block — to match your brand. See [Theming](/packages/pdf/theming).
+
+## Available components
+
+| Component | Description |
+|-----------|-------------|
+| [Heading](/packages/pdf/registry/heading) | Document headings (levels 1–4) |
+| [Separator](/packages/pdf/registry/separator) | Horizontal or vertical divider |
+| [Badge](/packages/pdf/registry/badge) | Status label with variants |
+| [Card](/packages/pdf/registry/card) | Bordered container with header and footer |
+| [Table](/packages/pdf/registry/table) | Table with a repeating header |
+| [Page Footer](/packages/pdf/registry/page-footer) | Footer on every page, with page numbers |
+| [Alert](/packages/pdf/registry/alert) | Callout with title, description and icon |
+| [Item](/packages/pdf/registry/item) | List row with media, content and actions |
+| [Avatar](/packages/pdf/registry/avatar) | Round image with fallback, and groups |
+| [Typeset](/packages/pdf/registry/typeset) | Long-form content rhythm driven by three tokens |
+| [Typeset Markdown](/packages/pdf/registry/typeset-markdown) | Markdown rendered with the Typeset components |
+
+<BlocksCallout
+  title="Looking for complete documents?"
+  description="The blocks assemble these components into finished documents: pass your data, get a PDF."
+/>

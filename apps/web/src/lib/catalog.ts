@@ -2,7 +2,9 @@ export type CatalogKind = "kit" | "ui" | "library";
 
 export type CatalogMedia =
   | { kind: "video"; src: string; poster?: string }
-  | { kind: "image"; src: string; alt: string };
+  | { kind: "image"; src: string; alt: string }
+  /** A few document pages fanned out, front page last. */
+  | { kind: "pages"; srcs: readonly string[]; alt: string };
 
 export interface CatalogEntry {
   href: string;
@@ -60,7 +62,7 @@ export const LANE_META: Record<CatalogKind, LaneMeta> = {
 export const catalog: readonly CatalogEntry[] = [
   {
     slug: "flash",
-    name: "@ui-registry/flash",
+    name: "@ui-registries/flash",
     tagline:
       "Encode flash messages in the URL so they survive a redirect — Rails-style.",
     status: "alpha",
@@ -69,12 +71,39 @@ export const catalog: readonly CatalogEntry[] = [
   },
   {
     slug: "swappable",
-    name: "@ui-registry/swappable",
+    name: "@ui-registries/swappable",
     tagline:
       "Swap component implementations by variant — responsive, platform, feature flag — with typed slots.",
     status: "alpha",
     kind: "library",
     href: "/packages/swappable",
+  },
+  {
+    slug: "pdf",
+    name: "@ui-registries/pdf",
+    tagline:
+      "Build PDFs with React primitives and Tailwind classes, on top of react-pdf — themes, fonts, SVG, multi-page layouts.",
+    status: "alpha",
+    kind: "library",
+    href: "/packages/pdf",
+  },
+  {
+    slug: "pdf-blocks",
+    name: "PDF blocks",
+    tagline:
+      "Ready-made documents you copy in with the shadcn CLI: invoice, quote, receipt, report, resume, certificate.",
+    status: "alpha",
+    kind: "ui",
+    href: "/ui/pdf",
+    media: {
+      kind: "pages",
+      srcs: [
+        "/previews/pdf/resume-1.png",
+        "/previews/pdf/invoice-1.png",
+        "/previews/pdf/report-1.png",
+      ],
+      alt: "Report, invoice and resume PDF blocks",
+    },
   },
 ] as const;
 

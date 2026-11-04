@@ -1,6 +1,6 @@
 "use client";
 
-import { defineConfig } from "@ui-registry/swappable";
+import { defineConfig } from "@ui-registries/swappable";
 import { useSyncExternalStore } from "react";
 
 export type ResponsiveVariant = "mobile" | "desktop";

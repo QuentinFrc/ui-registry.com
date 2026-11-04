@@ -1,0 +1,67 @@
+export const metadata = {
+  title: "Document",
+  description:
+    "Root wrapper for the entire PDF.",
+};
+
+# Document
+
+Root wrapper for the entire PDF.
+
+The top-level container for a PDF. Every PDF starts with a `Document` containing one or more `Page` elements. Does **not** support `className` (documents have no visual styles), but accepts a `theme` prop that applies your theme variables to the whole document.
+
+## Demo
+
+### Basic document with metadata
+
+```tsx
+import { Document, Page, Text, PDFViewer } from "@ui-registries/pdf";
+
+function Invoice() {
+  return (
+    <Document
+      theme={{ "--color-brand": "#0073e6" }}
+      title="Invoice #001"
+      author="Acme Corp"
+      subject="Monthly Invoice"
+      keywords="invoice, billing"
+    >
+      <Page size="A4" className="p-12 bg-white">
+        <Text className="text-2xl font-bold text-brand">Invoice #001</Text>
+        <Text className="text-sm text-gray-500 mt-1">Acme Corp</Text>
+      </Page>
+    </Document>
+  );
+}
+
+// Render in browser
+function App() {
+  return (
+    <PDFViewer style={{ width: "100%", height: "100vh" }}>
+      <Invoice />
+    </PDFViewer>
+  );
+}
+```
+
+### Multi-page document
+
+```tsx
+<Document>
+  <Page size="A4" className="p-12 bg-white">
+    <Text className="text-2xl font-bold">Cover Page</Text>
+  </Page>
+  <Page size="A4" className="p-12 bg-white">
+    <Text className="text-lg font-semibold">Chapter 1</Text>
+    <Text className="text-base text-gray-700 mt-2 leading-relaxed">
+      Content of the first chapter...
+    </Text>
+  </Page>
+  <Page size="A4" className="p-12 bg-white">
+    <Text className="text-lg font-semibold">Chapter 2</Text>
+    <Text className="text-base text-gray-700 mt-2 leading-relaxed">
+      Content of the second chapter...
+    </Text>
+  </Page>
+</Document>
+```
