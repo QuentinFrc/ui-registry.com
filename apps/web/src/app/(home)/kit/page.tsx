@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Bounds } from "@/components/bounds";
 import { CatalogGrid } from "@/components/catalog/catalog-grid";
 import { LaneIntro } from "@/components/catalog/lane-intro";
-import { CodeBlock } from "@/components/code-block";
+import { DocsCodeBlock } from "@/components/docs/code-block";
 import { KitGrid } from "@/components/kit/kit-grid";
 import { KIT_INSTALL_BASE, kitComponents } from "@/lib/kit";
 
@@ -35,7 +35,7 @@ export default function KitPage() {
           <h2 className="font-medium font-mono text-[11px] text-muted-foreground uppercase tracking-[0.18em]">
             Install
           </h2>
-          <CodeBlock
+          <DocsCodeBlock
             code={`# one component — an upgrade overrides the shadcn file of the same name
 pnpm dlx shadcn@latest add ${KIT_INSTALL_BASE}/dialog.json
 
@@ -45,7 +45,7 @@ pnpm dlx shadcn@latest add @kit/dialog
 
 # the whole set, on a fresh project
 pnpm dlx shadcn@latest init @kit/kit`}
-            lang="sh"
+            language="sh"
           />
         </div>
       </Bounds>

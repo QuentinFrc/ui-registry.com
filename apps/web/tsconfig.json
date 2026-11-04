@@ -18,7 +18,8 @@
     "paths": {
       "@/*": ["./src/*"],
       "@registry/*": ["../../packages/registries/*"],
-      "fumadocs-mdx:collections/*": [".source/*"]
+      "fumadocs-mdx:collections/*": [".source/*"],
+      "@repo/ui/*": ["../../packages/ui/src/*"]
     },
     "plugins": [
       {
