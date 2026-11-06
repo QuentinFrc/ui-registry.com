@@ -70,7 +70,7 @@ CI runs `pnpm lint:package` ([publint](https://publint.dev) and [are-the-types-w
 1. Create `packages/<name>` with `"name": "@ui-registries/<name>"`, `"publishConfig": { "access": "public" }`, `repository.directory` and a `lint:package` script (copy it from `packages/pdf`).
 2. Add a changeset for it.
 3. The first publish needs an `NPM_TOKEN` repository secret (a granular token with publish rights on the `@ui-registries` scope): npm only lets you add a trusted publisher to a package that already exists.
-4. Once it is on npm, add a trusted publisher in the package settings on npmjs.com (GitHub Actions, repository `QuentinFrc/ui-registry.com`, workflow `release.yml`). Later releases authenticate with OIDC, no token involved.
+4. Once it is on npm, add a trusted publisher in the package settings on npmjs.com (GitHub Actions, repository `QuentinFrc/ui-registry`, workflow `release.yml`). Later releases authenticate with OIDC, no token involved.
 
 ### Repository settings
 

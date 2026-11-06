@@ -14,7 +14,7 @@
   "homepage": "https://ui-registry.com/packages/swappable",
   "repository": {
     "type": "git",
-    "url": "https://github.com/QuentinFrc/ui-registry.com.git",
+    "url": "https://github.com/QuentinFrc/ui-registry.git",
     "directory": "packages/swappable"
   },
   "license": "MIT",
