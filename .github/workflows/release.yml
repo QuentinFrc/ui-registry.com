@@ -32,7 +32,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       # Opens a "Version packages" PR while changesets are pending; once that
-      # PR is merged, builds the @ui-registries/* packages and publishes every
+      # PR is merged, builds the @ui-registries/* packages and publishes (scripts/publish.mjs) every
       # non-private one whose version is not on npm yet, then tags it
       # (@ui-registries/<name>@<version>) and creates a GitHub release.
       #
