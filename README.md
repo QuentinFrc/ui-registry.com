@@ -61,7 +61,7 @@ Each library under `packages/` is versioned and published on its own, through [c
 2. On merge to `main`, the Release workflow opens (or updates) a "Version packages" PR with the new versions and changelogs.
 3. Merging that PR publishes every bumped package to npm with provenance, tags it (`@ui-registries/<name>@<version>`) and creates a GitHub release.
 
-Packages marked `"private": true` (currently `flash` and `swappable`) are never published; their changesets stay pending until the flag is removed.
+Packages marked `"private": true` (currently `flash` and `swappable`) are never published. Do not leave changesets for them on `main`: the Release workflow would keep trying to open an empty "Version packages" PR instead of publishing. Add the changeset in the PR that removes the flag.
 
 CI runs `pnpm lint:package` ([publint](https://publint.dev) and [are-the-types-wrong](https://arethetypeswrong.github.io)) on every published package, so a broken `exports` map fails the PR instead of the release.
 
