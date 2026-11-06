@@ -7,7 +7,13 @@ import manifest from "../../../public/previews/pdf/manifest.json";
 // `pnpm --filter @repo/registries pdf:previews` (PDF + one PNG per page).
 const PREVIEW_BASE = "/previews/pdf";
 
-interface PdfPreviewProps {
+interface PreviewManifestEntry {
+  height: number;
+  pages: number;
+  width: number;
+}
+
+export interface PdfPagesProps {
   /** Max height of the scrollable frame, in px. */
   height?: number;
   name: PreviewName;
@@ -18,15 +24,16 @@ interface PdfPreviewProps {
   scroll?: "start" | "end";
 }
 
-export function PdfPreview({
-  name,
+/** The rendered pages of a preview, in a scrollable frame. */
+export function PdfPages({
   height = 420,
+  name,
   scroll = "start",
-}: PdfPreviewProps) {
+}: PdfPagesProps) {
   const entry = (manifest as Record<string, PreviewManifestEntry>)[name];
   if (!entry) {
     throw new Error(
-      `PdfPreview: no rendered preview for "${name}". Run \`pnpm --filter @repo/registries pdf:previews\`.`
+      `PdfPages: no rendered preview for "${name}". Run \`pnpm --filter @repo/registries pdf:previews\`.`
     );
   }
   const pages = Array.from({ length: entry.pages }, (_, i) => i + 1);
@@ -36,10 +43,10 @@ export function PdfPreview({
   const ordered = pinToEnd ? [...pages].reverse() : pages;
 
   return (
-    <figure className="not-prose flex flex-col gap-2">
+    <div className="relative">
       <div
         className={cn(
-          "flex items-center gap-4 overflow-y-auto rounded-lg border bg-muted p-4 sm:p-6",
+          "flex items-center gap-4 overflow-y-auto bg-muted/50 px-6 pt-12 pb-6 sm:px-8 sm:pb-8",
           pinToEnd ? "flex-col-reverse" : "flex-col"
         )}
         style={{ maxHeight: height }}
@@ -57,26 +64,19 @@ export function PdfPreview({
           />
         ))}
       </div>
-      <figcaption className="flex items-center justify-between text-muted-foreground text-xs">
-        <span>
+      <div className="pointer-events-none absolute inset-x-3 top-3 flex items-center justify-between gap-2 text-xs">
+        <span className="rounded-full border bg-background/80 px-2 py-0.5 text-muted-foreground backdrop-blur">
           {entry.pages} page{entry.pages > 1 ? "s" : ""}
-          {entry.pages > 1 ? " — scroll to see them all" : ""}
         </span>
         <a
-          className="font-medium text-foreground underline-offset-4 hover:underline"
+          className="pointer-events-auto rounded-full border bg-background/80 px-2.5 py-0.5 font-medium text-foreground backdrop-blur transition-colors hover:bg-background"
           href={`${PREVIEW_BASE}/${name}.pdf`}
           rel="noopener"
           target="_blank"
         >
           Open PDF ↗
         </a>
-      </figcaption>
-    </figure>
+      </div>
+    </div>
   );
-}
-
-interface PreviewManifestEntry {
-  height: number;
-  pages: number;
-  width: number;
 }

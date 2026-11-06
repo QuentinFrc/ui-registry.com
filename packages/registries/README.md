@@ -95,3 +95,7 @@ pnpm dlx shadcn@latest add https://your-domain.com/r/demo/hello-world.json
 Components can reference base shadcn components (e.g. `button`, `input`) via `registryDependencies` in `registry.json`. These are automatically installed on the consumer side when using `shadcn add`.
 
 To depend on an item from another registry of this repo, use its public URL (`https://ui-registry.com/r/<registry>/<item>.json`). `validate.mts` checks that every such reference resolves to an existing item, so a rename cannot silently break a dependant.
+
+## PDF examples
+
+`pdf/examples/<name>.tsx` holds one example document per pdf registry item. The docs render it as images (`pnpm --filter @repo/registries pdf:previews`) and show its source under the preview, with registry imports rewritten to `@/components/pdf/*`. `pdf/previews.tsx` indexes them for the render script and the visual tests.
