@@ -35,3 +35,9 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      # publint + are-the-types-wrong on every package that defines
+      # lint:package (all published @ui-registries/* libs).
+      - name: Check published packages
+        run: pnpm lint:package
+

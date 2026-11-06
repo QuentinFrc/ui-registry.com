@@ -68,7 +68,8 @@
 		"check-types": "tsc --noEmit",
 		"test": "vitest run",
 		"test:watch": "vitest",
-		"test:ui": "vitest --ui"
+		"test:ui": "vitest --ui",
+		"lint:package": "publint --strict && attw --pack . --profile node16"
 	},
 	"peerDependencies": {
 		"@react-pdf/renderer": ">=4",
