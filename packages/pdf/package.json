@@ -10,10 +10,10 @@
 		"tailwind"
 	],
 	"homepage": "https://ui-registry.com/packages/pdf",
-	"bugs": "https://github.com/QuentinFrc/ui-registry.com/issues",
+	"bugs": "https://github.com/QuentinFrc/ui-registry/issues",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/QuentinFrc/ui-registry.com.git",
+		"url": "git+https://github.com/QuentinFrc/ui-registry.git",
 		"directory": "packages/pdf"
 	},
 	"license": "MIT",

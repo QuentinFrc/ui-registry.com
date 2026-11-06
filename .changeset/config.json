@@ -3,7 +3,7 @@
   "changelog": [
     "@changesets/changelog-github",
     {
-      "repo": "QuentinFrc/ui-registry.com"
+      "repo": "QuentinFrc/ui-registry"
     }
   ],
   "commit": false,

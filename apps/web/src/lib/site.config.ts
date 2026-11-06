@@ -5,7 +5,7 @@ export const siteConfig = {
   url: "https://ui-registry.com",
   github: {
     user: "QuentinFrc",
-    repo: "ui-registry.com",
+    repo: "ui-registry",
     branch: "main",
   },
   author: {
