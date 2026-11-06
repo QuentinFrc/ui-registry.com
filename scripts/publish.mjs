@@ -1,6 +1,6 @@
 // Publishes every non-private package under packages/ whose version is not
-// on npm yet, then creates the git tags with `changeset tag` (changesets/action reads
-// its "New tag:" lines to push the tags and create the GitHub releases).
+// on npm yet, and tags each one it published. changesets/action reads the
+// "New tag:" lines to push the tags and create the GitHub releases.
 //
 // `changeset publish` goes through `pnpm publish`, which does not get npm's
 // trusted publishing (OIDC) to authenticate. Calling the npm CLI directly from
@@ -46,16 +46,19 @@ for (const { dir, manifest } of publishable) {
   console.log(`Publishing ${name}@${version}`);
   const result = spawnSync(
     "npm",
-    ["publish", "--access", "public", "--provenance"],
+    ["publish", "--access", "public", "--provenance", "--loglevel", "verbose"],
     { cwd: dir, stdio: "inherit" }
   );
   if (result.status !== 0) {
     failed = true;
     console.error(`Failed to publish ${name}@${version}`);
+    continue;
   }
-}
 
-execFileSync("pnpm", ["changeset", "tag"], { cwd: root, stdio: "inherit" });
+  const tag = `${name}@${version}`;
+  execFileSync("git", ["tag", "-a", tag, "-m", tag], { cwd: root });
+  console.log(`New tag: ${tag}`);
+}
 
 if (failed) {
   process.exit(1);
