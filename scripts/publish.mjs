@@ -46,7 +46,7 @@ for (const { dir, manifest } of publishable) {
   console.log(`Publishing ${name}@${version}`);
   const result = spawnSync(
     "npm",
-    ["publish", "--access", "public", "--provenance", "--loglevel", "verbose"],
+    ["publish", "--access", "public", "--provenance"],
     { cwd: dir, stdio: "inherit" }
   );
   if (result.status !== 0) {
