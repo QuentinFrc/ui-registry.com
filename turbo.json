@@ -13,6 +13,9 @@
     "check-types": {
       "dependsOn": ["^build", "^check-types"]
     },
+    "lint:package": {
+      "dependsOn": ["build"]
+    },
     "test": {
       "dependsOn": ["^build"],
       "outputs": ["coverage/**"]

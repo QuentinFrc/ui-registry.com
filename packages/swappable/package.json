@@ -1,6 +1,7 @@
 {
   "name": "@ui-registries/swappable",
   "version": "0.0.0",
+  "private": true,
   "description": "Swap component implementations by variant (responsive, platform, feature flag) with typed slots.",
   "keywords": [
     "swappable",
