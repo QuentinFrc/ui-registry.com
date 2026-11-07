@@ -1,0 +1,60 @@
+export const metadata = {
+  title: "Hints",
+  description:
+    "Passive guides: a beacon on the target and the content in a popover.",
+};
+
+# Hints
+
+A hint is a passive guide, usually of one step, that starts on its own when its target scrolls into view: a pulsing beacon on the target, and the step's content in a popover when the user clicks it.
+
+```ts
+// lib/guides.ts
+export const exportStep = createGuideStep({ id: "reports.export", side: "left" });
+
+export const exportHint = defineGuide({
+  id: "export-hint",
+  mode: "passive",
+  trigger: "visible", // or { on: "visible", delay: 1000, threshold: 1 }
+  steps: [exportStep],
+});
+
+export const guides = createGuideManager({ guides: [onboarding, exportHint] });
+```
+
+```tsx
+// app/providers.tsx: mount the hint frame next to the tour frame.
+<GuideRoot manager={guides} router={router}>
+  {children}
+  <GuideSpotlight />
+  <TourFrame />
+  <Hint />
+</GuideRoot>
+```
+
+```tsx
+// app/reports/export-button.tsx
+const ExportContent = ({ ctx }: WithGuideContext) => (
+  <>
+    <HintTitle ctx={ctx}>Export to CSV</HintTitle>
+    <HintDescription ctx={ctx}>Download the filtered rows, ready for a spreadsheet.</HintDescription>
+  </>
+);
+
+export function ExportButton() {
+  const { ref } = useGuideAnchor(exportStep, { content: ExportContent });
+  return <Button ref={ref}>Export</Button>;
+}
+```
+
+The anchor and its content work exactly as in a tour; only the frame changes. `Hint` selects the passive runs and, for each one:
+
+- draws the **beacon** on the target's corner, from `frame.rects`: a `button` with `aria-expanded`, pulsing in CSS (`animate-ping`, off with reduced motion);
+- opens the **popover** on click: the frame's `floatingProps`, placed next to the target like the tour frame, with the content, a counter when the hint has several steps, and Next or Got it (`end("completed")`);
+- closes the popover on a press outside, and **dismisses** the hint with its close button or Escape while the focus is in it (`end("dismissed")`, hidden when not dismissible).
+
+It never takes the focus on its own: the popover only receives it after a click on the beacon, and after Next, when it stays open on the next step. A tour closes it: the hint comes back with its beacon only. A `visible` hint that was completed or dismissed never comes back by itself; bump its `version` to show it again. Labels are props with English defaults:
+
+```tsx
+<Hint labels={{ open: "Voir l'astuce", close: "Fermer", next: "Suivant", done: "Compris" }} />
+```

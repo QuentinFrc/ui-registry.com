@@ -1,0 +1,16 @@
+export const metadata = {
+  title: "Installation",
+  description:
+    "Install the package and the registry items.",
+};
+
+# Installation
+
+```sh
+pnpm add @ui-registries/guide
+pnpm dlx shadcn@latest add https://ui-registry.com/r/guide/tour-frame
+pnpm dlx shadcn@latest add https://ui-registry.com/r/guide/guide-spotlight
+pnpm dlx shadcn@latest add https://ui-registry.com/r/guide/hint
+```
+
+The npm package has two entries: `@ui-registries/guide`, the vanilla core (zero dependencies), and `@ui-registries/guide/react`, headless React 19 bindings. The shadcn registry ships the visible parts, as files you own once installed: `tour-frame`, `guide-spotlight`, `hint`, `welcome-dialog` and `next-router-adapter`.

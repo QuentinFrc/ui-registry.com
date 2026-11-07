@@ -2,7 +2,8 @@ import { DocsShell } from "@/components/docs/docs-shell";
 import { DocsSidebar } from "@/components/docs/docs-sidebar";
 import { BlocksCalloutCompact } from "@/components/pdf/blocks-callout";
 import { PdfTabs } from "@/components/pdf/pdf-tabs";
-import { flattenNav, pdfDocsNav } from "@/lib/pdf-docs";
+import { flattenNav } from "@/lib/docs-nav";
+import { pdfDocsNav } from "@/lib/pdf-docs";
 
 export const metadata = {
   title: {

@@ -9,7 +9,7 @@ const Bar = ({ className }: { className: string }) => (
 export function TourIllustration() {
   return (
     <div aria-hidden="true" className="absolute inset-0 overflow-hidden">
-      <div className="absolute inset-x-[12%] top-[12%] h-full overflow-hidden rounded-t-lg border border-border bg-background shadow-2xl transition-transform duration-500 group-hover:-translate-y-1">
+      <div className="absolute inset-x-[12%] top-[12%] h-full overflow-hidden rounded-t-lg border border-border bg-background shadow-2xl transition-transform duration-500 ease-out group-hover:-translate-y-2">
         {/* Title bar */}
         <div className="flex items-center gap-1.5 border-border border-b px-3 py-2">
           <span className="size-1.5 rounded-full bg-foreground/15" />
@@ -49,7 +49,7 @@ export function TourIllustration() {
             </div>
 
             {/* Tour frame, anchored under the target */}
-            <div className="absolute top-12 right-3 z-20 flex w-[46%] flex-col gap-2 rounded-lg border border-border bg-background p-3 text-foreground shadow-xl">
+            <div className="absolute top-12 right-3 z-20 flex w-[46%] flex-col gap-2 rounded-lg border border-border bg-background p-3 text-foreground shadow-xl transition-transform duration-500 ease-out group-hover:-translate-x-1 group-hover:translate-y-1">
               <span className="font-medium text-[10px]">Create a group</span>
               <Bar className="h-1.5 w-full" />
               <Bar className="h-1.5 w-2/3" />
@@ -64,7 +64,7 @@ export function TourIllustration() {
             </div>
 
             {/* Hint beacon */}
-            <span className="absolute bottom-[38%] left-[18%] z-20 flex size-2.5">
+            <span className="absolute bottom-[38%] left-[18%] z-20 flex size-2.5 transition-transform duration-300 group-hover:scale-125">
               <span className="absolute inline-flex size-full animate-ping rounded-full bg-primary/60" />
               <span className="relative inline-flex size-2.5 rounded-full bg-primary" />
             </span>

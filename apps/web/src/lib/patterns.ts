@@ -24,7 +24,7 @@ export const patterns: readonly Pattern[] = [
     name: "@ui-registries/pdf",
     title: "Make beautiful PDFs with React, Tailwind or inline CSS.",
     description:
-      "Primitives and a Tailwind engine on top of react-pdf — themes, fonts, SVG, multi-page layouts — plus ready-made documents you copy in with the shadcn CLI.",
+      "React primitives and Tailwind classes for react-pdf, plus ready-made documents to copy in.",
     status: "alpha",
     version: pdfPackage.version,
     href: PDF_DOCS_BASE,
@@ -43,7 +43,7 @@ export const patterns: readonly Pattern[] = [
     name: "@ui-registries/guide",
     title: "Walk users through your app with tours and hints.",
     description:
-      "Anchor steps on the elements they describe, chain them across pages, and keep each step's content in the component that owns its target. Headless core and React bindings, plus a tour frame, spotlight and hint you copy in.",
+      "Anchored steps, tours across pages and hints. Headless core, shadcn UI.",
     status: "alpha",
     href: "/packages/guide",
   },

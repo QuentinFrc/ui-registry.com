@@ -1,0 +1,15 @@
+export const metadata = {
+  title: "Design decisions",
+  description:
+    "Why the package is built the way it is.",
+};
+
+# Design decisions
+
+- **Steps carry no content**: the text belongs to the component that owns the target, with its props and providers. A step is a point, so it can be shared between guides.
+- **Two lifecycle levels**: the guide knows the route and the tab to open; the component knows its own state. Neither can do the other's job, so both get hooks, in a fixed order.
+- **`content`, `render` and `portal` rather than one option**: a component is the safe default, a function sees the closure, a portal inherits providers. Each has a cost the other two avoid.
+- **Headless frame, shadcn chrome in the registry**: positioning and aria are mechanics, the card and the buttons are yours. Changing a label is editing a file, not waiting for a prop.
+- **Slow and fast state**: runs and records change a few times per tour; target rects change on every scroll. They are two channels, so a scroll only re-renders the frame and the veil.
+- **Routes are data**: `onPage` is declarative and idempotent, which is what makes going backward across pages work without extra code.
+- **No animation library**: the frame animates in CSS from `data-side`, the veil transitions its `clip-path`.

@@ -1,0 +1,14 @@
+export const metadata = {
+  title: "Modes & triggers",
+  description:
+    "Modal and passive guides, manual and visible triggers.",
+};
+
+# Modes & triggers
+
+A guide is `modal` or `passive`.
+
+- **Modal**: one at a time, veil and spotlight, scroll to the target, focus in the frame and restored at the end, global keyboard (Escape, arrows). Starting a second modal guide is refused unless you pass `{ replace: true }`; a modal guide triggered automatically while another runs waits in a queue. Rendered by `tour-frame` and `guide-spotlight`.
+- **Passive**: several at once, no veil, no scroll (a step waits until its target is in the viewport), no stolen focus; Escape only acts when the focus is inside the run's frame. Passive runs are suspended (hidden, state kept) while a modal run is active, and come back when it ends. Rendered by `hint`.
+
+Triggers are `"manual"` (only `start()`) or `"visible"`: the guide starts when the target of its first step (or of the step an in-progress record points at) becomes visible, if it is eligible and was never completed or dismissed.

@@ -1,0 +1,23 @@
+export const metadata = {
+  title: "Persistence",
+  description:
+    "Per-user records, versions and storage adapters.",
+};
+
+# Persistence
+
+Each guide has a **record** per user: `in-progress` (with the step), `completed` or `dismissed`, plus the guide's `version`.
+
+```ts
+createGuideManager({
+  guides: [onboarding],
+  storage: localStorageAdapter({ prefix: "guide:" }), // default
+});
+```
+
+- `start()` resumes an `in-progress` record by default; `start(id, { from: "start" })` starts over.
+- Bumping a guide's `version` ignores older records: the guide is offered again.
+- Writes are optimistic, with a rollback and an `error` event if the storage fails. The local storage adapter swallows quota and private-mode errors and follows other tabs.
+- `memoryAdapter()` for tests; your own `{ get, set, remove, subscribe? }` for a server.
+
+A `manual` guide never resumes on its own after a reload: the record is exposed in the state and the app decides. The registry's `welcome-dialog` is that decision, written once: it opens when the records are hydrated and the guide has no record (Start) or an in-progress one (Resume, Start over), and Skip records the guide as dismissed (Escape only closes it for this visit). Its `enabled` prop gates it on whatever your guide's `when` checks.

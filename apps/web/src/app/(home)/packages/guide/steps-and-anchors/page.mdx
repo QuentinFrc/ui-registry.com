@@ -1,0 +1,22 @@
+export const metadata = {
+  title: "Steps & anchors",
+  description:
+    "Steps are points in the UI; anchors attach them to elements.",
+};
+
+# Steps & anchors
+
+A **step** is a point in the UI: an id, placement defaults (`side`, `align`, `sideOffset`, `spotlightPadding`) and, optionally, a `target`. It is frozen data with no content and no rendering, so the same step can appear in several guides.
+
+```ts
+export const dealerStep = createGuideStep({
+  id: "deals.dealer",
+  side: "right",
+  align: "start",
+  target: "[data-dealer]", // fallback when no anchor is registered
+});
+```
+
+The preferred way to point a step at an element is the **anchor**: `useGuideAnchor(step)` returns a callback ref. It can be set on several elements (the mobile and desktop variants of a button, each row of a list); empty rects are ignored, so hidden variants do not count. `target` is the fallback for elements you do not render yourself: a selector, several selectors, or a function returning elements. An invalid selector resolves to "no target", never to an exception.
+
+`useGuideAnchor` also takes `enabled` (no anchor, no content, no lifecycle while `false`) and `lifecycle`, local hooks that only exist while the component is mounted (see below).

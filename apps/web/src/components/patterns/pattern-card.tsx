@@ -20,7 +20,7 @@ export function PatternCard({ pattern }: PatternCardProps) {
 
   return (
     <article className="group relative flex flex-col">
-      <div className="relative aspect-video w-full overflow-hidden bg-muted">
+      <div className="relative aspect-video w-full overflow-hidden bg-muted transition-colors duration-300 group-hover:bg-muted/60">
         {Illustration ? (
           <Illustration />
         ) : (
@@ -36,6 +36,12 @@ export function PatternCard({ pattern }: PatternCardProps) {
               href={pattern.href}
             >
               {pattern.title}
+              <span
+                aria-hidden="true"
+                className="ml-1 inline-block text-muted-foreground opacity-0 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100"
+              >
+                →
+              </span>
             </Link>
           </h2>
           <p className="flex flex-wrap items-center gap-x-2 font-mono text-[10px] text-muted-foreground/70 tracking-widest">
