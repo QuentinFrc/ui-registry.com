@@ -8,8 +8,7 @@ interface PatternCardProps {
   pattern: Pattern;
 }
 
-// The whole card links to the pattern (stretched link on the title); its
-// parts (library, blocks…) sit above that link so each stays reachable.
+// The whole card links to the pattern (stretched link on the title).
 export function PatternCard({ pattern }: PatternCardProps) {
   return (
     <article className="group relative flex flex-col">
@@ -27,27 +26,17 @@ export function PatternCard({ pattern }: PatternCardProps) {
               {pattern.title}
             </Link>
           </h2>
+          <p className="flex flex-wrap items-center gap-x-2 font-mono text-[10px] text-muted-foreground/70 tracking-widest">
+            <span className="uppercase">{pattern.status}</span>
+            <span aria-hidden="true">·</span>
+            <span>v{pattern.version}</span>
+            <span aria-hidden="true">·</span>
+            <span>{pattern.name}</span>
+          </p>
           <p className="text-muted-foreground text-sm leading-relaxed">
             {pattern.description}
           </p>
         </div>
-
-        <ul className="relative z-10 mt-auto flex flex-wrap items-center gap-2 pt-1">
-          {pattern.parts.map((part) => (
-            <li key={part.kind}>
-              <Link
-                className="inline-flex items-center gap-1.5 rounded-full border border-border px-2.5 py-1 font-mono text-[11px] text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
-                href={part.href}
-              >
-                <span className="text-muted-foreground/70">{part.kind}</span>
-                <span>{part.label}</span>
-              </Link>
-            </li>
-          ))}
-          <li className="font-mono text-[10px] text-muted-foreground/70 uppercase tracking-widest">
-            {pattern.status}
-          </li>
-        </ul>
       </div>
     </article>
   );

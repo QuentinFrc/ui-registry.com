@@ -1,18 +1,8 @@
 import type { CatalogMedia } from "@/lib/catalog";
-import { PDF_BLOCKS_BASE, PDF_DOCS_BASE, pdfBlocks } from "@/lib/pdf-docs";
+import { PDF_DOCS_BASE } from "@/lib/pdf-docs";
+import pdfPackage from "../../../../packages/pdf/package.json";
 
-/**
- * What a pattern ships with. A pattern is one problem solved end to end, so
- * its npm package and its copy-in blocks are parts of the same entry.
- */
-export interface PatternPart {
-  href: string;
-  /** Short label shown on the card, e.g. "Library" or "Blocks". */
-  kind: string;
-  /** What you get, e.g. the package name or "6 documents". */
-  label: string;
-}
-
+/** One problem solved end to end: its library and its blocks together. */
 export interface Pattern {
   description: string;
   /** Main entry point of the pattern (usually its docs). */
@@ -20,11 +10,12 @@ export interface Pattern {
   media?: CatalogMedia;
   /** Package name, used by the code placeholder when there is no media. */
   name: string;
-  parts: readonly PatternPart[];
   slug: string;
   status: "alpha" | "beta" | "stable" | "planned";
   /** What the pattern lets you do, as a sentence. */
   title: string;
+  /** Published version of the package. */
+  version: string;
 }
 
 export const patterns: readonly Pattern[] = [
@@ -35,6 +26,7 @@ export const patterns: readonly Pattern[] = [
     description:
       "Primitives and a Tailwind engine on top of react-pdf — themes, fonts, SVG, multi-page layouts — plus ready-made documents you copy in with the shadcn CLI.",
     status: "alpha",
+    version: pdfPackage.version,
     href: PDF_DOCS_BASE,
     media: {
       kind: "pages",
@@ -45,45 +37,5 @@ export const patterns: readonly Pattern[] = [
       ],
       alt: "Report, invoice and resume PDFs",
     },
-    parts: [
-      { kind: "Library", label: "@ui-registries/pdf", href: PDF_DOCS_BASE },
-      {
-        kind: "Blocks",
-        label: `${pdfBlocks.length} documents`,
-        href: PDF_BLOCKS_BASE,
-      },
-    ],
-  },
-  {
-    slug: "swappable",
-    name: "@ui-registries/swappable",
-    title: "Swap components by breakpoint, platform or feature flag.",
-    description:
-      "One component, several implementations: pick the right one per variant with typed slots, instead of scattering conditionals through the tree.",
-    status: "alpha",
-    href: "/packages/swappable",
-    parts: [
-      {
-        kind: "Library",
-        label: "@ui-registries/swappable",
-        href: "/packages/swappable",
-      },
-    ],
-  },
-  {
-    slug: "flash",
-    name: "@ui-registries/flash",
-    title: "Show messages that survive a redirect.",
-    description:
-      "Rails-style flash messages encoded in the URL: set one before redirecting, show it as a toast on the next page. No session, no cookie.",
-    status: "alpha",
-    href: "/packages/flash",
-    parts: [
-      {
-        kind: "Library",
-        label: "@ui-registries/flash",
-        href: "/packages/flash",
-      },
-    ],
   },
 ] as const;
