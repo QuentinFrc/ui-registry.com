@@ -3,12 +3,18 @@ import Link from "next/link";
 import { PagesFan } from "@/components/pdf/pages-fan";
 import { type CatalogEntry, LANE_META } from "@/lib/catalog";
 
+/** The fields the preview needs, shared by catalog entries and patterns. */
+export type MediaSource = Pick<
+  CatalogEntry,
+  "media" | "name" | "slug" | "status"
+>;
+
 interface MediaPreviewProps {
   accent: string;
-  entry: CatalogEntry;
+  entry: MediaSource;
 }
 
-const MediaPreview = ({ entry, accent }: MediaPreviewProps) => {
+export const MediaPreview = ({ entry, accent }: MediaPreviewProps) => {
   if (entry.media?.kind === "video") {
     return (
       <video
@@ -46,7 +52,7 @@ const MediaPreview = ({ entry, accent }: MediaPreviewProps) => {
 
 interface CodePreviewProps {
   accent: string;
-  entry: CatalogEntry;
+  entry: MediaSource;
 }
 
 const CodePreviewPlaceholder = ({ accent, entry }: CodePreviewProps) => (
