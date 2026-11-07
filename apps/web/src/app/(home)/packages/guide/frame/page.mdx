@@ -1,0 +1,35 @@
+export const metadata = {
+  title: "Frame",
+  description:
+    "The headless floating container of a run, its placement and its veil.",
+};
+
+# Frame
+
+The **frame** is the floating container of a run: position, chrome, counter, navigation. `GuideFrame` is headless: it renders your function once per selected run and gives it everything else.
+
+```tsx
+<GuideFrame select={(run) => run.guide.mode === "modal"}>
+  {(frame) => (
+    <Card {...frame.floatingProps}>
+      <frame.Content />
+      <footer>
+        {frame.index + 1}/{frame.total}
+      </footer>
+    </Card>
+  )}
+</GuideFrame>
+```
+
+`floatingProps` carries the fixed position (hidden until the first measure), `role="dialog"`, `aria-modal`, the aria ids, `tabIndex={-1}` and three data attributes: `data-side` and `data-align`, the **effective** placement after fallbacks, and `data-mode`. `frame.rects` gives the targets' rects, followed while the step is active, to draw on the target itself (the hint's beacon). The registry's `tour-frame` uses `data-side` for its entry animation, in plain CSS: no animation library.
+
+`tour-frame` is that function written once with `Card` and `Button`: the step's content, a "Step 2 of 5" label, Skip (hidden when the step is not dismissible), Previous, and Next, which becomes Finish on the last step. The labels are props with English defaults:
+
+```tsx
+<TourFrame
+  labels={{ skip: "Passer", previous: "Précédent", next: "Suivant", finish: "Terminer" }}
+  stepLabel={({ current, total }) => `${current} / ${total}`} // null hides it
+/>
+```
+
+Placement is a replaceable strategy. `defaultPlacement` anchors on the largest target, tries the requested side, then the opposite one, then the perpendiculars, avoids the padded spotlights and clamps into the view. The veil is `useGuideSpotlight()`: a `clip-path` with one hole per target, merged when they overlap. The registry's `guide-spotlight` renders it and dismisses the run on click.

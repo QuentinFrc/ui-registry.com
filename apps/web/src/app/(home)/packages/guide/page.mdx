@@ -1,0 +1,20 @@
+export const metadata = {
+  title: "Introduction",
+  description:
+    "Guide users through your UI: anchored steps, cross-page sequences, lifecycle hooks and persistence.",
+};
+
+# Introduction
+
+Anchor steps on elements, order them into guides that cross pages, and let the component that owns each target own its content. Headless core, React bindings, shadcn frames.
+
+## Origin
+
+This package comes out of the product tour of a real mission, a bridge training app. The first version was a classic tour component: a list of steps, each with a CSS selector, a title and a description, rendered by one big provider. It held up for one page. Then the product asked for more, and every request hit the same walls:
+
+- **Content far from its target**: the step's text lived in the tour config, while the thing it described lived in a component three folders away, with the props and the state the text needed.
+- **Pages**: step 3 is on `/groups`, step 4 on `/deals/new`, and the editor must open the "Auction" tab before step 5 makes sense. The tour knew nothing about routes, tabs or waiting.
+- **Missing targets**: a feature flag, a mobile layout or an empty list removes an element, and the tour freezes on a spotlight around nothing.
+- **Persistence**: "has the user seen it?" became "which step were they on, which version of the tour, did they skip it or finish it?".
+
+The geometry held up well (spotlight clip-path, placement with fallbacks), so it was kept. The rest was rewritten around one idea: the lib describes the **mechanics** (steps, orchestration, waiting, persistence), the app renders **everything visible**, and the registry ships the usual shapes of it (a tour frame, a spotlight, a welcome dialog, a hint).

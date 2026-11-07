@@ -14,8 +14,8 @@ export interface Pattern {
   status: "alpha" | "beta" | "stable" | "planned";
   /** What the pattern lets you do, as a sentence. */
   title: string;
-  /** Published version of the package. */
-  version: string;
+  /** Published version of the package; unset while it is not on npm. */
+  version?: string;
 }
 
 export const patterns: readonly Pattern[] = [
@@ -24,7 +24,7 @@ export const patterns: readonly Pattern[] = [
     name: "@ui-registries/pdf",
     title: "Make beautiful PDFs with React, Tailwind or inline CSS.",
     description:
-      "Primitives and a Tailwind engine on top of react-pdf — themes, fonts, SVG, multi-page layouts — plus ready-made documents you copy in with the shadcn CLI.",
+      "React primitives and Tailwind classes for react-pdf, plus ready-made documents to copy in.",
     status: "alpha",
     version: pdfPackage.version,
     href: PDF_DOCS_BASE,
@@ -37,5 +37,14 @@ export const patterns: readonly Pattern[] = [
       ],
       alt: "Report, invoice and resume PDFs",
     },
+  },
+  {
+    slug: "guide",
+    name: "@ui-registries/guide",
+    title: "Walk users through your app with tours and hints.",
+    description:
+      "Anchored steps, tours across pages and hints. Headless core, shadcn UI.",
+    status: "alpha",
+    href: "/packages/guide",
   },
 ] as const;

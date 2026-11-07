@@ -1,0 +1,44 @@
+export const metadata = {
+  title: "Guides & orchestration",
+  description:
+    "Order steps across pages, with routes, conditions and lifecycle hooks.",
+};
+
+# Guides & orchestration
+
+A **guide** orders steps. Each entry can carry a route, a condition, hooks and overrides:
+
+```ts
+export const dealEditorTour = defineGuide({
+  id: "deal-editor",
+  version: 2,
+  steps: [
+    ...onPage("/groups", [createGroupStep, viewToggleStep]),
+    ...onPage("/deals/new", [
+      dealerStep,
+      { step: bidsStep, beforeEnter: () => editorUi.openTab("auction"), onMissing: "end" },
+      { step: studentStep, when: () => flags.students },
+    ]),
+  ],
+});
+```
+
+## `onPage` and routes
+
+`onPage(route, steps)` sets `route` on each entry and keeps its hooks and overrides. A string route is compared to the exact pathname (no query, no hash); a function receives the pathname and returns a boolean. When the next step's route does not match, the manager navigates through the router you gave to `GuideRoot`, waits for the pathname to match, then waits for the target. Routes are declarative and idempotent: going back a step that is on another page navigates back.
+
+`when` is evaluated once, at start. The run's total stays stable while it runs: the counter never jumps from "3 of 5" to "3 of 4".
+
+## Lifecycle, two levels
+
+A transition runs hooks at two levels: the **entry** (declared in the guide, always there) and the **local** lifecycle (registered by the anchored component, only while it is mounted). The order is fixed:
+
+1. `beforeLeave` of the current step: entry, then local.
+2. Route: navigate and wait for the pathname.
+3. `beforeEnter` of the entry: open the tab, expand the panel, whatever makes the target exist.
+4. Wait for a target (and the content, when the anchor provides one).
+5. `beforeEnter` local: the component is mounted now, it can prepare its own state.
+6. Scroll into view (modal), commit, record.
+7. `afterLeave` of the step left (local, then entry), then `afterEnter` (entry, then local).
+
+Every hook receives a context with the direction (`forward`, `backward`, `jump`), `from` and `to`, an `AbortSignal`, `navigate`, `waitFor` and the manager. The latest request wins: clicking Next twice aborts the first transition (its signal fires) and runs the second. Each hook is bounded by `hookTimeout` (10 s by default).

@@ -1,0 +1,30 @@
+export const metadata = {
+  title: "Content",
+  description:
+    "The component that owns the target owns the step content.",
+};
+
+# Content
+
+The component that owns the target also owns the step's content, because that is where the props, the state and the providers are. `useGuideAnchor` takes it in one of three forms:
+
+```tsx
+// content: a component, rendered by the frame. Own hooks and state; keep its identity stable.
+useGuideAnchor(step, { content: CreateGroupContent });
+
+// render: a function, called with the context. Sees the closure (props, state), no remount.
+useGuideAnchor(step, { render: (ctx) => <CreateGroupContent ctx={ctx} count={count} /> });
+
+// portal: the content renders in this component's tree (local providers), portaled into the frame.
+const { ref, portal } = useGuideAnchor(formStep, { portal: true, content: FormHint });
+return (
+  <>
+    <Field ref={ref} />
+    {portal}
+  </>
+);
+```
+
+Pick `content` by default, `render` when the text depends on the component's props or state, and `portal` only when the content needs a provider that the frame, mounted at the root, does not see (a form context, a local store).
+
+Every form receives `ctx`: the guide, the step, `mode`, `index`, `total`, `isFirst`, `isLast`, `dismissible`, `next()`, `prev()`, `end()` and `ids`. `ids.title` and `ids.description` are the ids the frame points `aria-labelledby` and `aria-describedby` at; `TourTitle` and `TourDescription` from the registry set them for you.

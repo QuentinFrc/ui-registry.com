@@ -1,0 +1,67 @@
+export const metadata = {
+  title: "Quick start",
+  description:
+    "A first guide in three files: the steps, the root and an anchor.",
+};
+
+# Quick start
+
+```tsx
+// lib/guides.ts
+import { createGuideManager, createGuideStep, defineGuide, onPage } from "@ui-registries/guide";
+
+export const createGroupStep = createGuideStep({ id: "groups.create", side: "bottom" });
+export const viewToggleStep = createGuideStep({ id: "groups.view", side: "left" });
+
+export const onboarding = defineGuide({
+  id: "onboarding",
+  steps: [...onPage("/groups", [createGroupStep, viewToggleStep])],
+});
+
+export const guides = createGuideManager({ guides: [onboarding] });
+```
+
+```tsx
+// app/providers.tsx
+"use client";
+import { GuideRoot } from "@ui-registries/guide/react";
+import { usePathname, useRouter } from "next/navigation";
+import { GuideSpotlight } from "@/components/guide-spotlight";
+import { TourFrame } from "@/components/tour-frame";
+import { nextRouterAdapter } from "@/lib/next-router-adapter";
+import { guides } from "@/lib/guides";
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  const router = nextRouterAdapter({ router: useRouter(), pathname: usePathname() });
+  return (
+    <GuideRoot manager={guides} router={router}>
+      {children}
+      <GuideSpotlight />
+      <TourFrame />
+    </GuideRoot>
+  );
+}
+```
+
+```tsx
+// app/groups/create-group-button.tsx
+"use client";
+import { useGuideAnchor, type WithGuideContext } from "@ui-registries/guide/react";
+import { Button } from "@/components/ui/button";
+import { TourDescription, TourTitle } from "@/components/tour-frame";
+import { createGroupStep } from "@/lib/guides";
+
+const CreateGroupContent = ({ ctx }: WithGuideContext) => (
+  <>
+    <TourTitle ctx={ctx}>Create your first group</TourTitle>
+    <TourDescription ctx={ctx}>Groups hold your students and their deals.</TourDescription>
+  </>
+);
+
+export function CreateGroupButton() {
+  const { ref } = useGuideAnchor(createGroupStep, { content: CreateGroupContent });
+  return <Button ref={ref}>New group</Button>;
+}
+```
+
+Then `guides.start("onboarding")` from anywhere: a button, an effect, the console. Three layers, each in its place: the steps and the guide are data, the root and the frame are mounted once, and each anchor brings its own content.

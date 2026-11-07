@@ -79,6 +79,15 @@ export const catalog: readonly CatalogEntry[] = [
     href: "/packages/swappable",
   },
   {
+    slug: "guide",
+    name: "@ui-registries/guide",
+    tagline:
+      "Guide users through your UI — anchored steps, cross-page tours, lifecycle hooks and persistence.",
+    status: "alpha",
+    kind: "library",
+    href: "/packages/guide",
+  },
+  {
     slug: "pdf",
     name: "@ui-registries/pdf",
     tagline:

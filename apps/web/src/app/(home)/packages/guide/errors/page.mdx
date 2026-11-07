@@ -1,0 +1,20 @@
+export const metadata = {
+  title: "Errors & dismissible",
+  description:
+    "Missing targets, failing hooks and the ways out of a run.",
+};
+
+# Errors & dismissible
+
+A step whose target never shows up within `waitTimeout` follows `onMissing`: `"skip"` (default) moves on in the same direction, `"end"` ends the run. A hook that throws or times out goes through `onError`, which picks an action:
+
+- **`"end"`** (default): ends the run, even when it is not dismissible.
+- **`"skip"`**: next step in the same direction.
+- **`"retry"`**: replays the transition once, then ends.
+- **`"stay"`**: stays on the current step; without a current step, or when it is not dismissible, it ends instead.
+
+Whatever happens, ending a run releases everything it holds: veil, scroll lock, keyboard listeners, observers, focus. Cleanup hooks that throw are reported, not rethrown.
+
+`dismissible: false` (entry, guide or manager) removes the ways out: Escape, a click on the veil and `end("dismissed")` are refused, and the frame hides Skip. `end("completed")` is always possible.
+
+All options resolve the same way: **entry, then guide, then manager, then default**.

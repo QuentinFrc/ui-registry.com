@@ -1,0 +1,78 @@
+{
+  "name": "@ui-registries/guide",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Guide users through your UI: anchored steps, cross-page sequences, lifecycle hooks and persistence.",
+  "keywords": [
+    "guide",
+    "tour",
+    "onboarding",
+    "hint",
+    "spotlight",
+    "react"
+  ],
+  "homepage": "https://ui-registry.com/packages/guide",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/QuentinFrc/ui-registry.git",
+    "directory": "packages/guide"
+  },
+  "license": "MIT",
+  "author": "Quentin",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run --coverage",
+    "test:watch": "vitest",
+    "check-types": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "^16.3.3",
+    "@types/node": "^22.15.3",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitest/coverage-v8": "^4.1.7",
+    "jsdom": "^30.1.1",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "tsup": "^8.5.1",
+    "typescript": "5.9.2",
+    "vitest": "^4.1.7"
+  }
+}
