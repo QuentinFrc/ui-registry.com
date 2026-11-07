@@ -2,10 +2,46 @@ import Link from "next/link";
 import { Bounds } from "@/components/bounds";
 import { CatalogGrid } from "@/components/catalog/catalog-grid";
 import { Logo } from "@/components/logo";
-import { catalog, catalogByKind, LANE_META } from "@/lib/catalog";
+import {
+  type CatalogKind,
+  catalog,
+  catalogByKind,
+  LANE_META,
+} from "@/lib/catalog";
+import { kitComponents } from "@/lib/kit";
 import { siteConfig } from "@/lib/site.config";
 
+interface LaneLinkProps {
+  count: string;
+  kind: CatalogKind;
+}
+
+const LaneLink = ({ kind, count }: LaneLinkProps) => {
+  const lane = LANE_META[kind];
+  return (
+    <Link
+      className="group inline-flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
+      href={lane.href}
+    >
+      <span
+        aria-hidden="true"
+        className="inline-block h-1.5 w-1.5 rounded-full"
+        style={{ background: lane.accent }}
+      />
+      Browse {lane.label}
+      <span className="text-muted-foreground/60">· {count}</span>
+      <span
+        aria-hidden="true"
+        className="translate-x-0 opacity-60 transition-transform group-hover:translate-x-0.5"
+      >
+        →
+      </span>
+    </Link>
+  );
+};
+
 export default function HomePage() {
+  const kitCount = kitComponents().length;
   const uiCount = catalogByKind("ui").length;
   const libraryCount = catalogByKind("library").length;
 
@@ -21,42 +57,9 @@ export default function HomePage() {
             {siteConfig.description}
           </p>
           <nav className="mt-2 flex flex-wrap items-center gap-x-6 gap-y-2 font-mono text-[13px]">
-            <Link
-              className="group inline-flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
-              href={LANE_META.ui.href}
-            >
-              <span
-                aria-hidden="true"
-                className="inline-block h-1.5 w-1.5 rounded-full"
-                style={{ background: LANE_META.ui.accent }}
-              />
-              Browse UI
-              <span className="text-muted-foreground/60">· {uiCount}</span>
-              <span
-                aria-hidden="true"
-                className="translate-x-0 opacity-60 transition-transform group-hover:translate-x-0.5"
-              >
-                →
-              </span>
-            </Link>
-            <Link
-              className="group inline-flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
-              href={LANE_META.library.href}
-            >
-              <span
-                aria-hidden="true"
-                className="inline-block h-1.5 w-1.5 rounded-full"
-                style={{ background: LANE_META.library.accent }}
-              />
-              Browse Libraries
-              <span className="text-muted-foreground/60">· {libraryCount}</span>
-              <span
-                aria-hidden="true"
-                className="translate-x-0 opacity-60 transition-transform group-hover:translate-x-0.5"
-              >
-                →
-              </span>
-            </Link>
+            <LaneLink count={String(kitCount)} kind="kit" />
+            <LaneLink count={String(uiCount)} kind="ui" />
+            <LaneLink count={String(libraryCount)} kind="library" />
           </nav>
         </header>
       </Bounds>

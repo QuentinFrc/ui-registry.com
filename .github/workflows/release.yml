@@ -1,0 +1,53 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  release:
+    if: github.repository == 'QuentinFrc/ui-registry'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write # npm provenance
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          registry-url: "https://registry.npmjs.org"
+
+      # npm trusted publishing (OIDC) needs npm >= 11.5.1. pnpm 9 hands the
+      # tarball to the npm CLI, so this is the version that authenticates.
+      - run: npm install -g npm@^11.5.1
+
+      - run: pnpm install --frozen-lockfile
+
+      # Opens a "Version packages" PR while changesets are pending; once that
+      # PR is merged, builds the @ui-registries/* packages and publishes (scripts/publish.mjs) every
+      # non-private one whose version is not on npm yet, then tags it
+      # (@ui-registries/<name>@<version>) and creates a GitHub release.
+      #
+      # Auth: trusted publishing (OIDC, configured per package on npmjs.com).
+      # NPM_TOKEN is only needed for the first publish of a new package, since
+      # a trusted publisher can only be added to a package that exists.
+      - uses: changesets/action@v1
+        with:
+          title: "Version packages"
+          commit: "Version packages"
+          version: pnpm version-packages
+          publish: pnpm release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true

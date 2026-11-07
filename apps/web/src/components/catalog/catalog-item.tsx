@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { PagesFan } from "@/components/pdf/pages-fan";
 import { type CatalogEntry, LANE_META } from "@/lib/catalog";
 
 interface MediaPreviewProps {
@@ -34,6 +35,10 @@ const MediaPreview = ({ entry, accent }: MediaPreviewProps) => {
         src={entry.media.src}
       />
     );
+  }
+
+  if (entry.media?.kind === "pages") {
+    return <PagesFan alt={entry.media.alt} srcs={entry.media.srcs} />;
   }
 
   return <CodePreviewPlaceholder accent={accent} entry={entry} />;

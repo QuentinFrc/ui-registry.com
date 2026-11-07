@@ -1,0 +1,77 @@
+export const metadata = {
+  title: "Canvas",
+  description:
+    "Low-level drawing surface for custom graphics.",
+};
+
+# Canvas
+
+Low-level drawing surface for custom graphics.
+
+Provides direct access to a PDF drawing API for custom shapes, lines, and fills. The `paint` callback receives a painter object and the available dimensions.
+
+## Demo
+
+### Simple shape
+
+```tsx
+import { Document, Page, Block, Canvas, Text, Tailwind } from "@ui-registries/pdf";
+
+<Tailwind>
+  <Document>
+    <Page size="A4" className="p-12 bg-white">
+      <Block className="flex flex-col items-center gap-4">
+        <Canvas
+          className="w-32 h-32"
+          paint={(painter, width, height) => {
+            // Blue circle
+            painter
+              .circle(width / 2, height / 2, Math.min(width, height) / 2 - 4)
+              .fill("#3b82f6");
+          }}
+        />
+        <Text className="text-sm text-gray-500">A filled circle</Text>
+      </Block>
+    </Page>
+  </Document>
+</Tailwind>
+```
+
+### Horizontal divider line
+
+```tsx
+<Canvas
+  className="w-full h-1"
+  paint={(painter, width) => {
+    painter
+      .moveTo(0, 0.5)
+      .lineTo(width, 0.5)
+      .lineWidth(0.5)
+      .stroke("#e5e5e5");
+  }}
+/>
+```
+
+### Colored bar chart
+
+```tsx
+<Canvas
+  className="w-full h-24"
+  paint={(painter, width, height) => {
+    const values = [60, 85, 45, 90, 70];
+    const barWidth = width / values.length;
+    const colors = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"];
+
+    values.forEach((value, i) => {
+      const barHeight = (value / 100) * height;
+      painter
+        .rect(i * barWidth + 2, height - barHeight, barWidth - 4, barHeight)
+        .fill(colors[i]);
+    });
+  }}
+/>
+```
+
+## Props
+
+<PropsTable name="CanvasProps" />

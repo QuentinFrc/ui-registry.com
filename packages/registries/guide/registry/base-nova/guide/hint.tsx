@@ -1,12 +1,12 @@
 "use client";
 
-import type { GuideRun, GuideState, Rect } from "@ui-registry/guide";
+import type { GuideRun, GuideState, Rect } from "@ui-registries/guide";
 import {
   type FrameContext,
   GuideFrame,
   useGuide,
   type WithGuideContext,
-} from "@ui-registry/guide/react";
+} from "@ui-registries/guide/react";
 import {
   type ComponentProps,
   type CSSProperties,

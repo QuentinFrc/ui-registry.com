@@ -1,6 +1,6 @@
 "use client";
 
-import type { FlashOptions } from "@ui-registry/flash";
+import type { FlashOptions } from "@ui-registries/flash";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { useFlash } from "./use-flash";

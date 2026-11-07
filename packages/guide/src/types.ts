@@ -1,5 +1,5 @@
 /**
- * Public types of `@ui-registry/guide` (vanilla entry). Type-only module.
+ * Public types of `@ui-registries/guide` (vanilla entry). Type-only module.
  */
 
 export type Side = "top" | "bottom" | "left" | "right";

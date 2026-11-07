@@ -1,0 +1,45 @@
+export const metadata = {
+  title: "Quick Start",
+  description:
+    "Build your first PDF document with @ui-registries/pdf.",
+};
+
+# Quick Start
+
+Build your first PDF document with @ui-registries/pdf.
+
+```tsx
+import { Document, Page, Block, Text, Tailwind, PDFViewer } from "@ui-registries/pdf";
+
+function MyDocument() {
+  return (
+    <Tailwind>
+      <Document>
+        <Page size="A4" className="p-12 bg-white">
+          <Block className="flex flex-col gap-4">
+            <Text className="text-3xl font-bold text-gray-900">
+              Invoice #001
+            </Text>
+            <Block className="flex flex-row justify-between border-b border-gray-200 pb-4">
+              <Text className="text-sm text-muted-foreground">Date: 2025-01-15</Text>
+              <Text className="text-sm text-muted-foreground">Due: 2025-02-15</Text>
+            </Block>
+            <Block className="flex flex-row justify-between bg-gray-50 p-4 rounded-lg">
+              <Text className="text-base">Web Development</Text>
+              <Text className="text-base font-semibold">$2,400.00</Text>
+            </Block>
+          </Block>
+        </Page>
+      </Document>
+    </Tailwind>
+  );
+}
+
+function App() {
+  return (
+    <PDFViewer style={{ width: "100%", height: "100vh" }}>
+      <MyDocument />
+    </PDFViewer>
+  );
+}
+```

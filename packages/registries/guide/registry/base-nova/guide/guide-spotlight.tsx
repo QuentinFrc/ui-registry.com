@@ -1,6 +1,6 @@
 "use client";
 
-import { useGuide, useGuideSpotlight } from "@ui-registry/guide/react";
+import { useGuide, useGuideSpotlight } from "@ui-registries/guide/react";
 import { cn } from "@/lib/utils";
 
 const selectNothing = () => null;

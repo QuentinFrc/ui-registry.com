@@ -1,0 +1,38 @@
+export const metadata = {
+  title: "Page Footer",
+  description:
+    "Footer fixed at the bottom of every page, with page numbers.",
+};
+
+# Page Footer
+
+Footer fixed at the bottom of every page, with page numbers.
+
+<ComponentPreview name="page-footer" height={360} scroll="end" />
+
+## Installation
+
+```bash
+npx shadcn add https://ui-registry.com/r/pdf/page-footer.json
+```
+
+## Usage
+
+```tsx
+import { PageFooter } from "@/components/pdf/page-footer";
+
+<Page className="px-12 pt-12 pb-24">
+  {/* content */}
+  <PageFooter className="right-12 left-12 bottom-8">
+    Acme Studio · Annual report
+  </PageFooter>
+</Page>
+```
+
+The footer is absolutely positioned: match `left`, `right` and `bottom` to your page padding, and keep enough bottom padding on the page so content does not run under it.
+
+Customize the page number with `pageNumber`, or hide it with `pageNumber={false}`:
+
+```tsx
+<PageFooter pageNumber={({ pageNumber, totalPages }) => `Page ${pageNumber} of ${totalPages}`} />
+```

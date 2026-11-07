@@ -1,0 +1,312 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "pdf",
+  "homepage": "https://ui-registry.com/packages/pdf",
+  "items": [
+    {
+      "name": "heading",
+      "type": "registry:ui",
+      "title": "Heading",
+      "description": "Document headings (levels 1–4).",
+      "dependencies": ["@ui-registries/pdf"],
+      "files": [
+        {
+          "path": "registry/base-nova/pdf/heading.tsx",
+          "type": "registry:ui",
+          "target": "components/pdf/heading.tsx"
+        }
+      ]
+    },
+    {
+      "name": "separator",
+      "type": "registry:ui",
+      "title": "Separator",
+      "description": "Horizontal or vertical divider.",
+      "dependencies": ["@ui-registries/pdf"],
+      "files": [
+        {
+          "path": "registry/base-nova/pdf/separator.tsx",
+          "type": "registry:ui",
+          "target": "components/pdf/separator.tsx"
+        }
+      ]
+    },
+    {
+      "name": "badge",
+      "type": "registry:ui",
+      "title": "Badge",
+      "description": "Small status label with default, secondary, destructive and outline variants.",
+      "dependencies": ["@ui-registries/pdf"],
+      "files": [
+        {
+          "path": "registry/base-nova/pdf/badge.tsx",
+          "type": "registry:ui",
+          "target": "components/pdf/badge.tsx"
+        }
+      ]
+    },
+    {
+      "name": "card",
+      "type": "registry:ui",
+      "title": "Card",
+      "description": "Bordered container with header, title, description, content and footer.",
+      "dependencies": ["@ui-registries/pdf"],
+      "files": [
+        {
+          "path": "registry/base-nova/pdf/card.tsx",
+          "type": "registry:ui",
+          "target": "components/pdf/card.tsx"
+        }
+      ]
+    },
+    {
+      "name": "table",
+      "type": "registry:ui",
+      "title": "Table",
+      "description": "Table with a header that repeats on every page and rows that never split across pages.",
+      "dependencies": ["@ui-registries/pdf"],
+      "files": [
+        {
+          "path": "registry/base-nova/pdf/table.tsx",
+          "type": "registry:ui",
+          "target": "components/pdf/table.tsx"
+        }
+      ]
+    },
+    {
+      "name": "page-footer",
+      "type": "registry:ui",
+      "title": "Page Footer",
+      "description": "Footer fixed on every page, with page numbers.",
+      "dependencies": ["@ui-registries/pdf"],
+      "files": [
+        {
+          "path": "registry/base-nova/pdf/page-footer.tsx",
+          "type": "registry:ui",
+          "target": "components/pdf/page-footer.tsx"
+        }
+      ]
+    },
+    {
+      "name": "alert",
+      "type": "registry:ui",
+      "title": "Alert",
+      "description": "Callout with a title, a description and an optional icon, in default and destructive variants.",
+      "dependencies": ["@ui-registries/pdf"],
+      "files": [
+        {
+          "path": "registry/base-nova/pdf/alert.tsx",
+          "type": "registry:ui",
+          "target": "components/pdf/alert.tsx"
+        }
+      ]
+    },
+    {
+      "name": "item",
+      "type": "registry:ui",
+      "title": "Item",
+      "description": "List row with media, title, description and right-aligned actions such as an amount or a badge.",
+      "dependencies": ["@ui-registries/pdf"],
+      "registryDependencies": ["https://ui-registry.com/r/pdf/separator.json"],
+      "files": [
+        {
+          "path": "registry/base-nova/pdf/item.tsx",
+          "type": "registry:ui",
+          "target": "components/pdf/item.tsx"
+        }
+      ]
+    },
+    {
+      "name": "avatar",
+      "type": "registry:ui",
+      "title": "Avatar",
+      "description": "Round image with an initials fallback, in three sizes, plus an overlapping avatar group.",
+      "dependencies": ["@ui-registries/pdf"],
+      "files": [
+        {
+          "path": "registry/base-nova/pdf/avatar.tsx",
+          "type": "registry:ui",
+          "target": "components/pdf/avatar.tsx"
+        }
+      ]
+    },
+    {
+      "name": "typeset",
+      "type": "registry:ui",
+      "title": "Typeset",
+      "description": "Rhythm for long-form content: headings, paragraphs, lists, quotes, code and tables driven by three tokens (size, leading, flow).",
+      "dependencies": ["@ui-registries/pdf"],
+      "files": [
+        {
+          "path": "registry/base-nova/pdf/typeset.tsx",
+          "type": "registry:ui",
+          "target": "components/pdf/typeset.tsx"
+        }
+      ]
+    },
+    {
+      "name": "typeset-markdown",
+      "type": "registry:ui",
+      "title": "Typeset Markdown",
+      "description": "Renders Markdown (with GFM tables, task lists and strikethrough) into a PDF with the Typeset components.",
+      "dependencies": ["@ui-registries/pdf", "marked"],
+      "registryDependencies": ["https://ui-registry.com/r/pdf/typeset.json"],
+      "files": [
+        {
+          "path": "registry/base-nova/pdf/typeset-markdown.tsx",
+          "type": "registry:ui",
+          "target": "components/pdf/typeset-markdown.tsx"
+        }
+      ]
+    },
+    {
+      "name": "invoice",
+      "type": "registry:block",
+      "title": "Invoice",
+      "description": "Multi-page invoice with line items, taxes, totals and localized amounts.",
+      "dependencies": ["@ui-registries/pdf"],
+      "registryDependencies": [
+        "https://ui-registry.com/r/pdf/badge.json",
+        "https://ui-registry.com/r/pdf/heading.json",
+        "https://ui-registry.com/r/pdf/page-footer.json",
+        "https://ui-registry.com/r/pdf/separator.json",
+        "https://ui-registry.com/r/pdf/table.json"
+      ],
+      "files": [
+        {
+          "path": "registry/base-nova/pdf/invoice.tsx",
+          "type": "registry:component",
+          "target": "components/pdf/invoice.tsx"
+        },
+        {
+          "path": "registry/base-nova/pdf/invoice-example.ts",
+          "type": "registry:lib",
+          "target": "components/pdf/invoice-example.ts"
+        }
+      ]
+    },
+    {
+      "name": "quote",
+      "type": "registry:block",
+      "title": "Quote",
+      "description": "Quote / estimate with project intro, line items, discount, taxes, terms and a signature block.",
+      "dependencies": ["@ui-registries/pdf"],
+      "registryDependencies": [
+        "https://ui-registry.com/r/pdf/badge.json",
+        "https://ui-registry.com/r/pdf/heading.json",
+        "https://ui-registry.com/r/pdf/page-footer.json",
+        "https://ui-registry.com/r/pdf/separator.json",
+        "https://ui-registry.com/r/pdf/table.json"
+      ],
+      "files": [
+        {
+          "path": "registry/base-nova/pdf/quote.tsx",
+          "type": "registry:component",
+          "target": "components/pdf/quote.tsx"
+        },
+        {
+          "path": "registry/base-nova/pdf/quote-example.ts",
+          "type": "registry:lib",
+          "target": "components/pdf/quote-example.ts"
+        }
+      ]
+    },
+    {
+      "name": "receipt",
+      "type": "registry:block",
+      "title": "Receipt",
+      "description": "Compact A5 payment receipt with an amount-paid highlight, payment method, items and taxes.",
+      "dependencies": ["@ui-registries/pdf"],
+      "registryDependencies": [
+        "https://ui-registry.com/r/pdf/heading.json",
+        "https://ui-registry.com/r/pdf/page-footer.json",
+        "https://ui-registry.com/r/pdf/separator.json",
+        "https://ui-registry.com/r/pdf/table.json"
+      ],
+      "files": [
+        {
+          "path": "registry/base-nova/pdf/receipt.tsx",
+          "type": "registry:component",
+          "target": "components/pdf/receipt.tsx"
+        },
+        {
+          "path": "registry/base-nova/pdf/receipt-example.ts",
+          "type": "registry:lib",
+          "target": "components/pdf/receipt-example.ts"
+        }
+      ]
+    },
+    {
+      "name": "report",
+      "type": "registry:block",
+      "title": "Report",
+      "description": "Monthly business report with a cover header, KPI cards, bar and line charts, a breakdown table and highlights.",
+      "dependencies": ["@ui-registries/pdf"],
+      "registryDependencies": [
+        "https://ui-registry.com/r/pdf/card.json",
+        "https://ui-registry.com/r/pdf/heading.json",
+        "https://ui-registry.com/r/pdf/page-footer.json",
+        "https://ui-registry.com/r/pdf/table.json"
+      ],
+      "files": [
+        {
+          "path": "registry/base-nova/pdf/report.tsx",
+          "type": "registry:component",
+          "target": "components/pdf/report.tsx"
+        },
+        {
+          "path": "registry/base-nova/pdf/report-charts.tsx",
+          "type": "registry:component",
+          "target": "components/pdf/report-charts.tsx"
+        },
+        {
+          "path": "registry/base-nova/pdf/report-example.ts",
+          "type": "registry:lib",
+          "target": "components/pdf/report-example.ts"
+        }
+      ]
+    },
+    {
+      "name": "resume",
+      "type": "registry:block",
+      "title": "Resume",
+      "description": "Two-column CV with experience, education, skills, languages and projects that flows cleanly across pages.",
+      "dependencies": ["@ui-registries/pdf"],
+      "registryDependencies": [
+        "https://ui-registry.com/r/pdf/badge.json",
+        "https://ui-registry.com/r/pdf/heading.json"
+      ],
+      "files": [
+        {
+          "path": "registry/base-nova/pdf/resume.tsx",
+          "type": "registry:component",
+          "target": "components/pdf/resume.tsx"
+        },
+        {
+          "path": "registry/base-nova/pdf/resume-example.ts",
+          "type": "registry:lib",
+          "target": "components/pdf/resume-example.ts"
+        }
+      ]
+    },
+    {
+      "name": "certificate",
+      "type": "registry:block",
+      "title": "Certificate",
+      "description": "Landscape certificate of completion with a decorative frame, signatures, credential ID and a themed seal.",
+      "dependencies": ["@ui-registries/pdf"],
+      "files": [
+        {
+          "path": "registry/base-nova/pdf/certificate.tsx",
+          "type": "registry:component",
+          "target": "components/pdf/certificate.tsx"
+        },
+        {
+          "path": "registry/base-nova/pdf/certificate-example.ts",
+          "type": "registry:lib",
+          "target": "components/pdf/certificate-example.ts"
+        }
+      ]
+    }
+  ]
+}

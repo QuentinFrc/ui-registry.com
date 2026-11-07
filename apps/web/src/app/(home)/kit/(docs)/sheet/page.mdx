@@ -1,0 +1,50 @@
+import { SheetScrollDemo } from "@/components/demos/dialog-scroll-demo";
+import { KitComponentBadges } from "@/components/kit/kit-component-badges";
+
+export const metadata = {
+  title: "Sheet",
+  description:
+    "The shadcn sheet with the dialog's Header / Body / Footer layout, scroll prop, sticky slots and nested stacking styles.",
+};
+
+# Sheet
+
+The shadcn `Sheet`, with the same parts and props as the kit [Dialog](/kit/dialog): a real body slot, an explicit `scroll` behaviour, `sticky` header and footer. Only the styling and the `side` prop differ.
+
+<KitComponentBadges name="sheet" />
+
+## Install
+
+```sh
+pnpm dlx shadcn@latest add https://ui-registry.com/r/kit/sheet.json
+```
+
+Replaces the shadcn file of the same name (Base UI flavour) and keeps its exports.
+
+## Anatomy
+
+```tsx
+<Sheet>
+  <SheetTrigger />
+  <SheetContent scroll="body" side="right">
+    <SheetHeader sticky>
+      <SheetTitle />
+      <SheetDescription />
+    </SheetHeader>
+    <SheetBody />
+    <SheetFooter sticky />
+  </SheetContent>
+</Sheet>
+```
+
+`SheetContent` renders `Portal > Overlay > Viewport > Popup`; `SheetViewport` and `SheetPopup` are exported for manual composition. The panel is the same `auto 1fr auto` grid as the dialog: with a full-height side panel, the empty body track still pushes the footer to the bottom.
+
+## Side and scroll
+
+`side` places the panel (`right` by default). `scroll` and `sticky` behave exactly as on the dialog.
+
+<SheetScrollDemo />
+
+## Nested sheets
+
+Sheets behind the topmost one slide away from it and dim, using the same Base UI nesting hooks as the dialog.

@@ -1,17 +1,18 @@
+import { fileURLToPath } from "node:url";
 import createMDX from "@next/mdx";
-
-/** @type {import('rehype-pretty-code').Options} */
-const prettyCodeOptions = {
-  theme: {
-    light: "github-light",
-    dark: "github-dark",
-  },
-  keepBackground: false,
-};
 
 const withMDX = createMDX({
   options: {
-    rehypePlugins: [["rehype-pretty-code", prettyCodeOptions]],
+    remarkPlugins: ["remark-gfm"],
+    // rehype-slug gives headings an id, used by the table of contents.
+    // rehype-code-meta keeps ```tsx title="…" for the code block component.
+    // Plugins are passed as strings so Turbopack can serialize them.
+    rehypePlugins: [
+      "rehype-slug",
+      fileURLToPath(
+        new URL("./src/lib/mdx/rehype-code-meta.mjs", import.meta.url)
+      ),
+    ],
   },
 });
 
@@ -19,6 +20,8 @@ const withMDX = createMDX({
 const config = {
   pageExtensions: ["ts", "tsx", "md", "mdx"],
   reactStrictMode: true,
+  // Used at build time by the PDF docs props tables (src/lib/pdf-props.ts).
+  serverExternalPackages: ["typescript"],
 };
 
 export default withMDX(config);

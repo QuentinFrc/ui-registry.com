@@ -1,0 +1,25 @@
+export const metadata = {
+  title: "PDF",
+  description:
+    "React primitives for building PDF documents with React.",
+};
+
+# @ui-registries/pdf
+
+React primitives for building PDF documents with React.
+
+`@ui-registries/pdf` provides React components for building PDF documents, with a `className` prop that accepts Tailwind-style utility classes.
+
+Built on top of `@react-pdf/renderer`, it adds a lightweight Tailwind-to-style engine so you can style PDFs the same way you style web apps — no `StyleSheet.create` needed.
+
+## Features
+
+- **className prop** on all layout components (`Block`, `Text`, `Page`, `Image`, `Link`, `Canvas`, `Note`, `Svg`, `G`, `SvgText`)
+- **40+ Tailwind utilities** — layout, spacing, typography, colors, borders, transforms, and more
+- **Theming** via CSS variable convention (`--color-brand`, `--text-tiny`, etc.)
+- **Full color palette** — Tailwind v4 colors + shadcn/ui semantic tokens
+- **Zero runtime CSS** — classes are parsed to style objects, no stylesheet generation
+
+Get started with [Installation](/packages/pdf/installation).
+
+<BlocksCallout />

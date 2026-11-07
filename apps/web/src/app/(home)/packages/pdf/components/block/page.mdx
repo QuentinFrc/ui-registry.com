@@ -1,0 +1,97 @@
+export const metadata = {
+  title: "Block",
+  description:
+    "The primary layout primitive for structuring PDF documents.",
+};
+
+# Block
+
+The primary layout primitive for structuring PDF documents.
+
+The main building block for layout. Use it to create rows, columns, grids, cards, containers — anything that needs structure.
+
+## Demo
+
+### Two-column layout
+
+```tsx
+import { Document, Page, Block, Text, Tailwind } from "@ui-registries/pdf";
+
+<Tailwind>
+  <Document>
+    <Page size="A4" className="p-12 bg-white">
+      <Block className="flex flex-row gap-4">
+        <Block className="flex-1 bg-blue-50 p-4 rounded-lg">
+          <Text className="text-sm font-semibold text-blue-900">Left column</Text>
+          <Text className="text-xs text-blue-700 mt-1">
+            Use flex-1 to split space evenly between columns.
+          </Text>
+        </Block>
+        <Block className="flex-1 bg-blue-50 p-4 rounded-lg">
+          <Text className="text-sm font-semibold text-blue-900">Right column</Text>
+          <Text className="text-xs text-blue-700 mt-1">
+            Both columns grow equally to fill available width.
+          </Text>
+        </Block>
+      </Block>
+    </Page>
+  </Document>
+</Tailwind>
+```
+
+### Card with header and body
+
+```tsx
+<Block className="border border-gray-200 rounded-xl overflow-hidden">
+  <Block className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+    <Text className="text-sm font-semibold text-gray-900">Order Summary</Text>
+  </Block>
+  <Block className="p-4 flex flex-col gap-2">
+    <Block className="flex flex-row justify-between">
+      <Text className="text-sm text-gray-600">Subtotal</Text>
+      <Text className="text-sm text-gray-900">$120.00</Text>
+    </Block>
+    <Block className="flex flex-row justify-between">
+      <Text className="text-sm text-gray-600">Tax</Text>
+      <Text className="text-sm text-gray-900">$9.60</Text>
+    </Block>
+    <Block className="border-t border-gray-200 pt-2 flex flex-row justify-between">
+      <Text className="text-sm font-bold text-gray-900">Total</Text>
+      <Text className="text-sm font-bold text-gray-900">$129.60</Text>
+    </Block>
+  </Block>
+</Block>
+```
+
+### Absolute positioning (watermark)
+
+```tsx
+<Block className="relative w-full h-full">
+  <Block className="absolute top-1/3 left-1/4 rotate-[-45] opacity-10">
+    <Text className="text-5xl font-extrabold text-gray-900 uppercase">
+      Draft
+    </Text>
+  </Block>
+  {/* Page content goes here */}
+</Block>
+```
+
+### Page-break control
+
+```tsx
+{/* This block will not be split across pages */}
+<Block breakable={false} className="p-4 border border-gray-200 rounded-lg">
+  <Text className="text-sm">This entire block stays on one page.</Text>
+</Block>
+
+{/* This block can break across pages (default behavior) */}
+<Block breakable className="p-4">
+  <Text className="text-sm">This block can split across page boundaries.</Text>
+</Block>
+```
+
+## Props
+
+<PropsTable name="BlockProps" />
+
+> `View` is also exported as a deprecated alias for `Block`.

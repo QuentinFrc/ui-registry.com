@@ -1,0 +1,44 @@
+export const metadata = {
+  title: "Card",
+  description:
+    "Bordered container with header, content and footer.",
+};
+
+# Card
+
+Bordered container with header, content and footer.
+
+<ComponentPreview name="card" height={360} />
+
+## Installation
+
+```bash
+npx shadcn add https://ui-registry.com/r/pdf/card.json
+```
+
+## Usage
+
+```tsx
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/pdf/card";
+
+<Card>
+  <CardHeader>
+    <CardTitle>Quarterly summary</CardTitle>
+    <CardDescription>Q3 2026 — all regions</CardDescription>
+  </CardHeader>
+  <CardContent>
+    <Text>Revenue grew 18% compared to the previous quarter.</Text>
+  </CardContent>
+  <CardFooter className="justify-between">
+    <Text>Total</Text>
+    <Text className="font-semibold">€ 1.2M</Text>
+  </CardFooter>
+</Card>
+```

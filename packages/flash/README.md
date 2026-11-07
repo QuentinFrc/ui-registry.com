@@ -1,4 +1,4 @@
-# @ui-registry/flash
+# @ui-registries/flash
 
 Encode a flash message into the URL so it survives a redirect — Rails/Laravel-style, for React and Next.js apps.
 
@@ -7,13 +7,13 @@ Encode a flash message into the URL so it survives a redirect — Rails/Laravel-
 ## Install
 
 ```sh
-pnpm add @ui-registry/flash
+pnpm add @ui-registries/flash
 ```
 
 ## Usage
 
 ```ts
-import { encodeFlash, decodeFlash, FLASH_PARAM } from "@ui-registry/flash";
+import { encodeFlash, decodeFlash, FLASH_PARAM } from "@ui-registries/flash";
 
 // Producer side (before redirect)
 const url = `/login?${FLASH_PARAM}=${encodeFlash({

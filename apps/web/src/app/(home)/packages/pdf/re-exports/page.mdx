@@ -1,0 +1,97 @@
+export const metadata = {
+  title: "Re-exports",
+  description:
+    "PDF generation utilities and viewer components.",
+};
+
+# Re-exports
+
+PDF generation utilities and viewer components.
+
+These utilities are included in @ui-registries/pdf for convenience so you can import everything from a single package.
+
+```ts
+import { StyleSheet, PDFViewer, PDFDownloadLink, BlobProvider, usePDF, pdf } from "@ui-registries/pdf";
+```
+
+For font registration, see [`defineFont()`](/packages/pdf/fonts) — the recommended API. The raw `Font` object from react-pdf is also available as `Font` if needed.
+
+## StyleSheet
+
+Create typed style objects. Useful when you need styles outside of the className system.
+
+```ts
+const styles = StyleSheet.create({
+  watermark: { position: "absolute", opacity: 0.1, fontSize: 72, transform: "rotate(-45deg)" },
+});
+```
+
+## PDFViewer
+
+Renders the PDF in an iframe for browser preview.
+
+```tsx
+<PDFViewer style={{ width: "100%", height: "100vh" }}>
+  <MyDocument />
+</PDFViewer>
+```
+
+## PDFDownloadLink
+
+Renders a download link that generates the PDF on click.
+
+```tsx
+<PDFDownloadLink document={<MyDocument />} fileName="report.pdf">
+  {({ loading }) => (loading ? "Generating..." : "Download PDF")}
+</PDFDownloadLink>
+```
+
+## BlobProvider
+
+Provides the PDF as a blob for custom download/preview logic.
+
+```tsx
+<BlobProvider document={<MyDocument />}>
+  {({ blob, url, loading }) => (
+    loading ? <span>Loading...</span> : <a href={url}>Download</a>
+  )}
+</BlobProvider>
+```
+
+## usePDF
+
+Hook for imperative PDF generation.
+
+```tsx
+const [instance, update] = usePDF({ document: <MyDocument /> });
+// instance.url — blob URL
+// instance.blob — Blob object
+// instance.loading — boolean
+// instance.error — Error | null
+```
+
+## pdf
+
+Generate a PDF blob outside of React (e.g. in a server endpoint or script).
+
+```ts
+const blob = await pdf(<MyDocument />).toBlob();
+const buffer = await pdf(<MyDocument />).toBuffer();
+```
+
+## renderToBuffer / renderToStream / renderToFile
+
+Node-only helpers for server-side generation (route handlers, scripts, jobs).
+
+```ts title="app/invoice/route.ts"
+import { renderToBuffer } from "@ui-registries/pdf";
+
+export async function GET() {
+  const buffer = await renderToBuffer(<Invoice />);
+  return new Response(buffer, {
+    headers: { "Content-Type": "application/pdf" },
+  });
+}
+```
+
+`renderToStream(<Doc />)` returns a Node readable stream; `renderToFile(<Doc />, "out.pdf")` writes to disk.

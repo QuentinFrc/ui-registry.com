@@ -1,7 +1,7 @@
 "use client";
 
-import type { GuideState } from "@ui-registry/guide";
-import { useGuide } from "@ui-registry/guide/react";
+import type { GuideState } from "@ui-registries/guide";
+import { useGuide } from "@ui-registries/guide/react";
 import { type ReactNode, useCallback, useRef, useState } from "react";
 import {
   AlertDialog,

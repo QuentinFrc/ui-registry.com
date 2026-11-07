@@ -1,8 +1,14 @@
 {
   "extends": "@repo/typescript-config/react-library.json",
   "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "outDir": "dist",
     "paths": {
+      "@/components/ui/*": [
+        "./kit/registry/base-nova/ui/*",
+        "../ui/src/components/ui/*"
+      ],
       "@/*": ["../ui/src/*"],
       "@repo/ui/*": ["../ui/src/*"]
     }

@@ -1,10 +1,10 @@
 export const metadata = {
-  title: "@ui-registry/guide",
+  title: "@ui-registries/guide",
   description:
     "Guide users through your UI: anchored steps, cross-page sequences, lifecycle hooks and persistence.",
 };
 
-# @ui-registry/guide
+# @ui-registries/guide
 
 Anchor steps on elements, order them into guides that cross pages, and let the component that owns each target own its content. Headless core, React bindings, shadcn frames.
 
@@ -22,19 +22,19 @@ The geometry held up well (spotlight clip-path, placement with fallbacks), so it
 ## Install
 
 ```sh
-pnpm add @ui-registry/guide
+pnpm add @ui-registries/guide
 pnpm dlx shadcn@latest add https://ui-registry.com/r/guide/tour-frame
 pnpm dlx shadcn@latest add https://ui-registry.com/r/guide/guide-spotlight
 pnpm dlx shadcn@latest add https://ui-registry.com/r/guide/hint
 ```
 
-The npm package has two entries: `@ui-registry/guide`, the vanilla core (zero dependencies), and `@ui-registry/guide/react`, headless React 19 bindings. The shadcn registry ships the visible parts, as files you own once installed: `tour-frame`, `guide-spotlight`, `hint`, `welcome-dialog` and `next-router-adapter`.
+The npm package has two entries: `@ui-registries/guide`, the vanilla core (zero dependencies), and `@ui-registries/guide/react`, headless React 19 bindings. The shadcn registry ships the visible parts, as files you own once installed: `tour-frame`, `guide-spotlight`, `hint`, `welcome-dialog` and `next-router-adapter`.
 
 ## Quick start
 
 ```tsx
 // lib/guides.ts
-import { createGuideManager, createGuideStep, defineGuide, onPage } from "@ui-registry/guide";
+import { createGuideManager, createGuideStep, defineGuide, onPage } from "@ui-registries/guide";
 
 export const createGroupStep = createGuideStep({ id: "groups.create", side: "bottom" });
 export const viewToggleStep = createGuideStep({ id: "groups.view", side: "left" });
@@ -50,7 +50,7 @@ export const guides = createGuideManager({ guides: [onboarding] });
 ```tsx
 // app/providers.tsx
 "use client";
-import { GuideRoot } from "@ui-registry/guide/react";
+import { GuideRoot } from "@ui-registries/guide/react";
 import { usePathname, useRouter } from "next/navigation";
 import { GuideSpotlight } from "@/components/guide-spotlight";
 import { TourFrame } from "@/components/tour-frame";
@@ -72,7 +72,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 ```tsx
 // app/groups/create-group-button.tsx
 "use client";
-import { useGuideAnchor, type WithGuideContext } from "@ui-registry/guide/react";
+import { useGuideAnchor, type WithGuideContext } from "@ui-registries/guide/react";
 import { Button } from "@/components/ui/button";
 import { TourDescription, TourTitle } from "@/components/tour-frame";
 import { createGroupStep } from "@/lib/guides";

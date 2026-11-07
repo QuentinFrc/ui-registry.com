@@ -1,4 +1,4 @@
-# `@ui-registry/guide` — spec v1
+# `@ui-registries/guide` — spec v1
 
 > Statut : spec complète, validée sur le principe le 2026-09-27. Livraison par lots (§14).
 > Origine : le tour de bridge-training (`packages/ui/src/primitives/tour.tsx` + `components/tour/setup`).
@@ -22,8 +22,8 @@ Le package décrit la mécanique ; les usages (tour, hint, annonce) vivent dans 
 
 | Entrée | Contenu | Dépendances |
 |---|---|---|
-| `@ui-registry/guide` | `createGuideStep`, `defineGuide`, `onPage`, `createGuideManager`, `localStorageAdapter`, `memoryAdapter`, `defaultPlacement`, `spotlightPath`, types | aucune |
-| `@ui-registry/guide/react` | `GuideRoot`, `useGuide`, `useGuideRun`, `useGuideAnchor`, `GuideFrame`, `useGuideSpotlight`, types `GuideContext`, `WithGuideContext`, `FrameContext` | `react` (peer, optionnel pour l'entrée vanilla) |
+| `@ui-registries/guide` | `createGuideStep`, `defineGuide`, `onPage`, `createGuideManager`, `localStorageAdapter`, `memoryAdapter`, `defaultPlacement`, `spotlightPath`, types | aucune |
+| `@ui-registries/guide/react` | `GuideRoot`, `useGuide`, `useGuideRun`, `useGuideAnchor`, `GuideFrame`, `useGuideSpotlight`, types `GuideContext`, `WithGuideContext`, `FrameContext` | `react` (peer, optionnel pour l'entrée vanilla) |
 
 Registry `guide` (base-nova, fichiers possédés par l'app une fois installés) :
 

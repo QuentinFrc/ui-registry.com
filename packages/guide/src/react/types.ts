@@ -1,5 +1,5 @@
 /**
- * Public types of `@ui-registry/guide/react`. Type-only module.
+ * Public types of `@ui-registries/guide/react`. Type-only module.
  */
 import type {
   ComponentType,

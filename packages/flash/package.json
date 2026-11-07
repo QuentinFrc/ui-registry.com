@@ -1,6 +1,7 @@
 {
-  "name": "@ui-registry/flash",
+  "name": "@ui-registries/flash",
   "version": "0.0.0",
+  "private": true,
   "description": "Encode flash messages in the URL so they survive a redirect.",
   "keywords": [
     "flash",

@@ -1,4 +1,4 @@
-const PREFIX = "[@ui-registry/guide]";
+const PREFIX = "[@ui-registries/guide]";
 
 /** Development build (bundlers replace `process.env.NODE_ENV`). */
 export const isDev = (): boolean =>

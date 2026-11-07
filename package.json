@@ -7,16 +7,20 @@
     "lint": "turbo run lint",
     "test": "turbo run test",
     "check-types": "turbo run check-types",
+    "lint:package": "turbo run lint:package",
     "check": "ultracite check",
     "fix": "ultracite fix",
     "changeset": "changeset",
     "version-packages": "changeset version",
-    "release": "turbo run build --filter='./packages/*' && changeset publish"
+    "release": "turbo run build --filter='@ui-registries/*' && node scripts/publish.mjs"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
     "@biomejs/biome": "2.4.0",
+    "@changesets/changelog-github": "^1.0.1",
     "@changesets/cli": "^2.31.0",
     "@vitest/coverage-v8": "^4.1.7",
+    "publint": "^0.3.25",
     "tsup": "^8.5.1",
     "turbo": "^2.8.13",
     "typescript": "5.9.2",

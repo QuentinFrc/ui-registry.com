@@ -1,0 +1,84 @@
+export const metadata = {
+  title: "Text",
+  description:
+    "Renders text content with typography utilities.",
+};
+
+# Text
+
+Renders text content with typography utilities.
+
+The only component that can render text. All visible text in a PDF must be wrapped in `Text`.
+
+## Demo
+
+### Headings and body text
+
+```tsx
+import { Document, Page, Block, Text, Tailwind } from "@ui-registries/pdf";
+
+<Tailwind>
+  <Document>
+    <Page size="A4" className="p-12 bg-white">
+      <Block className="flex flex-col gap-3">
+        <Text className="text-3xl font-bold text-gray-900">
+          Main Heading
+        </Text>
+        <Text className="text-xl font-semibold text-gray-700">
+          Section Title
+        </Text>
+        <Text className="text-base text-gray-600 leading-relaxed">
+          Body text with a relaxed line height for comfortable reading.
+          You can nest Text elements for inline formatting.
+        </Text>
+        <Text className="text-xs text-muted-foreground uppercase tracking-wide">
+          Caption / Label
+        </Text>
+      </Block>
+    </Page>
+  </Document>
+</Tailwind>
+```
+
+### Inline formatting with nested Text
+
+```tsx
+<Text className="text-base text-gray-800 leading-normal">
+  You can mix <Text className="font-bold">bold</Text>,{" "}
+  <Text className="italic text-gray-500">italic</Text>, and{" "}
+  <Text className="underline decoration-blue-500">underlined</Text> text
+  within the same paragraph.
+</Text>
+```
+
+### Styled label / badge
+
+```tsx
+<Block className="flex flex-row gap-2 items-center">
+  <Block className="bg-green-100 px-2 py-0.5 rounded-sm">
+    <Text className="text-xs font-medium text-green-800">Paid</Text>
+  </Block>
+  <Block className="bg-red-100 px-2 py-0.5 rounded-sm">
+    <Text className="text-xs font-medium text-red-800">Overdue</Text>
+  </Block>
+  <Block className="bg-gray-100 px-2 py-0.5 rounded-sm">
+    <Text className="text-xs font-medium text-gray-700">Draft</Text>
+  </Block>
+</Block>
+```
+
+### Line clamping
+
+```tsx
+<Block className="w-64">
+  <Text className="text-sm text-gray-700 line-clamp-2">
+    This is a long paragraph that will be truncated after two lines.
+    Any content beyond the second line will be cut off by the
+    maxLines property that line-clamp sets.
+  </Text>
+</Block>
+```
+
+## Props
+
+<PropsTable name="TextProps" />

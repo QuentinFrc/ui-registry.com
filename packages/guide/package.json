@@ -1,6 +1,7 @@
 {
-  "name": "@ui-registry/guide",
+  "name": "@ui-registries/guide",
   "version": "0.0.0",
+  "private": true,
   "description": "Guide users through your UI: anchored steps, cross-page sequences, lifecycle hooks and persistence.",
   "keywords": [
     "guide",

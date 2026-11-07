@@ -11,7 +11,10 @@
       "dependsOn": ["^lint"]
     },
     "check-types": {
-      "dependsOn": ["^check-types"]
+      "dependsOn": ["^build", "^check-types"]
+    },
+    "lint:package": {
+      "dependsOn": ["build"]
     },
     "test": {
       "dependsOn": ["^build"],

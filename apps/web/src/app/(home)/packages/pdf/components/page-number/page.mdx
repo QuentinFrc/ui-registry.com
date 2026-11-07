@@ -1,0 +1,54 @@
+export const metadata = {
+  title: "PageNumber",
+  description:
+    "Renders the current page number and total pages.",
+};
+
+# PageNumber
+
+Renders the current page number and total pages.
+
+A convenience wrapper around `Text` that uses react-pdf's `render` prop to display page numbering. Defaults to `"1 / 5"` format.
+
+## Demo
+
+### Default format
+
+```tsx
+import { Document, Page, Block, Text, PageNumber, Tailwind } from "@ui-registries/pdf";
+
+<Tailwind>
+  <Document>
+    <Page size="A4" className="p-12 bg-white">
+      <Block className="flex flex-col gap-4">
+        <Text className="text-base text-gray-700">
+          Document content goes here.
+        </Text>
+      </Block>
+      <PageNumber className="text-xs text-gray-400 text-center mt-8" />
+    </Page>
+  </Document>
+</Tailwind>
+```
+
+### Custom format
+
+Use the `render` prop to customize the output:
+
+```tsx
+<PageNumber
+  className="text-sm text-gray-500"
+  render={({ pageNumber, totalPages }) => `Page ${pageNumber} of ${totalPages}`}
+/>
+```
+
+```tsx
+<PageNumber
+  className="text-xs"
+  render={({ pageNumber }) => `— ${pageNumber} —`}
+/>
+```
+
+## Props
+
+<PropsTable name="PageNumberProps" />

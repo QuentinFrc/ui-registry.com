@@ -13,12 +13,12 @@ import {
   type GuideStep,
   memoryAdapter,
   type Rect,
-} from "@ui-registry/guide";
+} from "@ui-registries/guide";
 import {
   GuideRoot,
   useGuideAnchor,
   type WithGuideContext,
-} from "@ui-registry/guide/react";
+} from "@ui-registries/guide/react";
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {

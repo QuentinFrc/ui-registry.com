@@ -1,4 +1,4 @@
-import type { GuideRouter } from "@ui-registry/guide";
+import type { GuideRouter } from "@ui-registries/guide";
 
 /** The part of Next's `AppRouterInstance` (`useRouter()`) the adapter uses. */
 export interface NextAppRouter {

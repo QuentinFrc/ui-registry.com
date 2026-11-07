@@ -1,15 +1,54 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "./scroll-fade.css";
 
-@theme {
-  --color-background: oklch(1 0 0);
-  --color-foreground: oklch(0.145 0 0);
-  --color-muted: oklch(0.97 0 0);
-  --color-muted-foreground: oklch(0.556 0 0);
-  --color-border: oklch(0.922 0 0);
-  --color-primary: oklch(0.205 0 0);
-  --color-primary-foreground: oklch(0.985 0 0);
-  --color-accent-ui: oklch(0.72 0.14 62);
-  --color-accent-library: oklch(0.6 0.15 258);
+/* Kit sources rendered in live demos. */
+@source "../../../../packages/registries/kit/registry";
+/* Shared shadcn components used by the site (code blocks…). */
+@source "../../../../packages/ui/src/components/ui/code-block.tsx";
+@source "../../../../packages/ui/src/components/ui/button.tsx";
+@source "../../../../packages/ui/src/lib/highlighter.tsx";
+
+/* Colors are CSS variables so dark mode can swap them: Tailwind v4 doesn't
+   support @theme inside @media. */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-destructive: var(--destructive);
+  --color-accent-kit: var(--accent-kit);
+  --color-accent-ui: var(--accent-ui);
+  --color-accent-library: var(--accent-library);
+}
+
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --accent-kit: oklch(0.66 0.14 160);
+  --accent-ui: oklch(0.72 0.14 62);
+  --accent-library: oklch(0.6 0.15 258);
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before {
+    border-color: var(--color-border);
+  }
 }
 
 .prose-content h1 {
@@ -62,48 +101,54 @@
   border-radius: 0.25rem;
 }
 
-.prose-content pre {
-  padding: 1rem;
+.prose-content table:not(.not-prose table) {
+  display: block;
+  width: 100%;
   overflow-x: auto;
-  font-size: 0.85rem;
-  line-height: 1.55;
-  background: var(--color-muted);
-  border: 1px solid var(--color-border);
-  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  border-collapse: collapse;
 }
 
-.prose-content pre code {
+.prose-content table:not(.not-prose table) th,
+.prose-content table:not(.not-prose table) td {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.prose-content table:not(.not-prose table) th {
+  font-weight: 500;
+}
+
+.prose-content table:not(.not-prose table) td {
+  color: var(--color-muted-foreground);
+}
+
+.prose-content .not-prose a,
+.prose-content a.not-prose {
+  text-decoration: none;
+}
+
+.prose-content .not-prose code {
   padding: 0;
   font-size: inherit;
   background: none;
 }
 
-.prose-content figure[data-rehype-pretty-code-figure] {
-  margin: 0;
-}
-
-code[data-theme],
-code[data-theme] span {
-  color: var(--shiki-light);
-  background-color: var(--shiki-light-bg);
-}
-
 @media (prefers-color-scheme: dark) {
-  @theme {
-    --color-background: oklch(0.145 0 0);
-    --color-foreground: oklch(0.985 0 0);
-    --color-muted: oklch(0.205 0 0);
-    --color-muted-foreground: oklch(0.708 0 0);
-    --color-border: oklch(0.269 0 0);
-    --color-primary: oklch(0.985 0 0);
-    --color-primary-foreground: oklch(0.205 0 0);
-    --color-accent-ui: oklch(0.78 0.13 62);
-    --color-accent-library: oklch(0.72 0.14 258);
-  }
-
-  code[data-theme],
-  code[data-theme] span {
-    color: var(--shiki-dark);
-    background-color: var(--shiki-dark-bg);
+  :root {
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(0.985 0 0);
+    --muted: oklch(0.205 0 0);
+    --muted-foreground: oklch(0.708 0 0);
+    --border: oklch(0.269 0 0);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.556 0 0);
+    --primary: oklch(0.985 0 0);
+    --primary-foreground: oklch(0.205 0 0);
+    --destructive: oklch(0.704 0.191 22.216);
+    --accent-kit: oklch(0.76 0.13 160);
+    --accent-ui: oklch(0.78 0.13 62);
+    --accent-library: oklch(0.72 0.14 258);
   }
 }

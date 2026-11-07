@@ -1,13 +1,13 @@
-# @ui-registry/guide
+# @ui-registries/guide
 
 Guide users through your UI: steps anchored on elements, ordered into guides that can cross pages, with lifecycle hooks, modal and passive modes, triggers and persistence.
 
-> Status: alpha. The vanilla entry (core, DOM, placement, spotlight), the React bindings (`@ui-registry/guide/react`) and the registry items (tour frame, spotlight, hint, welcome dialog, Next.js router adapter) are available. API may change.
+> Status: alpha. The vanilla entry (core, DOM, placement, spotlight), the React bindings (`@ui-registries/guide/react`) and the registry items (tour frame, spotlight, hint, welcome dialog, Next.js router adapter) are available. API may change.
 
 ## Install
 
 ```sh
-pnpm add @ui-registry/guide
+pnpm add @ui-registries/guide
 # Optional: the shadcn frames (files you own once installed)
 pnpm dlx shadcn@latest add https://ui-registry.com/r/guide/tour-frame
 pnpm dlx shadcn@latest add https://ui-registry.com/r/guide/guide-spotlight
@@ -22,7 +22,7 @@ import {
   defineGuide,
   localStorageAdapter,
   onPage,
-} from "@ui-registry/guide";
+} from "@ui-registries/guide";
 
 const createGroup = createGuideStep({ id: "groups.create", target: ".group-row" });
 const dealer = createGuideStep({ id: "deals.dealer", side: "right" });
@@ -59,7 +59,7 @@ The manager exposes a slow state (`getState` / `subscribe`: runs and records) an
 The layout channel gives the targets' rects, the placement view (`collisionContainer` or viewport) and the viewport size. Two pure helpers turn it into pixels:
 
 ```ts
-import { defaultPlacement, spotlightPath } from "@ui-registry/guide";
+import { defaultPlacement, spotlightPath } from "@ui-registries/guide";
 
 const layout = guides.getLayout("onboarding");
 if (layout) {
@@ -88,7 +88,7 @@ if (layout) {
 
 ## React
 
-`@ui-registry/guide/react` (React 19, optional peer dependency) binds the manager to your tree. Everything is headless: the Frame and the veil are yours.
+`@ui-registries/guide/react` (React 19, optional peer dependency) binds the manager to your tree. Everything is headless: the Frame and the veil are yours.
 
 ```tsx
 "use client";
@@ -98,7 +98,7 @@ import {
   useGuideAnchor,
   useGuideSpotlight,
   type WithGuideContext,
-} from "@ui-registry/guide/react";
+} from "@ui-registries/guide/react";
 
 // Root: provides the manager, pushes the router and its pathname into it.
 <GuideRoot manager={guides} router={{ pathname, navigate: (path) => router.push(path) }}>

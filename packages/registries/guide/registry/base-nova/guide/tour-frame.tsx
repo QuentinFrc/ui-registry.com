@@ -1,7 +1,7 @@
 "use client";
 
-import type { GuideRun } from "@ui-registry/guide";
-import { GuideFrame, type WithGuideContext } from "@ui-registry/guide/react";
+import type { GuideRun } from "@ui-registries/guide";
+import { GuideFrame, type WithGuideContext } from "@ui-registries/guide/react";
 import type { ComponentProps, ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";

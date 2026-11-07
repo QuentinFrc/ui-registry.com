@@ -119,7 +119,7 @@ describe("async helpers", () => {
 describe("dev warnings", () => {
   it("warns in development only", () => {
     warn("hello", 1);
-    expect(console.warn).toHaveBeenCalledWith("[@ui-registry/guide] hello", 1);
+    expect(console.warn).toHaveBeenCalledWith("[@ui-registries/guide] hello", 1);
     vi.mocked(console.warn).mockClear();
     vi.stubEnv("NODE_ENV", "production");
     expect(isDev()).toBe(false);

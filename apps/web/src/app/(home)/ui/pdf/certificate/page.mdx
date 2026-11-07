@@ -1,0 +1,79 @@
+export const metadata = {
+  title: "Certificate",
+  description:
+    "Landscape certificate of completion with a decorative frame, signatures, credential ID and a themed seal.",
+};
+
+# Certificate
+
+Landscape certificate of completion with a decorative frame, signatures, credential ID and a themed seal.
+
+<ComponentPreview name="certificate" height={520} />
+
+## Installation
+
+```bash
+npx shadcn add https://ui-registry.com/r/pdf/certificate.json
+```
+
+This installs `certificate.tsx` and a `certificate-example.ts` with sample data. It only depends on `@ui-registries/pdf`: the frame, ornaments and seal are drawn with `Block` and `Svg`, and the type uses the built-in Helvetica and Times fonts, so there are no assets to ship.
+
+## Usage
+
+```tsx
+import { Certificate } from "@/components/pdf/certificate";
+
+<Certificate
+  data={{
+    issuer: "Northwind Academy",
+    recipient: "Élise Marchand",
+    achievement: "Advanced React & TypeScript for Product Teams",
+    description: "A 40-hour professional program covering component architecture, type-safe APIs, performance and accessibility.",
+    issueDate: new Date("2026-10-16"),
+    locale: "en-US",
+    credentialId: "NWA-2026-RT-04821",
+    verifyUrl: "https://northwind.academy/verify/NWA-2026-RT-04821",
+    seal: { text: "2026", caption: "Certified" },
+    signatures: [
+      { name: "Margaret Chen", role: "Program Director" },
+      { name: "Daniel Okafor", role: "Head of Curriculum" },
+    ],
+  }}
+  theme={{ "--color-primary": "#1e3a5f" }}
+/>
+```
+
+`Certificate` renders a full `<Document>`: pass it straight to `PDFViewer`, `renderToBuffer`, etc.
+
+The frame, ornaments, subtitle and seal use the `primary` color, so a single `--color-primary` in `theme` restyles the whole certificate.
+
+### Signatures and seal
+
+- Pass one or two `signatures`. Each one shows the name in an italic serif face over a rule, then the name and role underneath. Set `image` (URL, path or data URI) to use a scanned signature instead.
+- With fewer than two signatures, the issue date moves out of the footer and takes the left slot, so the bottom row stays balanced.
+- `seal` draws a rosette with ribbons between the signatures. Keep `text` short (a year, a grade, a short word); `caption` is an optional uppercase line under it. Leave `seal` out to hide it.
+
+### Translate labels
+
+All visible labels can be overridden, for example to issue a certificate of achievement or a French version:
+
+```tsx
+<Certificate
+  data={{ ...data, locale: "fr-FR" }}
+  labels={{
+    title: "Certificat",
+    subtitle: "de réussite",
+    certifies: "Ce certificat atteste que",
+    completed: "a suivi avec succès",
+    date: "Date",
+    credentialId: "Identifiant",
+    verify: "Vérifier sur",
+  }}
+/>
+```
+
+The date is formatted with `Intl` using `data.locale`.
+
+### Single page
+
+The certificate is designed for a single landscape A4 page: the recipient and achievement are centered in the space left between the header and the signatures. Keep `achievement` to a line or two and `description` to two or three lines; much longer text pushes the signatures onto a second page.

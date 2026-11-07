@@ -1,0 +1,92 @@
+{
+	"name": "@ui-registries/pdf",
+	"version": "0.1.0",
+	"description": "React primitives for PDF generation with react-pdf",
+	"keywords": [
+		"pdf",
+		"primitives",
+		"react",
+		"react-pdf",
+		"tailwind"
+	],
+	"homepage": "https://ui-registry.com/packages/pdf",
+	"bugs": "https://github.com/QuentinFrc/ui-registry/issues",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/QuentinFrc/ui-registry.git",
+		"directory": "packages/pdf"
+	},
+	"license": "MIT",
+	"author": "Quentin",
+	"type": "module",
+	"main": "./dist/index.cjs",
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"import": {
+				"types": "./dist/index.d.ts",
+				"default": "./dist/index.js"
+			},
+			"require": {
+				"types": "./dist/index.d.cts",
+				"default": "./dist/index.cjs"
+			}
+		},
+		"./font": {
+			"import": {
+				"types": "./dist/font-entry.d.ts",
+				"default": "./dist/font-entry.js"
+			},
+			"require": {
+				"types": "./dist/font-entry.d.cts",
+				"default": "./dist/font-entry.cjs"
+			}
+		},
+		"./tw": {
+			"import": {
+				"types": "./dist/tw-entry.d.ts",
+				"default": "./dist/tw-entry.js"
+			},
+			"require": {
+				"types": "./dist/tw-entry.d.cts",
+				"default": "./dist/tw-entry.cjs"
+			}
+		}
+	},
+	"files": [
+		"dist",
+		"README.md"
+	],
+	"sideEffects": false,
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"build": "tsup",
+		"dev": "tsup --watch",
+		"check-types": "tsc --noEmit",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"test:ui": "vitest --ui",
+		"lint:package": "publint --strict && attw --pack . --profile node16"
+	},
+	"peerDependencies": {
+		"@react-pdf/renderer": ">=4",
+		"react": ">=18"
+	},
+	"devDependencies": {
+		"@react-pdf/renderer": "^4.3.2",
+		"@testing-library/jest-dom": "^6.9.1",
+		"@testing-library/react": "^16.3.2",
+		"@types/node": "25.3.5",
+		"@types/react": "^19.2.7",
+		"@vitest/ui": "^4.1.7",
+		"jsdom": "^28.1.0",
+		"react": "^19.2.0",
+		"tsup": "^8.5.1",
+		"typescript": "5.9.2",
+		"vitest": "^4.1.7",
+		"@repo/typescript-config": "workspace:*"
+	}
+}
