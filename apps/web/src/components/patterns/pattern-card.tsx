@@ -45,8 +45,6 @@ export function PatternCard({ pattern }: PatternCardProps) {
             </Link>
           </h2>
           <p className="flex flex-wrap items-center gap-x-2 font-mono text-[10px] text-muted-foreground/70 tracking-widest">
-            <span className="uppercase">{pattern.status}</span>
-            <span aria-hidden="true">·</span>
             <span>
               {pattern.version ? `v${pattern.version}` : "unreleased"}
             </span>
