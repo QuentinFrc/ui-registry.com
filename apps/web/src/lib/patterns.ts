@@ -14,8 +14,8 @@ export interface Pattern {
   status: "alpha" | "beta" | "stable" | "planned";
   /** What the pattern lets you do, as a sentence. */
   title: string;
-  /** Published version of the package. */
-  version: string;
+  /** Published version of the package; unset while it is not on npm. */
+  version?: string;
 }
 
 export const patterns: readonly Pattern[] = [
@@ -37,5 +37,14 @@ export const patterns: readonly Pattern[] = [
       ],
       alt: "Report, invoice and resume PDFs",
     },
+  },
+  {
+    slug: "guide",
+    name: "@ui-registries/guide",
+    title: "Walk users through your app with tours and hints.",
+    description:
+      "Anchor steps on the elements they describe, chain them across pages, and keep each step's content in the component that owns its target. Headless core and React bindings, plus a tour frame, spotlight and hint you copy in.",
+    status: "alpha",
+    href: "/packages/guide",
   },
 ] as const;
